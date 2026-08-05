@@ -1,0 +1,41 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Konstantin Darovskiy - web designer">
+  <!-- preloader: ink screen, ascii morph, margin sketches, optional sound -->
+  <div id="preloader" aria-hidden="true">
+    <canvas id="ascii-canvas"></canvas>
+    <svg class="sketches" id="sketch-layer"></svg>
+    <button id="sound-toggle" type="button">SOUND OFF</button>
+  </div>
+
+  <!-- hero, revealed when the preloader dissolves -->
+  <header class="flex h-[56px] items-center justify-between border-b border-hairline px-020 md:h-[64px] md:px-080" style="padding-inline: 20px;">
+    <span class="font-mono text-mono-nav">kuixl</span>
+    <nav class="flex items-center gap-032">
+      <span class="font-mono text-mono-nav text-muted">RU / EN</span>
+      <a href="#contact" class="font-mono text-mono-nav">CONTACT</a>
+    </nav>
+  </header>
+
+  <section class="relative flex min-h-[calc(100vh-64px)] flex-col justify-center px-[20px] md:px-080">
+    <h1 class="text-display-xl-m font-sans md:text-display-xl">
+      Konstantin<br />Darovskiy
+    </h1>
+    <p class="mt-024 text-body-lg text-muted">I design interfaces. Then I ship them.</p>
+
+    <ul class="mt-048 space-y-016 font-mono text-mono-label text-muted md:hidden">
+      <li class="border-l border-hairline pl-016">UX/UI&nbsp;&nbsp;&nbsp;WEB&nbsp;&nbsp;&nbsp;CODE</li>
+      <li class="border-l border-hairline pl-016">CLAUDE CODE&nbsp;&nbsp;&nbsp;FIGMA MCP&nbsp;&nbsp;&nbsp;AI WORKFLOW</li>
+      <li class="border-l border-hairline pl-016">MOSCOW&nbsp;&nbsp;&nbsp;GMT+3</li>
+    </ul>
+
+    <span class="absolute bottom-048 left-[20px] font-mono text-mono-caption text-muted md:left-080">SCROLL</span>
+  </section>
+
+  <script>
+    import { initPreloader } from '../scripts/preloader';
+    import { initMotion } from '../scripts/motion';
+    initPreloader().then(() => initMotion());
+  </script>
+</Base>

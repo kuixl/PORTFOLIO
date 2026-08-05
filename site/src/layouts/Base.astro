@@ -1,0 +1,19 @@
+---
+import '../styles/global.css';
+interface Props { title: string; description?: string; }
+const { title, description = 'Portfolio of Konstantin Darovskiy, web designer.' } = Astro.props;
+---
+<!doctype html>
+<html lang="en" class="is-preloading">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <link rel="preload" href="/fonts/switzer-var-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/sligoil-micro-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <title>{title}</title>
+  </head>
+  <body class="bg-paper text-primary">
+    <slot />
+  </body>
+</html>

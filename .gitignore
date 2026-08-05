@@ -1,0 +1,14 @@
+# deps / build
+node_modules/
+site/dist/
+site/.astro/
+
+# tooling artifacts
+.playwright-mcp/
+
+# personal media and raw references - never push these
+refs/
+
+# desktop font sources (EULA forbids redistribution; web subsets in
+# site/public/fonts are the embedded webfonts and stay tracked)
+fonts/
