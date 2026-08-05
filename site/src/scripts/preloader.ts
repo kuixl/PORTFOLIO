@@ -16,6 +16,7 @@ const INK_LIMIT = 5;                  // ramp index <= this counts as "ink"
 const PAPER = '#F4F2EE';
 const INK = '#0E0E0E';
 const CAP_MS = 2000;                  // never block longer than this
+const MIN_MS = 1800;                  // pace floor: instant assets still play the choreography
 const PORTRAIT_CROP = { x: 0.47, y: 0.02, w: 0.48, h: 0.76 }; // face of portrait.jpg
 
 type Cell = { c: number; r: number; ch: string; lockAt: number; seed: number };
@@ -335,18 +336,20 @@ export function initPreloader(): Promise<void> {
     let displayed = 0;
     function frame(now: number) {
       if (done) return;
-      const timeP = Math.min(1, (now - t0) / CAP_MS);
-      // display progress never trails the 2s cap, never leads real assets by less
-      displayed = forcedP ?? Math.max(realProgress(), timeP);
-      // do not enter phase 2 before the portrait exists
-      if (!cells.length) displayed = Math.min(displayed, 0.38);
+      const elapsed = now - t0;
+      const timeP = Math.min(1, elapsed / CAP_MS);
+      // paced by MIN_MS so instant loads still show the morph,
+      // capped by CAP_MS so slow loads never hold the page hostage
+      displayed = forcedP ?? Math.min(elapsed / MIN_MS, Math.max(realProgress(), timeP));
+      // do not enter phase 2 before the portrait exists - but never past the cap
+      if (!cells.length && elapsed < CAP_MS) displayed = Math.min(displayed, 0.38);
 
       grid(displayed, now);
       if (displayed < 0.4) drawPhase1(displayed / 0.4, now);
       else if (displayed < 0.8) drawPhase2((displayed - 0.4) / 0.4, now);
       else drawPhase3((displayed - 0.8) / 0.2);
 
-      if (displayed >= 1 && realProgress() >= 0.99) { finish(); return; }
+      if (displayed >= 1) { finish(); return; }
       if (forcedP === null || displayed < 1) requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
