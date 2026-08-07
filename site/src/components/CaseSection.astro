@@ -37,14 +37,20 @@ const { n, title, wide = false, id } = Astro.props;
     font-family: var(--font-mono);
     font-size: var(--text-mono-label);
     color: var(--color-muted);
+    padding-right: var(--spacing-012);
+    border-right: 1px solid var(--color-hairline);
   }
+  /* Case pages are commentary about a product, not the product. Setting their
+     headings in the same heavy grotesque as the sites they describe made the
+     two read as one continuous thing. Mono, small, ruled - the voice of an
+     annotation rather than a title. */
   .cs-title {
-    font-family: var(--font-sans);
-    font-weight: 900;
-    font-size: clamp(32px, 6vw, 64px);
-    line-height: 1;
-    letter-spacing: -0.02em;
-    /* long section names must not break mid-word on narrow rails */
+    font-family: var(--font-mono);
+    font-weight: 400;
+    font-size: clamp(15px, 1.6vw, 18px);
+    line-height: 1.2;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
     hyphens: none;
     overflow-wrap: normal;
   }
@@ -55,7 +61,14 @@ const { n, title, wide = false, id } = Astro.props;
       grid-template-columns: 240px minmax(0, 1fr);
       gap: var(--spacing-048);
     }
-    .cs-rail { flex-direction: column; gap: var(--spacing-012); }
+    .cs-rail {
+      flex-direction: row;
+      align-items: baseline;
+      gap: var(--spacing-012);
+      position: sticky;
+      top: var(--spacing-024);
+      align-self: start;
+    }
     .case-section[data-wide] { grid-template-columns: 1fr; }
     .case-section[data-wide] .cs-rail { flex-direction: row; align-items: baseline; }
   }

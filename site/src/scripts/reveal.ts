@@ -43,6 +43,33 @@ export function initReveals() {
 const GLYPHS = '@%#*+=-:.';
 
 /**
+ * Index rows: the number scrambles on hover, the row shifts. Cheap, and it
+ * makes the list feel like a machine rather than a stack of links.
+ */
+export function initIndexHover() {
+  if (prm()) return;
+  document.querySelectorAll<HTMLElement>('.index-link').forEach((row) => {
+    const n = row.querySelector<HTMLElement>('.ix-n');
+    if (!n) return;
+    const final = n.textContent ?? '';
+    let timer = 0;
+    row.addEventListener('mouseenter', () => {
+      let f = 0;
+      clearInterval(timer);
+      timer = window.setInterval(() => {
+        n.textContent = f++ < 6
+          ? String(Math.floor(Math.random() * 90) + 10)
+          : ((clearInterval(timer), final));
+      }, 45);
+    });
+    row.addEventListener('mouseleave', () => {
+      clearInterval(timer);
+      n.textContent = final;
+    });
+  });
+}
+
+/**
  * The contact heading resolves from random characters, rhyming with the
  * preloader without repeating it: the preloader does this to the wordmark at
  * the start, this closes the visit five minutes later.

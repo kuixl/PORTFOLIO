@@ -154,12 +154,13 @@ const contacts = [
     import { initPreloader } from '../scripts/preloader';
     import { initMotion } from '../scripts/motion';
     import { initFullViewLinks } from '../scripts/workframe';
-    import { initReveals, initAssembleHeading, initPageWipe } from '../scripts/reveal';
+    import { initReveals, initAssembleHeading, initPageWipe, initIndexHover } from '../scripts/reveal';
     initPreloader().then(() => {
       initMotion();
       initFullViewLinks();
       initReveals();
       initAssembleHeading();
+      initIndexHover();
       initPageWipe();
     });
   </script>

@@ -113,16 +113,18 @@ export const cases: Case[] = [
   {
     slug: 'beta',
     title: 'BETA',
-    lead: 'A landing page for a student design sprint. Two weeks, five people, one real client.',
+    lead:
+      'A landing page for a student design sprint. One page has to do the whole job - ' +
+      'there is no second screen to move an objection to.',
     coverMeta: [
       ['ROLE', 'Team of 5 · UX + structure'],
       ['YEAR', '2026'],
       ['STATUS', 'Shipped'],
     ],
     facts: [
-      ['DURATION', '2 weeks'],
-      ['TEAM', '5 people'],
-      ['MY PART', 'Architecture, wireframes, prototype'],
+      ['FORMAT', 'One page, eight sections'],
+      ['DURATION', '2 weeks, fixed'],
+      ['TEAM', '5 people, 1 client'],
       ['OUTCOME', 'Shipped, structure held without a rewrite'],
     ],
     meta: [
