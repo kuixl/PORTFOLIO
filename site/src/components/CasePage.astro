@@ -1,0 +1,352 @@
+---
+/**
+ * A case page in whichever language it is handed. Structure, frames, screens
+ * and section order come from the English record; the Russian file supplies
+ * words only, and anything it is missing falls back to English rather than
+ * rendering a blank section.
+ */
+import CaseSection from './CaseSection.astro';
+import WorkFrame from './WorkFrame.astro';
+import type { Case } from '../data/cases';
+import { casesRu } from '../data/cases.ru';
+import { caseLabels } from '../data/caseLabels';
+import type { Lang } from '../data/home';
+import works from '../../public/works/works.json';
+
+interface Props { c: Case; lang: Lang }
+const { c: base, lang } = Astro.props;
+
+const L = caseLabels[lang];
+const c: Case = lang === 'ru' ? { ...base, ...(casesRu[base.slug] ?? {}) } : base;
+const pfx = lang === "ru" ? "/ru" : "";
+
+const screens = (base.screens ?? [])
+  .map(([label, page]) => {
+    const set = (works as Record<string, any[]>)[base.frame?.project ?? base.slug] ?? [];
+    const shot = set.find((s) => s.page === page && s.size === 'desktop');
+    return shot?.thumb
+      ? { label, file: shot.thumb.file, w: shot.thumb.w, h: shot.thumb.h, full: shot.parts[0].file }
+      : null;
+  })
+  .filter(Boolean) as { label: string; file: string; w: number; h: number; full: string }[];
+
+let step = 0;
+const n = () => String(++step).padStart(2, "0");
+let artStep = 0;
+const ai = () => artStep++;
+---
+<header class="site-head">
+  <a href={pfx || "/"} class="font-mono text-mono-nav">kuixl</a>
+  <a href={`${pfx}/#contact`} class="font-mono text-mono-nav">{L.contact}</a>
+</header>
+  <main class="case" id="main">
+    <section class="case-cover">
+      <div class="cc-meta">
+        {c.coverMeta.map(([k, v]) => (
+          <span><b>{k}</b>&nbsp;&nbsp;{v}</span>
+        ))}
+      </div>
+      <h1 class="cc-title">{c.title}</h1>
+      <p class="cc-lead">{c.lead}</p>
+    </section>
+
+    <CaseSection n={n()} title={L.result} wide>
+      <dl class="facts">
+        {c.facts.map(([k, v]) => (
+          <div><dt>{k}</dt><dd>{v}</dd></div>
+        ))}
+      </dl>
+    </CaseSection>
+
+    {c.frame && (
+      <CaseSection n={n()} title={L.work} wide>
+        <WorkFrame
+          project={base.frame.project}
+          title={c.title}
+          url={base.frame.url}
+          note={base.frame.note}
+          tabs={base.frame.tabs}
+        />
+      </CaseSection>
+    )}
+
+    <CaseSection n={n()} title={L.brief} art={base.slug} artIndex={ai()}>
+      {c.brief.map((p) => <p>{p}</p>)}
+      <dl class="meta">
+        {c.meta.map(([k, v]) => (
+          <div><dt>{k}</dt><dd>{v}</dd></div>
+        ))}
+      </dl>
+    </CaseSection>
+
+    {c.broken && (
+      <CaseSection n={n()} title={L.broken} art={base.slug} artIndex={ai()}>
+        {c.broken.map((p) => <p>{p}</p>)}
+      </CaseSection>
+    )}
+
+    {c.myRole && (
+      <CaseSection n={n()} title={L.role} art={base.slug} artIndex={ai()}>
+        {c.myRole.map((p) => <p>{p}</p>)}
+      </CaseSection>
+    )}
+
+    {c.personas && (
+      <CaseSection n={n()} title={L.research} art={base.slug} artIndex={ai()}>
+        <div class="personas">
+          {c.personas.map(([name, who, quote]) => (
+            <figure class="persona">
+              <figcaption><strong>{name}</strong><span>{who}</span></figcaption>
+              <blockquote>&laquo;{quote}&raquo;</blockquote>
+            </figure>
+          ))}
+        </div>
+      </CaseSection>
+    )}
+
+    <CaseSection n={n()} title={L.decisions} art={base.slug} artIndex={ai()}>
+      <div class="decisions">
+        {c.decisions.map((d) => (
+          <article class="decision">
+            <span class="d-n" aria-hidden="true">{d.n}</span>
+            <div class="d-body">
+              <h3>{d.title}</h3>
+              {d.body.map((p) => <p>{p}</p>)}
+            </div>
+          </article>
+        ))}
+      </div>
+    </CaseSection>
+
+    {screens.length > 1 && (
+      <CaseSection n={n()} title={L.screens} wide>
+        <div class="screens">
+          {screens.map((s) => (
+            <figure class="screen">
+              <button type="button" class="screen-open"
+                data-fullview={`/works/${base.frame?.project ?? base.slug}/${s.full}`}
+                data-fullview-label={`${c.title} - ${s.label}`}>
+                <img src={`/works/${base.frame?.project ?? base.slug}/${s.file}`} width={s.w} height={s.h}
+                  alt={`${c.title} - ${s.label}`} loading="lazy" decoding="async" />
+                <span class="screen-cue">OPEN</span>
+              </button>
+              <figcaption>{s.label}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </CaseSection>
+    )}
+
+    {c.system && (
+      <CaseSection n={n()} title={L.system} art={base.slug} artIndex={ai()}>
+        {c.system.map((p) => <p>{p}</p>)}
+      </CaseSection>
+    )}
+
+    {c.judges && (
+      <CaseSection n={n()} title={L.judges} wide>
+        <div class="judges">
+          {c.judges.quotes.map((q) => <blockquote>&laquo;{q}&raquo;</blockquote>)}
+        </div>
+        <span class="judges-src font-mono">{c.judges.source}</span>
+      </CaseSection>
+    )}
+
+    <CaseSection n={n()} title={L.retro} art={base.slug} artIndex={ai()}>
+      {c.retro.map((p) => <p>{p}</p>)}
+    </CaseSection>
+
+    <a class="case-next" href={`${pfx}/${base.next.slug}`}>
+      <span class="font-mono text-mono-label">{L.next}</span>
+      <span class="cn-title">{base.next.title}</span>
+    </a>
+  </main>
+
+<style>
+  .site-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    padding-inline: 20px;
+    border-bottom: 1px solid var(--color-hairline);
+  }
+  .case {
+    max-width: 1240px;
+    margin-inline: auto;
+    padding-inline: 20px;
+    padding-bottom: var(--gap-section);
+  }
+
+  .case-cover { padding-block: var(--gap-section); }
+  .cc-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-block);
+    font-family: var(--font-mono);
+    font-size: var(--text-mono-label);
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
+  }
+  .cc-meta b { font-weight: 400; }
+  .cc-title {
+    margin-top: var(--gap-item);
+    font-family: var(--font-sans);
+    font-weight: 900;
+    font-size: clamp(56px, 15vw, 180px);
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+  }
+  .cc-lead {
+    margin-top: var(--gap-item);
+    max-width: 640px;
+    font-size: var(--text-body-lg);
+    color: var(--color-muted);
+  }
+
+  .facts { display: grid; gap: var(--gap-block); grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+
+  /* auto-fit left a single orphan on a second row whenever the count was not a
+     multiple of the column count; ruled rows carry any number cleanly and match
+     the fact tables elsewhere on the site */
+  .meta { margin-top: var(--gap-block); border-top: 1px solid var(--color-hairline); }
+  .meta > div {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 5px;
+    padding-block: var(--gap-item);
+    border-bottom: 1px solid var(--color-hairline);
+  }
+  @media (min-width: 901px) {
+    .meta > div { grid-template-columns: 170px minmax(0, 1fr); gap: var(--gap-block); align-items: baseline; }
+  }
+  .facts dt, .meta dt {
+    font-family: var(--font-mono);
+    font-size: var(--text-mono-caption);
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
+  }
+  .facts dd { margin-top: 6px; font-weight: 700; font-size: 22px; line-height: 1.2; }
+  .meta dd { margin-top: 6px; font-size: var(--text-body); }
+
+  .personas { display: grid; gap: var(--gap-block); grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .persona figcaption { display: flex; flex-direction: column; gap: 2px; }
+  .persona strong { font-size: 24px; font-weight: 700; }
+  .persona span {
+    font-family: var(--font-mono);
+    font-size: var(--text-mono-caption);
+    letter-spacing: 0.06em;
+    color: var(--color-muted);
+  }
+  .persona blockquote { margin-top: var(--gap-tight); font-style: italic; color: var(--color-muted); }
+
+  /* Three identical stacks of label, bold line, two grey paragraphs read as one
+     undifferentiated column. A large numeral in its own gutter gives the eye a
+     place to land and turns the section into a list you can scan. */
+  .decisions { display: grid; gap: var(--gap-block); }
+  .decision {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr);
+    gap: var(--gap-item);
+    align-items: start;
+    padding-block: var(--gap-block);
+    border-top: 1px solid var(--color-hairline);
+  }
+  .decision:first-child { border-top: 0; padding-top: 0; }
+  .d-n {
+    font-family: var(--font-sans);
+    font-weight: 900;
+    font-size: 44px;
+    line-height: 0.85;
+    letter-spacing: -0.03em;
+    color: var(--color-hairline);
+  }
+  .d-body { max-width: var(--measure); }
+  .decision h3 {
+    font-size: clamp(22px, 2.4vw, 30px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+  }
+  .decision p { margin-top: var(--gap-item); }
+  /* the opening sentence carries the claim; let it lead */
+  .decision p:first-of-type { font-size: 19px; line-height: 1.55; color: var(--color-primary); }
+
+  /* On a phone one card per row turned Screens into 1800px of scrolling - a
+     third of the page for a contact sheet. Two up: still legible as a
+     thumbnail, half the height. */
+  .screens {
+    display: grid;
+    gap: var(--gap-item);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  @media (min-width: 901px) {
+    .screens { gap: var(--gap-block); grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  }
+  .screen-open {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+  .screen img { width: 100%; height: auto; display: block; border: 1px solid var(--color-hairline); }
+  .screen-cue {
+    position: absolute;
+    inset: auto 8px 8px auto;
+    padding: 4px 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--color-paper);
+    background: var(--color-ink);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .screen-open:hover .screen-cue,
+  .screen-open:focus-visible .screen-cue { opacity: 1; }
+  .screen figcaption {
+    margin-top: var(--gap-tight);
+    font-family: var(--font-mono);
+    font-size: var(--text-mono-caption);
+    letter-spacing: 0.08em;
+    color: var(--color-muted);
+  }
+
+  .judges { display: grid; gap: var(--gap-block); grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .judges blockquote {
+    font-size: 20px;
+    line-height: 1.45;
+    font-style: italic;
+    padding-left: var(--gap-item);
+    border-left: 1px solid var(--color-hairline);
+  }
+  .judges-src {
+    display: block;
+    margin-top: var(--gap-item);
+    font-size: var(--text-mono-caption);
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
+  }
+
+  .case-next {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-tight);
+    padding-top: var(--gap-section);
+    border-top: 1px solid var(--color-hairline);
+  }
+  .cn-title {
+    font-family: var(--font-sans);
+    font-weight: 900;
+    font-size: clamp(48px, 10vw, 96px);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  @media (min-width: 901px) {
+    .case, .site-head { padding-inline: var(--spacing-080); }
+  }
+</style>

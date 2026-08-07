@@ -9,9 +9,7 @@ import works from '../../public/works/works.json';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = home[lang];
-// Case pages exist in English only for now, so the Russian index links to them
-// rather than to routes that would 404.
-const p = '';
+const p = lang === 'ru' ? '/ru' : '';
 
 const monolithPages = ['index', 'archive', 'materials']
   .map((page) => works.monolith.find((s) => s.page === page && s.size === 'desktop'))

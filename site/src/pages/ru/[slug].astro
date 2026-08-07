@@ -1,0 +1,28 @@
+---
+import Base from '../../layouts/Base.astro';
+import CasePage from '../../components/CasePage.astro';
+import { cases } from '../../data/cases';
+import { casesRu } from '../../data/cases.ru';
+
+export function getStaticPaths() {
+  return cases.map((c) => ({ params: { slug: c.slug }, props: { c } }));
+}
+const { c } = Astro.props;
+const lead = casesRu[c.slug]?.lead ?? c.lead;
+---
+<Base title={`${c.title} - кейс - Константин Даровский`} description={lead} lang="ru">
+  <CasePage c={c} lang="ru" />
+
+  <script>
+    import { initWorkFrames, initFullViewLinks } from '../../scripts/workframe';
+    import { initMotion } from '../../scripts/motion';
+    import { initReveals, initPageWipe, initFrameEntrance, initRailArt } from '../../scripts/reveal';
+    initMotion();
+    initWorkFrames();
+    initFullViewLinks();
+    initReveals();
+    initFrameEntrance();
+    initRailArt();
+    initPageWipe();
+  </script>
+</Base>
