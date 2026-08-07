@@ -67,28 +67,15 @@ export const sound = {
   },
 
   /**
-   * Autoplay is blocked until a user gesture, so true background audio is
-   * impossible. Closest legal thing: the first gesture anywhere (click, key,
-   * wheel, touch) starts the loop quietly. The corner toggle still turns it off.
+   * Turn sound on. Only meaningful when called from inside a user gesture -
+   * browsers keep the audio context suspended until one happens, which is
+   * exactly why the preloader opens with an invitation to press something.
    */
-  armAutostart() {
-    if (prm) return;
-    const fire = async (e: Event) => {
-      if ((e.target as HTMLElement | null)?.closest?.('#sound-toggle')) return;
-      disarm();
-      if (!enabled) { enabled = true; await startLoop(); syncButton(); }
-    };
-    const opts = { once: true, capture: true } as AddEventListenerOptions;
-    const disarm = () => {
-      removeEventListener('pointerdown', fire, opts);
-      removeEventListener('keydown', fire, opts);
-      removeEventListener('wheel', fire, opts);
-      removeEventListener('touchstart', fire, opts);
-    };
-    addEventListener('pointerdown', fire, opts);
-    addEventListener('keydown', fire, opts);
-    addEventListener('wheel', fire, opts);
-    addEventListener('touchstart', fire, opts);
+  async enable() {
+    if (prm || enabled) return;
+    enabled = true;
+    await startLoop();
+    syncButton();
   },
 
   /** tiny typewriter click on symbol locks, throttled */

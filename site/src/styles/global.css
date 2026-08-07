@@ -162,6 +162,61 @@ html.is-preloading {
   height: 100%;
   pointer-events: none;
 }
+
+/* the real Switzer the ASCII swarm resolves into; the script drives opacity,
+   blur and scale, so it starts invisible and out of focus */
+#preload-wordmark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(1.06);
+  font-family: var(--font-sans);
+  font-weight: 900;
+  font-size: clamp(72px, 18vw, 260px);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--color-paper);
+  opacity: 0;
+  filter: blur(6px);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* opening invitation - it exists because browsers refuse to play audio before
+   a gesture, so the gesture is made part of the show */
+#preload-invite {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  transition: opacity 0.3s ease;
+}
+#preload-invite.is-gone {
+  opacity: 0;
+  pointer-events: none;
+}
+#preload-invite .invite-key {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  letter-spacing: 0.18em;
+  color: var(--color-paper);
+  animation: invite-pulse 1.5s ease-in-out infinite;
+}
+#preload-invite .invite-note {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--color-muted-inverse);
+}
+@keyframes invite-pulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
 #sound-toggle {
   position: absolute;
   right: 20px;

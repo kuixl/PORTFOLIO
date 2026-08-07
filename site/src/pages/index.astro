@@ -6,6 +6,12 @@ import Base from '../layouts/Base.astro';
   <div id="preloader" aria-hidden="true">
     <canvas id="ascii-canvas"></canvas>
     <svg class="sketches" id="sketch-layer"></svg>
+    <!-- the real type the ASCII swarm resolves into -->
+    <span id="preload-wordmark">kuixl</span>
+    <div id="preload-invite">
+      <span class="invite-key">PRESS ANY KEY</span>
+      <span class="invite-note">click, scroll or press a key to begin with sound</span>
+    </div>
     <button id="sound-toggle" type="button">SOUND OFF</button>
   </div>
 
