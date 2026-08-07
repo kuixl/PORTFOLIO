@@ -45,6 +45,61 @@ type Node = { ch: string; x: number; y: number };
 const FORCED = new URLSearchParams(location.search).has('replay');
 const prm = !FORCED && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+/**
+ * Order glyphs the way a pen would travel: a greedy nearest-neighbour chain
+ * from the top-left of the drawing, jumping to the nearest unvisited glyph when
+ * a stroke runs out. Returns each glyph's 0..1 position along that path.
+ *
+ * Ordering by distance from the centre was tried first and does not work on
+ * outline art - almost every glyph sits at roughly the same radius, so the
+ * drawing stays empty and then arrives all at once. A traversal follows the
+ * strokes themselves, which is what reads as drawing.
+ *
+ * Buckets keep the search local; a plain scan is O(n^2) and n runs past 2000.
+ */
+function penPath(nodes: Node[]): number[] {
+  const n = nodes.length;
+  if (!n) return [];
+  const CELL = 48;
+  const key = (x: number, y: number) => `${Math.floor(x / CELL)},${Math.floor(y / CELL)}`;
+  const buckets = new Map<string, number[]>();
+  nodes.forEach((p, i) => {
+    const k = key(p.x, p.y);
+    (buckets.get(k) ?? buckets.set(k, []).get(k)!).push(i);
+  });
+
+  const done = new Uint8Array(n);
+  const order = new Array<number>(n);
+  let cur = 0;
+  for (let i = 1; i < n; i++)
+    if (nodes[i].y < nodes[cur].y || (nodes[i].y === nodes[cur].y && nodes[i].x < nodes[cur].x)) cur = i;
+
+  for (let step = 0; step < n; step++) {
+    done[cur] = 1;
+    order[cur] = step / (n - 1 || 1);
+    if (step === n - 1) break;
+
+    // widen the search ring until an unvisited glyph turns up
+    const cx = Math.floor(nodes[cur].x / CELL), cy = Math.floor(nodes[cur].y / CELL);
+    let best = -1, bestD = Infinity;
+    for (let ring = 0; ring < 40 && best < 0; ring++) {
+      for (let gx = cx - ring; gx <= cx + ring; gx++)
+        for (let gy = cy - ring; gy <= cy + ring; gy++) {
+          if (ring > 0 && Math.abs(gx - cx) !== ring && Math.abs(gy - cy) !== ring) continue;
+          for (const i of buckets.get(`${gx},${gy}`) ?? []) {
+            if (done[i]) continue;
+            const d = (nodes[i].x - nodes[cur].x) ** 2 + (nodes[i].y - nodes[cur].y) ** 2;
+            if (d < bestD) { bestD = d; best = i; }
+          }
+        }
+    }
+    if (best < 0) { for (let i = 0; i < n; i++) if (!done[i]) { best = i; break; } }
+    if (best < 0) break;
+    cur = best;
+  }
+  return order;
+}
+
 const easeIO = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 const rand = (a: number, b: number) => a + Math.random() * (b - a);
 const seg = (t: number, a: number, b: number) => Math.min(1, Math.max(0, (t - a) / (b - a)));
@@ -62,10 +117,19 @@ function parseArt(text: string): Cell[] {
   return cells;
 }
 
-/** three drawings, picked at random so a repeat visit is not the same show */
+/**
+ * Three drawings per visit, drawn at random from the whole set so a repeat
+ * visit is a different show. Fisher-Yates, not `sort(() => Math.random()-0.5)`:
+ * a random comparator is not a shuffle and leaves the original order visible.
+ */
 async function loadArts(): Promise<Cell[][]> {
   const manifest: { name: string }[] = await fetch('/art/art.json').then((r) => r.json());
-  const pick = manifest.sort(() => Math.random() - 0.5).slice(0, 3);
+  const pool = [...manifest];
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  const pick = pool.slice(0, 3);
   const texts = await Promise.all(pick.map((m) => fetch(`/art/${m.name}.txt`).then((r) => r.text())));
   return texts.map(parseArt);
 }
@@ -113,6 +177,8 @@ export function initPreloader(): Promise<void> {
     let ctrl: { cx: number; cy: number }[] = [];
     let scatter: { sx: number; sy: number }[] = [];
     let tracked: number[] = [];
+    let drawOrder: number[] = [];  // per-glyph 0..1 position in the draw-on
+    const EDGE = 0.08;             // width of the unsettled working edge
     let wordBox = { x: 0, y: 0, w: 0, h: 0 };
 
     /** raster `kuixl` into the same grid so the swarm can spell it */
@@ -210,6 +276,8 @@ export function initPreloader(): Promise<void> {
         if (isWord) wordBox = p.box;
       });
 
+      drawOrder = penPath(nodes[0]);
+
       ctrl = Array.from({ length: n }, () => ({ cx: rand(-0.3, 0.3), cy: rand(-0.45, -0.1) }));
       scatter = Array.from({ length: n }, () => ({ sx: rand(-120, 120), sy: rand(-220, -40) }));
       tracked = Array.from({ length: 5 }, () => Math.floor(rand(0, n)));
@@ -251,19 +319,31 @@ export function initPreloader(): Promise<void> {
     }
 
     // ---------- acts ----------
+    /**
+     * The drawing draws itself. A plain top-to-bottom scanline reads as a
+     * window shade coming down; a hand builds a shape outward from where it
+     * started. Glyphs are ordered by distance from the drawing's centre, so the
+     * subject grows from the middle out, with a live edge that settles behind
+     * the front.
+     */
     function drawStage(a: number, now: number) {
       const st = nodes[0];
-      if (!st) return;
+      if (!st || !drawOrder.length) return;
       ctx.font = `${F}px ui-monospace, Consolas, monospace`;
       ctx.textBaseline = 'top';
-      const rowsTotal = (H - originY) / cellH;
-      const line = a * (rowsTotal + 6) - 3;
-      for (const nd of st) {
-        const r = (nd.y - originY) / cellH;
-        const edge = line - r;
-        if (edge < 0) continue;
-        ctx.fillStyle = PAPER + (edge < 1.5 ? '0.35)' : '0.9)');
-        ctx.fillText(edge < 1.5 ? '.:=#'[Math.floor(now / 70 + r) % 4] : nd.ch, nd.x, nd.y);
+      const front = a * (1 + EDGE) - EDGE;
+      for (let i = 0; i < st.length; i++) {
+        const at = drawOrder[i];            // 0..1, when this glyph is reached
+        if (at > front + EDGE) continue;
+        const nd = st[i];
+        if (at > front) {
+          // the working edge: unsettled characters, flickering
+          ctx.fillStyle = PAPER + '0.3)';
+          ctx.fillText('.:-=' [Math.floor(now / 60 + i) % 4], nd.x, nd.y);
+        } else {
+          ctx.fillStyle = PAPER + '0.92)';
+          ctx.fillText(nd.ch, nd.x, nd.y);
+        }
       }
     }
 

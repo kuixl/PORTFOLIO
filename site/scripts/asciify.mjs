@@ -51,7 +51,9 @@ const DEFAULTS = {
   // Ink coverage in these sources runs from 4% to 13% of the canvas, so any
   // fixed gain floods one drawing while blanking another. Instead, aim for a
   // target share of filled cells and solve for the gain that produces it.
-  targetInk: 0.17,
+  // Thin. The newer sources carry enough contrast that the stroke survives a
+  // low target, which the earlier batch could not.
+  targetInk: 0.13,
   // Percentile stretch is for photographs, where the useful range is unknown.
   // Line art on white is already calibrated - stretching it drags the white
   // background down into the ramp and floods the grid with characters.
