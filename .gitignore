@@ -15,3 +15,6 @@ fonts/
 
 # ascii art sources (large originals; committed output lives in site/public/art)
 art/source/
+
+# raw full-page captures (reproducible via the capture step; webp is committed)
+site/public/works/**/*.png

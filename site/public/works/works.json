@@ -1,0 +1,88 @@
+{
+  "nichive": [
+    {
+      "page": "exhibitions",
+      "size": "desktop",
+      "w": 1425,
+      "h": 3051,
+      "parts": [
+        {
+          "file": "exhibitions-desktop.webp",
+          "w": 1425,
+          "h": 3051,
+          "kb": 133
+        }
+      ]
+    },
+    {
+      "page": "exhibitions",
+      "size": "mobile",
+      "w": 377,
+      "h": 4084,
+      "parts": [
+        {
+          "file": "exhibitions-mobile.webp",
+          "w": 377,
+          "h": 4084,
+          "kb": 107
+        }
+      ]
+    },
+    {
+      "page": "index",
+      "size": "desktop",
+      "w": 1425,
+      "h": 4764,
+      "parts": [
+        {
+          "file": "index-desktop.webp",
+          "w": 1425,
+          "h": 4764,
+          "kb": 209
+        }
+      ]
+    },
+    {
+      "page": "index",
+      "size": "mobile",
+      "w": 377,
+      "h": 5487,
+      "parts": [
+        {
+          "file": "index-mobile.webp",
+          "w": 377,
+          "h": 5487,
+          "kb": 141
+        }
+      ]
+    },
+    {
+      "page": "materials",
+      "size": "desktop",
+      "w": 1425,
+      "h": 2283,
+      "parts": [
+        {
+          "file": "materials-desktop.webp",
+          "w": 1425,
+          "h": 2283,
+          "kb": 116
+        }
+      ]
+    },
+    {
+      "page": "materials",
+      "size": "mobile",
+      "w": 377,
+      "h": 2999,
+      "parts": [
+        {
+          "file": "materials-mobile.webp",
+          "w": 377,
+          "h": 2999,
+          "kb": 88
+        }
+      ]
+    }
+  ]
+}
