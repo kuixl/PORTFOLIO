@@ -1,4 +1,20 @@
 {
+  "beta": [
+    {
+      "page": "landing",
+      "size": "desktop",
+      "w": 1199,
+      "h": 4096,
+      "parts": [
+        {
+          "file": "landing-desktop.webp",
+          "w": 1199,
+          "h": 4096,
+          "kb": 263
+        }
+      ]
+    }
+  ],
   "nichive": [
     {
       "page": "exhibitions",
@@ -81,6 +97,22 @@
           "w": 377,
           "h": 2999,
           "kb": 88
+        }
+      ]
+    }
+  ],
+  "yakitoria": [
+    {
+      "page": "menu",
+      "size": "desktop",
+      "w": 1120,
+      "h": 4096,
+      "parts": [
+        {
+          "file": "menu-desktop.webp",
+          "w": 1120,
+          "h": 4096,
+          "kb": 359
         }
       ]
     }
