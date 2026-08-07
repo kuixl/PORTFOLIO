@@ -37,7 +37,7 @@ const { n, title, wide = false, id } = Astro.props;
     font-family: var(--font-mono);
     font-size: var(--text-mono-label);
     color: var(--color-muted);
-    padding-right: var(--spacing-012);
+    padding-right: var(--gap-tight);
     border-right: 1px solid var(--color-hairline);
   }
   /* Case pages are commentary about a product, not the product. Setting their
@@ -66,7 +66,7 @@ const { n, title, wide = false, id } = Astro.props;
       align-items: baseline;
       gap: var(--gap-tight);
       position: sticky;
-      top: var(--spacing-024);
+      top: var(--gap-item);
       align-self: start;
     }
     .case-section[data-wide] { grid-template-columns: 1fr; }

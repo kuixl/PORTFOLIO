@@ -187,7 +187,7 @@ const contacts = [
   }
 
   /* hero */
-  .hero { position: relative; padding-block: var(--spacing-048) var(--spacing-080); min-height: 72vh; display: flex; flex-direction: column; justify-content: center; }
+  .hero { position: relative; padding-block: var(--gap-block) var(--gap-section); min-height: 72vh; display: flex; flex-direction: column; justify-content: center; }
   .hero-tags {
     display: flex;
     flex-wrap: wrap;
@@ -204,7 +204,7 @@ const contacts = [
     border-top: 1px solid var(--color-hairline);
   }
   .hero-meta > div {
-    padding: var(--spacing-012) var(--spacing-016) var(--spacing-012) 0;
+    padding: var(--gap-tight) var(--gap-item) var(--gap-tight) 0;
     border-right: 1px solid var(--color-hairline);
   }
   .hero-meta > div:last-child { border-right: 0; }
@@ -217,7 +217,7 @@ const contacts = [
   }
   .hero-meta dd { margin-top: 4px; font-size: 15px; }
   .hero-title {
-    margin-block: var(--spacing-032);
+    margin-block: var(--gap-block);
     font-family: var(--font-sans);
     font-weight: 900;
     font-size: clamp(56px, 13vw, 180px);
@@ -226,7 +226,7 @@ const contacts = [
   }
   .hero-lead { font-size: var(--text-body-lg); color: var(--color-muted); }
   .hero-meta { margin-top: var(--gap-block); }
-  .hero-scroll { position: absolute; bottom: var(--spacing-024); left: 0; font-size: var(--text-mono-caption); color: var(--color-muted); }
+  .hero-scroll { position: absolute; bottom: var(--gap-item); left: 0; font-size: var(--text-mono-caption); color: var(--color-muted); }
 
   /* works index */
   .works { padding-block: var(--gap-section); border-top: 1px solid var(--color-hairline); }
@@ -236,9 +236,9 @@ const contacts = [
     display: grid;
     grid-template-columns: auto 1fr;
     grid-template-areas: 'n title' '. meta' '. go';
-    gap: var(--spacing-008) var(--spacing-024);
+    gap: var(--gap-tight) var(--gap-block);
     width: 100%;
-    padding-block: var(--spacing-032);
+    padding-block: var(--gap-block);
     text-align: left;
     background: none;
     border: 0;
@@ -299,8 +299,10 @@ const contacts = [
   .pf-facts div {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 2px;
-    padding-block: var(--spacing-012);
+    /* 2px between a label and its value is not a gap, it is a collision - on
+       one column the label has to sit clear of the line it introduces */
+    gap: 5px;
+    padding-block: var(--gap-item);
     border-bottom: 1px solid var(--color-hairline);
   }
   .pf-facts dt {
@@ -323,7 +325,7 @@ const contacts = [
   .site-foot {
     display: flex;
     justify-content: space-between;
-    padding: var(--spacing-024) 20px;
+    padding: var(--gap-item) 20px;
     border-top: 1px solid var(--color-hairline);
     font-size: var(--text-mono-caption);
     letter-spacing: 0.1em;

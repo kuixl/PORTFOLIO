@@ -179,7 +179,7 @@ const n = () => String(++step).padStart(2, '0');
     max-width: 1240px;
     margin-inline: auto;
     padding-inline: 20px;
-    padding-bottom: var(--spacing-080);
+    padding-bottom: var(--gap-section);
   }
 
   .case-cover { padding-block: var(--gap-section); }
@@ -213,7 +213,7 @@ const n = () => String(++step).padStart(2, '0');
   .meta {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     margin-top: var(--gap-block);
-    padding-top: var(--spacing-024);
+    padding-top: var(--gap-item);
     border-top: 1px solid var(--color-hairline);
   }
   .facts dt, .meta dt {
@@ -300,7 +300,7 @@ const n = () => String(++step).padStart(2, '0');
     font-size: 20px;
     line-height: 1.45;
     font-style: italic;
-    padding-left: var(--spacing-016);
+    padding-left: var(--gap-item);
     border-left: 1px solid var(--color-hairline);
   }
   .judges-src {
@@ -314,8 +314,8 @@ const n = () => String(++step).padStart(2, '0');
   .case-next {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-008);
-    padding-top: var(--spacing-080);
+    gap: var(--gap-tight);
+    padding-top: var(--gap-section);
     border-top: 1px solid var(--color-hairline);
   }
   .cn-title {
