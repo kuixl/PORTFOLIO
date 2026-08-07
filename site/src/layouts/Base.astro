@@ -11,24 +11,28 @@ interface Props {
   preload?: boolean;
   /** social card image, relative to the site root */
   image?: string;
+  lang?: 'en' | 'ru';
 }
 const {
   title,
   description = 'Konstantin Darovskiy, web designer in Moscow. UX/UI, web and 3D. I design the work, then I build it.',
   preload = false,
   image = '/og.png',
+  lang = 'en',
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://kuixl.github.io');
 const ogImage = new URL(image, Astro.site ?? 'https://kuixl.github.io');
 ---
 <!doctype html>
-<html lang="en" class={preload ? 'is-preloading' : undefined}>
+<html lang={lang} class={preload ? 'is-preloading' : undefined}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical.href} />
+    <link rel="alternate" hreflang="en" href={new URL(Astro.url.pathname.replace(/^\/ru/, '') || '/', Astro.site ?? 'https://kuixl.github.io').href} />
+    <link rel="alternate" hreflang="ru" href={new URL('/ru' + Astro.url.pathname.replace(/^\/ru/, ''), Astro.site ?? 'https://kuixl.github.io').href} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
     <meta property="og:type" content="website" />
