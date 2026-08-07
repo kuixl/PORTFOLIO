@@ -9,7 +9,10 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 export function initMotion() {
   gsap.registerPlugin(ScrollTrigger);
 
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // `?motion` overrides the system preference for the session - see reveal.ts
+  const forced = sessionStorage.getItem('kuixl:motion') === '1' ||
+    new URLSearchParams(location.search).has('motion');
+  if (!forced && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   const lenis = new Lenis({ autoRaf: false, lerp: 0.12 });
   lenis.on('scroll', ScrollTrigger.update);

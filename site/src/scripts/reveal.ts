@@ -9,7 +9,22 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-const prm = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+/**
+ * `?motion` forces animation on even when the system asks for reduced motion.
+ * Windows ships with animation effects switched off on plenty of machines, and
+ * the author's is one of them - without an override he cannot see his own site.
+ * Typing the parameter is a deliberate choice, unlike the ambient setting, and
+ * the choice sticks for the session so it survives navigation.
+ */
+const FORCED = (() => {
+  if (new URLSearchParams(location.search).has('motion')) {
+    sessionStorage.setItem('kuixl:motion', '1');
+    return true;
+  }
+  return sessionStorage.getItem('kuixl:motion') === '1';
+})();
+
+const prm = () => !FORCED && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /** blocks rise into place once, as they enter */
 export function initReveals() {
@@ -105,6 +120,39 @@ export function initAssembleHeading(selector = '[data-assemble]') {
       };
       tick();
     },
+  });
+}
+
+/**
+ * Rail drawings draw themselves in when their section arrives, top to bottom,
+ * so they read as something being made rather than a grey stain in the margin.
+ * A clip wipe rather than per-character reveal: these grids run to a couple of
+ * thousand characters and wrapping each one in a span to animate it would cost
+ * far more than the effect is worth.
+ */
+export function initRailArt() {
+  const arts = [...document.querySelectorAll<HTMLElement>('.cs-art')];
+  if (!arts.length) return;
+
+  if (prm()) {
+    arts.forEach((a) => (a.style.clipPath = 'none'));
+    return;
+  }
+  gsap.registerPlugin(ScrollTrigger);
+
+  arts.forEach((art) => {
+    gsap.set(art, { clipPath: 'inset(0 0 100% 0)' });
+    ScrollTrigger.create({
+      trigger: art.closest('.case-section') ?? art,
+      start: 'top 78%',
+      once: true,
+      onEnter: () =>
+        gsap.to(art, {
+          clipPath: 'inset(0 0 0% 0)',
+          duration: 1.4,
+          ease: 'power2.inOut',
+        }),
+    });
   });
 }
 

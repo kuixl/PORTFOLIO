@@ -103,8 +103,10 @@ if (art) {
       font-size: 5.2px;
       line-height: 9.9px;
       letter-spacing: 0;
-      color: var(--color-muted);
-      opacity: 0.65;
+      /* was muted at 0.65 and read as a smudge; ink at low opacity keeps the
+         strokes legible while staying clearly secondary to the copy */
+      color: var(--color-primary);
+      opacity: 0.4;
       white-space: pre;
     }
   }
