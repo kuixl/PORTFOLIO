@@ -20,16 +20,16 @@ const profileFacts = [
   ['FOCUS', 'UX/UI, Web, Motion, 3D'],
   ['DESIGN', 'Figma, Blender, Three.js, GSAP'],
   ['AI WORKFLOW', 'Claude Code, Cursor, Figma MCP, agent-assisted prototyping'],
-  ['NOTES', 'Obsidian for research, decisions and case writing'],
+  ['NOTES', 'Obsidian, where the research and the case writing live'],
   ['LANGUAGES', 'Russian native, English B2+'],
   ['FORMAT', 'Office, hybrid, remote'],
   ['LOCATION', 'Moscow, ready to relocate'],
 ];
 
 const contacts = [
-  ['asrieldreemur1213@gmail.com', 'mailto:asrieldreemur1213@gmail.com'],
-  ['t.me/kuixl', 'https://t.me/kuixl'],
-  ['github.com/kuixl', 'https://github.com/kuixl'],
+  ['asrieldreemur1213@gmail.com', 'mailto:asrieldreemur1213@gmail.com', '/logo/gmail.svg', 'Email'],
+  ['t.me/kuixl', 'https://t.me/kuixl', '/logo/telegram.svg', 'Telegram'],
+  ['github.com/kuixl', 'https://github.com/kuixl', '/logo/github.svg', 'GitHub'],
 ];
 ---
 <Base title="Konstantin Darovskiy - web designer" preload>
@@ -99,7 +99,7 @@ const contacts = [
         })}
       </ol>
       <p class="index-note font-mono">
-        Monolith shipped as a site but never got written up &mdash; the pages open in place.
+        Monolith shipped but I never wrote it up. The pages open here instead.
       </p>
     </section>
 
@@ -113,15 +113,15 @@ const contacts = [
         </figure>
         <div class="pf-text">
           <p>
-            4th year web design student at IT-Hub College, Moscow. I work across UX/UI,
-            motion and 3D. Most of my projects go from research to a working site &mdash; I
-            design them, then build them.
+            4th year web design student at IT-Hub College in Moscow. I work across UX/UI,
+            motion and 3D. Most of what I make goes from research to a site that runs. I
+            design it, then I build it.
           </p>
           <p>
-            I build with AI agents in the loop &mdash; Claude Code and Cursor for production
-            code, Figma MCP for design systems and prototypes, Obsidian for the research
-            and the reasoning behind them. The tools speed up execution. The structure and
-            the decisions are mine.
+            I work with AI agents in the loop. Claude Code and Cursor write production code
+            with me, Figma MCP handles design systems and prototypes, and the research and
+            reasoning live in Obsidian. The tools make execution faster. What to build, and
+            why, is still my call.
           </p>
           <dl class="pf-facts">
             {profileFacts.map(([k, v]) => (
@@ -142,8 +142,14 @@ const contacts = [
         </div>
       </div>
       <ul class="ct-list">
-        {contacts.map(([label, href]) => (
-          <li><a href={href}>{label}</a></li>
+        {contacts.map(([label, href, icon, name]) => (
+          <li>
+            <a href={href}>
+              <img src={icon} alt="" width="22" height="22" loading="lazy" />
+              <span class="ct-label">{label}</span>
+              <span class="ct-kind font-mono">{name}</span>
+            </a>
+          </li>
         ))}
       </ul>
     </section>
@@ -204,8 +210,12 @@ const contacts = [
     letter-spacing: 0.1em;
     color: var(--color-muted);
   }
+  /* even cells: ragged widths made the row read as debris rather than a set */
   .hero-tags li {
-    padding: 4px 10px;
+    display: grid;
+    place-items: center;
+    min-width: 132px;
+    padding: 6px 12px;
     border: 1px solid var(--color-hairline);
   }
   .hero-meta {
@@ -214,10 +224,13 @@ const contacts = [
     margin-top: var(--gap-block);
     border-top: 1px solid var(--color-hairline);
   }
+  /* text was sitting hard against the rule of the next cell - a divider needs
+     air on both sides or it reads as a collision, not a separation */
   .hero-meta > div {
-    padding: var(--gap-tight) var(--gap-item) var(--gap-tight) 0;
+    padding: var(--gap-item) var(--gap-block);
     border-right: 1px solid var(--color-hairline);
   }
+  .hero-meta > div:first-child { padding-left: 0; }
   .hero-meta > div:last-child { border-right: 0; }
   .hero-meta dt {
     font-family: var(--font-mono);
@@ -329,9 +342,24 @@ const contacts = [
   .ct-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--gap-block); }
   .ct-title { font-family: var(--font-sans); font-weight: 900; font-size: clamp(40px, 9vw, 96px); line-height: 1; letter-spacing: -0.02em; }
   .ct-status { display: flex; flex-direction: column; font-size: var(--text-mono-caption); letter-spacing: 0.1em; color: var(--color-muted); }
-  .ct-list { list-style: none; margin-top: var(--gap-block); display: grid; gap: var(--gap-item); }
-  .ct-list a { font-size: clamp(20px, 3vw, 24px); border-bottom: 1px solid var(--color-hairline); }
-  .ct-list a:hover { border-color: var(--color-primary); }
+  .ct-list { list-style: none; margin-top: var(--gap-block); display: grid; border-top: 1px solid var(--color-hairline); }
+  .ct-list a {
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--gap-item);
+    padding-block: var(--gap-item);
+    border-bottom: 1px solid var(--color-hairline);
+    font-size: clamp(18px, 2.4vw, 22px);
+  }
+  .ct-list img { display: block; }
+  .ct-kind {
+    font-size: var(--text-mono-caption);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .ct-list a:hover .ct-label { text-decoration: underline; text-underline-offset: 4px; }
 
   .site-foot {
     display: flex;

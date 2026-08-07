@@ -76,7 +76,12 @@ function openFull(src: string | string[], label: string) {
       </div>
     </div>`;
   document.body.appendChild(overlay);
+  // Hiding overflow is not enough: Lenis drives the page from wheel events and
+  // keeps scrolling the site behind the reader, so the picture stays put while
+  // the portfolio moves under it. Stop it for as long as the overlay is up.
   document.documentElement.style.overflow = 'hidden';
+  document.body.style.overflow = 'hidden';
+  window.dispatchEvent(new CustomEvent('kuixl:lock'));
   overlay.querySelector('button')!.addEventListener('click', close);
   // clicking the backdrop closes; clicking the page itself must not
   overlay.addEventListener('click', (e) => {
@@ -94,6 +99,8 @@ function close() {
   overlay.remove();
   overlay = null;
   document.documentElement.style.overflow = '';
+  document.body.style.overflow = '';
+  window.dispatchEvent(new CustomEvent('kuixl:unlock'));
   removeEventListener('keydown', onKey);
 }
 

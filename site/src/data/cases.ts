@@ -116,8 +116,8 @@ export const cases: Case[] = [
     slug: 'beta',
     title: 'BETA',
     lead:
-      'A landing page for a student design sprint. One page has to do the whole job - ' +
-      'there is no second screen to move an objection to.',
+      'A landing page for a student design sprint. One page has to do the whole job, ' +
+      'because there is no second screen to move an objection to.',
     coverMeta: [
       ['ROLE', 'Team of 5 · UX + structure'],
       ['YEAR', '2026'],

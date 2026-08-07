@@ -10,8 +10,8 @@ import { cases } from '../data/cases';
 
   <main id="main" class="nf">
     <p class="nf-code font-mono">404</p>
-    <h1 class="nf-title">This page is not in the archive.</h1>
-    <p class="nf-lead">The address is wrong, or it moved. The work is all here:</p>
+    <h1 class="nf-title">Nothing here.</h1>
+    <p class="nf-lead">Wrong address, or it moved. The work is all still there:</p>
     <ul class="nf-list">
       {cases.map((c) => (
         <li><a href={`/${c.slug}`}>{c.title}</a></li>

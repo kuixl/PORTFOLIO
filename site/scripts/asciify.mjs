@@ -303,6 +303,23 @@ const run = async () => {
         continue;
       }
       await writeFile(join(OUT, `${name}.txt`), text, 'utf8');
+
+      // A second, coarse grid for page margins. The 76-column version has to be
+      // set at ~5px to fit a 240px rail, which is below the size a character
+      // reads at - it looked like dust. Forty columns fits the same rail at
+      // 11px, where the glyphs are actually glyphs.
+      const railCols = 40;
+      // Denser than the fine grid on purpose. At 40 columns a 13% target leaves
+      // a handful of scattered marks instead of a subject: each cell now covers
+      // four times the area, so the same target draws far less of the drawing.
+      const railTarget = 0.3;
+      const railSample = await sample(path, railCols, blurDiv * 0.6, args.includes('--edge'));
+      const railLum = stretch(railSample.lum, preset.gamma, preset.stretch);
+      const railText = toText(railLum, railCols, railSample.rows, {
+        ...preset,
+        gain: autoGain(railLum, preset.floor, railTarget),
+      });
+      await writeFile(join(OUT, `${name}.rail.txt`), railText, 'utf8');
       // The originals are the artwork as drawn and they beat any re-rendering
       // of them, so pages get a compressed copy. The character grid is for the
       // preloader, which needs glyphs it can move individually.

@@ -25,7 +25,8 @@ const { n, title, wide = false, id, art } = Astro.props;
 const ART_DIR = fileURLToPath(new URL('../../public/art/', import.meta.url));
 let artText = '';
 if (art) {
-  const files = readdirSync(ART_DIR).filter((f) => f.endsWith('.txt')).sort();
+  // the coarse variant: the fine one has to be set below readable size to fit
+  const files = readdirSync(ART_DIR).filter((f) => f.endsWith('.rail.txt')).sort();
   if (files.length) {
     // stable per section: same seed, same drawing on every build
     let h = 0;
@@ -98,15 +99,15 @@ if (art) {
     /* Sized to fit the rail outright rather than scaled and clipped: clipping
        showed one corner of a drawing, which reads as a stray mark, not art.
        At 76 columns a 5.2px monospace advance lands just inside 240px. */
+    /* 40 columns at 11px lands just inside the 240px rail, and at 11px a
+       character is a character rather than a speck of dust */
     .cs-art {
       font-family: ui-monospace, Consolas, monospace;
-      font-size: 5.2px;
-      line-height: 9.9px;
+      font-size: 11px;
+      line-height: 20px;
       letter-spacing: 0;
-      /* was muted at 0.65 and read as a smudge; ink at low opacity keeps the
-         strokes legible while staying clearly secondary to the copy */
       color: var(--color-primary);
-      opacity: 0.4;
+      opacity: 0.42;
       white-space: pre;
     }
   }
