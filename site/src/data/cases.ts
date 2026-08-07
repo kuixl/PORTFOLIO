@@ -195,7 +195,7 @@ export const cases: Case[] = [
       ['TEAM', 'Solo'],
       ['BRIEF FROM', 'FoodTech Lab and Yakitoria'],
     ],
-    frame: { project: 'yakitoria' },
+    frame: { project: 'yakitoria', tabs: ['menu', 'product', 'reviews'] },
     brief: [
       'Redesign the menu and cart so the average order goes up and fewer people drop out before checkout. Audience: 18 to 35, ordering delivery three or four times a week.',
       'Three constraints. Keep the brand recognisable. Fit inside 60 developer hours. Work with the existing product range - the catalogue stays, the interface around it changes. The last one mattered most: this was not an invitation to redraw the site, it was a question about which mechanics move an order forward.',
@@ -238,6 +238,11 @@ export const cases: Case[] = [
           'Moving reviews onto the product page puts social proof where the doubt is, at the point of adding to cart.',
         ],
       },
+    ],
+    screens: [
+      ['01 MENU', 'menu'],
+      ['02 PRODUCT PAGE', 'product'],
+      ['03 REVIEWS', 'reviews'],
     ],
     judges: {
       quotes: [

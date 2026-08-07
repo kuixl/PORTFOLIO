@@ -285,6 +285,46 @@
         "h": 518,
         "kb": 25
       }
+    },
+    {
+      "page": "product",
+      "size": "desktop",
+      "w": 1896,
+      "h": 4096,
+      "parts": [
+        {
+          "file": "product-desktop.webp",
+          "w": 1896,
+          "h": 4096,
+          "kb": 387
+        }
+      ],
+      "thumb": {
+        "file": "product-desktop.thumb.webp",
+        "w": 720,
+        "h": 518,
+        "kb": 30
+      }
+    },
+    {
+      "page": "reviews",
+      "size": "desktop",
+      "w": 1645,
+      "h": 4096,
+      "parts": [
+        {
+          "file": "reviews-desktop.webp",
+          "w": 1645,
+          "h": 4096,
+          "kb": 318
+        }
+      ],
+      "thumb": {
+        "file": "reviews-desktop.thumb.webp",
+        "w": 720,
+        "h": 518,
+        "kb": 36
+      }
     }
   ]
 }

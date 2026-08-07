@@ -22,6 +22,17 @@ const OUT = fileURLToPath(new URL('../public/works/', import.meta.url));
 const MAX_H = 16000;      // stay clear of the 16383px encoder ceiling
 const QUALITY = 80;
 
+/**
+ * Where to take the card crop from, as a fraction of page height. Defaults to
+ * the top, which is right for most pages - but a card is supposed to show the
+ * thing its caption names, and on a long page that thing is rarely at the top.
+ * The reviews page opens on a promo banner; cropping from the top labelled a
+ * banner "reviews".
+ */
+const THUMB_AT = {
+  'reviews-desktop': 0.55,
+};
+
 const run = async () => {
   const projects = (await readdir(SRC, { withFileTypes: true }))
     .filter((d) => d.isDirectory())
@@ -60,9 +71,11 @@ const run = async () => {
       // beats scaling the whole page down: a 5000px page shrunk to card height
       // is an unreadable smear.
       const thumbH = Math.min(height, Math.round(width * 0.72));
+      const at = THUMB_AT[name] ?? 0;
+      const thumbTop = Math.max(0, Math.min(height - thumbH, Math.round(height * at)));
       const thumbName = `${name}.thumb.webp`;
       const thumb = await sharp(src)
-        .extract({ left: 0, top: 0, width, height: thumbH })
+        .extract({ left: 0, top: thumbTop, width, height: thumbH })
         .resize(720, null)
         .webp({ quality: 78 })
         .toFile(join(outDir, thumbName));
