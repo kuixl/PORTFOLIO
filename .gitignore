@@ -1,4 +1,4 @@
-# deps / build
+﻿# deps / build
 node_modules/
 site/dist/
 site/.astro/
@@ -16,5 +16,5 @@ fonts/
 # ascii art sources (large originals; committed output lives in site/public/art)
 art/source/
 
-# raw full-page captures (reproducible via the capture step; webp is committed)
-site/public/works/**/*.png
+# raw full-page captures (outside public/ so they never ship; webp is committed)
+captures/

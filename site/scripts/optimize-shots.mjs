@@ -3,9 +3,10 @@
  *
  *   node scripts/optimize-shots.mjs
  *
- * Captures land in public/works/<project>/<page>-<size>.png as raw Playwright
- * output. This turns each into a webp the browser can actually afford. The PNGs
- * stay on disk but out of git - they are reproducible by re-running the capture.
+ * Raw captures live in captures/<project>/<page>-<size>.png, deliberately
+ * outside public/ - anything under public/ is copied into the build wholesale,
+ * so multi-megabyte sources would ship, and Vite's watcher locks them during
+ * dev. Only the webp derivatives go to public/works/.
  *
  * Full-page shots are tall and thin, and some exceed the 16383px limit browsers
  * and encoders impose on a single image dimension, so anything over the cap is
@@ -16,19 +17,22 @@ import { readdir, mkdir, writeFile, stat } from 'node:fs/promises';
 import { join, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const ROOT = fileURLToPath(new URL('../public/works/', import.meta.url));
+const SRC = fileURLToPath(new URL('../../captures/', import.meta.url));
+const OUT = fileURLToPath(new URL('../public/works/', import.meta.url));
 const MAX_H = 16000;      // stay clear of the 16383px encoder ceiling
 const QUALITY = 80;
 
 const run = async () => {
-  const projects = (await readdir(ROOT, { withFileTypes: true }))
+  const projects = (await readdir(SRC, { withFileTypes: true }))
     .filter((d) => d.isDirectory())
     .map((d) => d.name);
 
   const manifest = {};
 
   for (const project of projects) {
-    const dir = join(ROOT, project);
+    const dir = join(SRC, project);
+    const outDir = join(OUT, project);
+    await mkdir(outDir, { recursive: true });
     const shots = (await readdir(dir)).filter((f) => f.endsWith('.png'));
     manifest[project] = [];
 
@@ -48,7 +52,7 @@ const run = async () => {
         const info = await sharp(src)
           .extract({ left: 0, top, width, height: h })
           .webp({ quality: QUALITY })
-          .toFile(join(dir, out));
+          .toFile(join(outDir, out));
         parts.push({ file: out, w: info.width, h: info.height, kb: Math.round(info.size / 1024) });
       }
 
@@ -62,8 +66,8 @@ const run = async () => {
     }
   }
 
-  await mkdir(ROOT, { recursive: true });
-  await writeFile(join(ROOT, 'works.json'), JSON.stringify(manifest, null, 2), 'utf8');
+  await mkdir(OUT, { recursive: true });
+  await writeFile(join(OUT, 'works.json'), JSON.stringify(manifest, null, 2), 'utf8');
   console.log('\nwrote public/works/works.json');
 };
 

@@ -1,0 +1,207 @@
+---
+/**
+ * Full-page view of a shipped project.
+ *
+ * Desktop: the frame pins and the page scrolls through it, so the whole site
+ * passes by in about two screens of scrolling. Click opens it full screen for
+ * anyone who wants to actually read it.
+ * Mobile: no pinning - it fights inertial scroll on touch. Static first screen,
+ * tap to open, and the mobile capture is used where one exists.
+ *
+ * Projects carry different amounts of material on purpose: nichive shipped and
+ * has six captures, BETA has one page. The component shows what each has rather
+ * than flattening everyone down to the thinnest.
+ */
+import works from '../../public/works/works.json';
+
+interface Props {
+  project: keyof typeof works;
+  title: string;
+  url?: string;
+  note?: string;
+}
+const { project, title, url, note } = Astro.props;
+
+const shots = works[project] as {
+  page: string; size: string; w: number; h: number;
+  parts: { file: string; w: number; h: number; kb: number }[];
+}[];
+
+// the entry page leads regardless of how the files sort alphabetically -
+// otherwise nichive opens on "exhibitions" because e comes before i
+const ENTRY = ['index', 'landing', 'menu', 'home'];
+const pages = [...new Set(shots.map((s) => s.page))].sort((a, b) => {
+  const ai = ENTRY.indexOf(a), bi = ENTRY.indexOf(b);
+  if (ai !== bi) return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi);
+  return a.localeCompare(b);
+});
+const hasMobile = shots.some((s) => s.size === 'mobile');
+const first = pages[0];
+---
+
+<section class="work-frame" data-project={project}>
+  <header class="wf-head">
+    <span class="wf-label">FULL VIEW</span>
+
+    {pages.length > 1 && (
+      <div class="wf-tabs" role="tablist" aria-label={`${title} pages`}>
+        {pages.map((p) => (
+          <button type="button" role="tab" data-page={p}
+            aria-selected={p === first ? 'true' : 'false'}
+            class={p === first ? 'is-active' : ''}>{p}</button>
+        ))}
+      </div>
+    )}
+
+    {hasMobile && (
+      <div class="wf-sizes" role="group" aria-label="viewport">
+        <button type="button" data-size="desktop" class="is-active">1440</button>
+        <button type="button" data-size="mobile">375</button>
+      </div>
+    )}
+  </header>
+
+  <div class="wf-frame" data-frame>
+    <div class="wf-chrome">
+      <span class="wf-dots"><i></i><i></i><i></i></span>
+      <span class="wf-url">{url ?? title.toLowerCase()}</span>
+      <span class="wf-hint">click to open</span>
+    </div>
+    <div class="wf-viewport" data-viewport>
+      {[...shots].sort((a, b) => pages.indexOf(a.page) - pages.indexOf(b.page)).map((s) => (
+        <img
+          src={`/works/${project}/${s.parts[0].file}`}
+          width={s.parts[0].w}
+          height={s.parts[0].h}
+          alt={`${title} - ${s.page}, ${s.size}`}
+          data-page={s.page}
+          data-size={s.size}
+          class={s.page === first && s.size === 'desktop' ? 'is-active' : ''}
+          loading="lazy"
+          decoding="async"
+        />
+      ))}
+    </div>
+  </div>
+
+  <div class="wf-foot">
+    <span class="wf-count">{pages.length} {pages.length === 1 ? 'page' : 'pages'}</span>
+    {note && <span class="wf-note">{note}</span>}
+    {url && <a class="wf-live" href={url} target="_blank" rel="noopener">open the live site &rarr;</a>}
+  </div>
+</section>
+
+<style>
+  .work-frame {
+    margin-block: var(--spacing-120);
+  }
+
+  .wf-head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--spacing-024);
+    flex-wrap: wrap;
+    margin-bottom: var(--spacing-016);
+  }
+  .wf-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-mono-label);
+    letter-spacing: 0.12em;
+    color: var(--color-muted);
+    margin-right: auto;
+  }
+
+  .wf-tabs, .wf-sizes { display: flex; gap: 2px; }
+  .wf-tabs button, .wf-sizes button {
+    font-family: var(--font-mono);
+    font-size: var(--text-mono-caption);
+    letter-spacing: 0.06em;
+    padding: 6px 12px;
+    color: var(--color-muted);
+    border: 1px solid var(--color-hairline);
+    background: transparent;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s, background 0.2s;
+  }
+  .wf-tabs button:hover, .wf-sizes button:hover { color: var(--color-primary); }
+  .wf-tabs button.is-active, .wf-sizes button.is-active {
+    color: var(--color-paper);
+    background: var(--color-ink);
+    border-color: var(--color-ink);
+  }
+
+  /* the window itself */
+  .wf-frame {
+    position: relative;
+    border: 1px solid var(--color-hairline);
+    background: var(--color-paper);
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .wf-chrome {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-012);
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--color-hairline);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-muted);
+  }
+  .wf-dots { display: flex; gap: 5px; }
+  .wf-dots i {
+    width: 8px; height: 8px; border-radius: 50%;
+    border: 1px solid var(--color-hairline);
+  }
+  .wf-url { letter-spacing: 0.04em; }
+  .wf-hint { margin-left: auto; opacity: 0; transition: opacity 0.2s; }
+  .wf-frame:hover .wf-hint { opacity: 1; }
+
+  .wf-viewport {
+    position: relative;
+    height: 68vh;
+    min-height: 420px;
+    overflow: hidden;
+  }
+  .wf-viewport img {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: auto;
+    display: none;
+    will-change: transform;
+  }
+  .wf-viewport img.is-active { display: block; }
+
+  /* A 375px capture blown up to full frame width is a blurry wall of text.
+     Show the phone at phone size, centred on the surface instead. */
+  .wf-viewport.is-mobile {
+    background: color-mix(in srgb, var(--color-ink) 6%, var(--color-paper));
+  }
+  .wf-viewport.is-mobile img.is-active {
+    width: 375px;
+    left: 50%;
+    margin-left: -187px;
+    box-shadow: 0 0 0 1px var(--color-hairline);
+  }
+
+  .wf-foot {
+    display: flex;
+    gap: var(--spacing-024);
+    margin-top: var(--spacing-012);
+    font-family: var(--font-mono);
+    font-size: var(--text-mono-caption);
+    color: var(--color-muted);
+  }
+  .wf-live { margin-left: auto; color: var(--color-primary); }
+
+  /* touch: pinning fights inertial scroll, so the frame just sits there */
+  @media (max-width: 900px) {
+    .wf-viewport { height: 60vh; min-height: 340px; }
+    .wf-hint { opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .wf-viewport img { transform: none !important; }
+  }
+</style>

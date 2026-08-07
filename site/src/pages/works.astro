@@ -1,0 +1,42 @@
+---
+import Base from '../layouts/Base.astro';
+import WorkFrame from '../components/WorkFrame.astro';
+---
+<Base title="Works - Konstantin Darovskiy">
+  <header class="flex h-[64px] items-center justify-between border-b border-hairline px-[20px] md:px-080">
+    <a href="/" class="font-mono text-mono-nav">kuixl</a>
+    <span class="font-mono text-mono-nav text-muted">FULL VIEW / TEST</span>
+  </header>
+
+  <main class="mx-auto max-w-[1200px] px-[20px] pb-240 md:px-080">
+    <h1 class="mt-120 text-display-l-m font-sans md:text-display-l">Works, in full.</h1>
+    <p class="mt-016 max-w-[640px] text-body text-muted">
+      Every project below is shown as the whole page, not a crop. Scroll to run it
+      through the window, click to open it at reading size.
+    </p>
+
+    <h2 class="mt-120 text-h2 font-sans">nichive</h2>
+    <WorkFrame
+      project="nichive"
+      title="nichive"
+      url="https://kuixl.github.io/final-kt/"
+      note="the site ships in Russian"
+    />
+
+    <h2 class="text-h2 font-sans">Monolith</h2>
+    <WorkFrame project="monolith" title="Monolith" />
+
+    <h2 class="text-h2 font-sans">Yakitoria</h2>
+    <WorkFrame project="yakitoria" title="Yakitoria" />
+
+    <h2 class="text-h2 font-sans">BETA</h2>
+    <WorkFrame project="beta" title="BETA" />
+  </main>
+
+  <script>
+    import { initWorkFrames } from '../scripts/workframe';
+    import { initMotion } from '../scripts/motion';
+    initMotion();
+    initWorkFrames();
+  </script>
+</Base>

@@ -163,6 +163,54 @@ html.is-preloading {
   pointer-events: none;
 }
 
+/* ---------- full-screen work reader ----------
+   Created by script outside any component, so the styles live here. */
+.wf-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: color-mix(in srgb, var(--color-ink) 92%, transparent);
+  display: flex;
+  flex-direction: column;
+  animation: wf-fade 0.2s ease;
+}
+@keyframes wf-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.wf-overlay-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  font-family: var(--font-mono);
+  font-size: var(--text-mono-caption);
+  color: var(--color-muted-inverse);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-paper) 14%, transparent);
+}
+.wf-overlay-bar button {
+  font-family: inherit;
+  font-size: inherit;
+  letter-spacing: 0.08em;
+  color: var(--color-paper);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+.wf-overlay-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+}
+.wf-overlay-scroll img {
+  width: min(100%, 1100px);
+  height: auto;
+  align-self: flex-start;
+}
+
 /* the real Switzer the ASCII swarm resolves into; the script drives opacity,
    blur and scale, so it starts invisible and out of focus */
 #preload-wordmark {
