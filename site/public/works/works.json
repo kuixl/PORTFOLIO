@@ -15,6 +15,50 @@
       ]
     }
   ],
+  "monolith": [
+    {
+      "page": "archive",
+      "size": "desktop",
+      "w": 1200,
+      "h": 1383,
+      "parts": [
+        {
+          "file": "archive-desktop.webp",
+          "w": 1200,
+          "h": 1383,
+          "kb": 69
+        }
+      ]
+    },
+    {
+      "page": "index",
+      "size": "desktop",
+      "w": 1200,
+      "h": 1314,
+      "parts": [
+        {
+          "file": "index-desktop.webp",
+          "w": 1200,
+          "h": 1314,
+          "kb": 84
+        }
+      ]
+    },
+    {
+      "page": "materials",
+      "size": "desktop",
+      "w": 1200,
+      "h": 2789,
+      "parts": [
+        {
+          "file": "materials-desktop.webp",
+          "w": 1200,
+          "h": 2789,
+          "kb": 211
+        }
+      ]
+    }
+  ],
   "nichive": [
     {
       "page": "exhibitions",
