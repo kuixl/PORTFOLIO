@@ -38,19 +38,20 @@ const DEFAULTS = {
   // These are outline drawings, and outlines need resolution and restraint.
   // At 78 columns with 30% ink they came out as blobs: the strokes merged into
   // fields and the subject disappeared. Finer grid, thinner ink, less blur.
-  // Finer and thinner than the first pass, but not as fine as it could be.
-  // Past roughly 110 columns the grid starts resolving the source's own
-  // character cells and the outline breaks into dots, so this sits just under
-  // that ceiling. Blur is matched to bridge those cells rather than erase them.
-  cols: 100,
+  // Sources are ASCII art rendered to an image, so their strokes are rows of
+  // discrete characters. Sample finer than roughly 80 columns and the grid
+  // starts resolving those characters and the line breaks into dots; blur
+  // enough to bridge them and shapes fill solid. This pair sits in the window
+  // where outlines stay continuous and still read as a subject.
+  cols: 76,
   ramp: 'line',
   gamma: 0.9,
   floor: 0.12,
-  blurDiv: 7,
+  blurDiv: 9,
   // Ink coverage in these sources runs from 4% to 13% of the canvas, so any
   // fixed gain floods one drawing while blanking another. Instead, aim for a
   // target share of filled cells and solve for the gain that produces it.
-  targetInk: 0.12,
+  targetInk: 0.17,
   // Percentile stretch is for photographs, where the useful range is unknown.
   // Line art on white is already calibrated - stretching it drags the white
   // background down into the ramp and floods the grid with characters.
@@ -67,9 +68,7 @@ const DEFAULTS = {
  * grid that keeps its width readable it is six or seven rows tall, and the
  * subject flattens into a horizontal smear.
  */
-const PRESETS = {
-  'image-5': { skip: true },
-};
+const PRESETS = {};
 
 const args = process.argv.slice(2);
 const flag = (name, fallback) => {
@@ -105,8 +104,15 @@ async function polarity(path) {
     }
   }
   const mean = n ? sum / n : 1;
-  // opaque pixels mostly light => the drawing is light-on-dark
-  return { lightOnDark: mean > 0.5, mean, coverage: n / (info.width * info.height) };
+  const coverage = n / (info.width * info.height);
+
+  // The same number means opposite things depending on the source.
+  // With transparency, the pixels carrying alpha ARE the drawing, so their mean
+  // is the ink colour. Without it, the frame is mostly background, so the mean
+  // is the background colour and the ink is whatever contrasts with it. Reading
+  // both the same way inverted every opaque source and filled it solid.
+  const lightOnDark = coverage > 0.9 ? mean < 0.5 : mean > 0.5;
+  return { lightOnDark, mean, coverage };
 }
 
 async function load(path) {
@@ -269,6 +275,13 @@ const run = async () => {
     );
 
     if (!probeOnly) {
+      // A grid that comes out almost entirely filled is a failed conversion,
+      // not a drawing - shipping it puts a black rectangle in the preloader.
+      // Drop it and say so rather than let it through.
+      if (inkRatio > 0.6) {
+        console.log(`  rejected: ${(inkRatio * 100).toFixed(0)}% ink, reads as a solid block`);
+        continue;
+      }
       await writeFile(join(OUT, `${name}.txt`), text, 'utf8');
       // The originals are the artwork as drawn and they beat any re-rendering
       // of them, so pages get a compressed copy. The character grid is for the
