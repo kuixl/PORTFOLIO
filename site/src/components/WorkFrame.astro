@@ -200,8 +200,12 @@ const first = pages[0];
 
   /* touch: pinning fights inertial scroll, so the frame just sits there */
   @media (max-width: 900px) {
-    .wf-viewport { height: 60vh; min-height: 340px; }
+    .wf-viewport { height: 46vh; min-height: 280px; }
     .wf-hint { opacity: 1; }
+    /* the footer runs out of room for three items side by side */
+    .wf-foot { flex-wrap: wrap; gap: var(--gap-tight) var(--gap-item); }
+    .wf-live { margin-left: 0; }
+    .wf-head { gap: var(--gap-item); }
   }
 
   @media (prefers-reduced-motion: reduce) {

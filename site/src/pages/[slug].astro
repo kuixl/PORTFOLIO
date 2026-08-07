@@ -236,10 +236,10 @@ const n = () => String(++step).padStart(2, '0');
   }
   .persona blockquote { margin-top: var(--gap-tight); font-style: italic; color: var(--color-muted); }
 
-  .decisions { display: grid; gap: var(--gap-block); }
+  .decisions { display: grid; gap: var(--gap-item); }
   .decision {
     max-width: var(--measure);
-    padding-block: var(--spacing-024);
+    padding-block: var(--gap-item);
     border-top: 1px solid var(--color-hairline);
   }
   .decision:first-child { border-top: 0; padding-top: 0; }
@@ -252,7 +252,17 @@ const n = () => String(++step).padStart(2, '0');
   .decision h3 { margin-top: var(--gap-tight); font-size: 28px; font-weight: 700; letter-spacing: -0.01em; }
   .decision p { margin-top: var(--gap-item); }
 
-  .screens { display: grid; gap: var(--gap-block); grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  /* On a phone one card per row turned Screens into 1800px of scrolling - a
+     third of the page for a contact sheet. Two up: still legible as a
+     thumbnail, half the height. */
+  .screens {
+    display: grid;
+    gap: var(--gap-item);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  @media (min-width: 901px) {
+    .screens { gap: var(--gap-block); grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  }
   .screen-open {
     position: relative;
     display: block;
