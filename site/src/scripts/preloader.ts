@@ -36,7 +36,14 @@ const ACT_NAMES: [number, string][] = [
 type Cell = { c: number; r: number; ch: string };
 type Node = { ch: string; x: number; y: number };
 
-const prm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+/**
+ * `?replay` forces the full sequence: it ignores the once-per-session flag and
+ * overrides reduced motion. Asking for it by hand is explicit consent, unlike
+ * the ambient OS setting - and without it nobody whose system has animations
+ * switched off can ever see this thing, including its author.
+ */
+const FORCED = new URLSearchParams(location.search).has('replay');
+const prm = !FORCED && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const easeIO = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 const rand = (a: number, b: number) => a + Math.random() * (b - a);
@@ -77,7 +84,7 @@ export function initPreloader(): Promise<void> {
     };
 
     // home page only, once per session
-    if (!shell || !canvas || sessionStorage.getItem(SESSION_KEY)) { done(); return; }
+    if (!shell || !canvas || (!FORCED && sessionStorage.getItem(SESSION_KEY))) { done(); return; }
     sessionStorage.setItem(SESSION_KEY, '1');
 
     const ctx = canvas.getContext('2d')!;
@@ -317,16 +324,20 @@ export function initPreloader(): Promise<void> {
     }
 
     if (prm) {
-      // static frame, out as soon as the assets are in
+      // Static frame - but held briefly. Reduced motion means no movement, not
+      // a 200ms flash of something unreadable; a title card that is gone before
+      // it can be read is worse than no title card.
+      const STATIC_MS = 900;
+      const started = performance.now();
       const wait = () => {
-        hud(ACT.morphB, performance.now(), performance.now());
+        hud(ACT.morphB, performance.now(), started);
         if (nodes[0]) {
           ctx.font = `${F}px ui-monospace, Consolas, monospace`;
           ctx.textBaseline = 'top';
           ctx.fillStyle = PAPER + '0.9)';
           for (const nd of nodes[0]) ctx.fillText(nd.ch, nd.x, nd.y);
         }
-        if (realProgress() >= 0.99) finish();
+        if (realProgress() >= 0.99 && performance.now() - started > STATIC_MS) finish();
         else requestAnimationFrame(wait);
       };
       invite?.remove();
