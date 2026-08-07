@@ -26,13 +26,13 @@ const { n, title, wide = false, id } = Astro.props;
   .case-section {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--spacing-024);
+    gap: var(--gap-block);
     /* was 120 top and bottom - a rhythm that reads as unfinished rather than
        generous once the sections carry real content */
-    padding-block: var(--spacing-064);
+    padding-block: var(--gap-section);
     border-top: 1px solid var(--color-hairline);
   }
-  .cs-rail { display: flex; align-items: baseline; gap: var(--spacing-016); }
+  .cs-rail { display: flex; align-items: baseline; gap: var(--gap-item); }
   .cs-n {
     font-family: var(--font-mono);
     font-size: var(--text-mono-label);
@@ -54,17 +54,17 @@ const { n, title, wide = false, id } = Astro.props;
     hyphens: none;
     overflow-wrap: normal;
   }
-  .cs-body > :global(* + *) { margin-top: var(--spacing-024); }
+  .cs-body > :global(* + *) { margin-top: var(--gap-item); }
 
   @media (min-width: 901px) {
     .case-section {
       grid-template-columns: 240px minmax(0, 1fr);
-      gap: var(--spacing-048);
+      gap: var(--gap-block);
     }
     .cs-rail {
       flex-direction: row;
       align-items: baseline;
-      gap: var(--spacing-012);
+      gap: var(--gap-tight);
       position: sticky;
       top: var(--spacing-024);
       align-self: start;

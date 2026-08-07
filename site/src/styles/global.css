@@ -57,6 +57,15 @@
   --spacing-160: 160px;
   --spacing-240: 240px;
 
+  /* Semantic rhythm. The raw 4-240 scale says how far, not what for, so every
+     file was picking its own distance and the page read as either cavernous or
+     stuck together. Four steps, one meaning each, used everywhere. */
+  --gap-section: 72px;   /* between major sections */
+  --gap-block: 32px;     /* between blocks inside a section */
+  --gap-item: 16px;      /* between related items in a block */
+  --gap-tight: 8px;      /* label to value */
+  --measure: 68ch;       /* longest comfortable line */
+
   /* type scale, desktop */
   --text-display-xl: 180px;
   --text-display-xl--line-height: 0.9;
@@ -116,6 +125,13 @@
   --text-display-l-m--line-height: 1;
   --text-display-l-m--letter-spacing: -0.02em;
   --text-display-l-m--font-weight: 900;
+}
+
+@media (max-width: 900px) {
+  :root {
+    --gap-section: 48px;
+    --gap-block: 24px;
+  }
 }
 
 /* ---------- base ---------- */

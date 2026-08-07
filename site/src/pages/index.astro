@@ -183,7 +183,7 @@ const contacts = [
     font-size: clamp(40px, 9vw, 96px);
     line-height: 1;
     letter-spacing: -0.02em;
-    margin-bottom: var(--spacing-032);
+    margin-bottom: var(--gap-block);
   }
 
   /* hero */
@@ -191,7 +191,7 @@ const contacts = [
   .hero-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--spacing-024);
+    gap: var(--gap-block);
     font-family: var(--font-mono);
     font-size: var(--text-mono-label);
     letter-spacing: 0.1em;
@@ -200,7 +200,7 @@ const contacts = [
   .hero-meta {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-    margin-top: var(--spacing-032);
+    margin-top: var(--gap-block);
     border-top: 1px solid var(--color-hairline);
   }
   .hero-meta > div {
@@ -225,11 +225,11 @@ const contacts = [
     letter-spacing: -0.03em;
   }
   .hero-lead { font-size: var(--text-body-lg); color: var(--color-muted); }
-  .hero-meta { margin-top: var(--spacing-032); }
+  .hero-meta { margin-top: var(--gap-block); }
   .hero-scroll { position: absolute; bottom: var(--spacing-024); left: 0; font-size: var(--text-mono-caption); color: var(--color-muted); }
 
   /* works index */
-  .works { padding-block: var(--spacing-064); border-top: 1px solid var(--color-hairline); }
+  .works { padding-block: var(--gap-section); border-top: 1px solid var(--color-hairline); }
   .index { list-style: none; }
   .index-row + .index-row { border-top: 1px solid var(--color-hairline); }
   .index-link {
@@ -266,18 +266,18 @@ const contacts = [
     grid-area: meta;
     display: flex;
     flex-wrap: wrap;
-    gap: var(--spacing-016);
+    gap: var(--gap-item);
     font-family: var(--font-mono);
     font-size: var(--text-mono-caption);
     letter-spacing: 0.08em;
     color: var(--color-muted);
   }
   .ix-go { grid-area: go; font-size: var(--text-mono-caption); letter-spacing: 0.1em; }
-  .index-note { margin-top: var(--spacing-024); font-size: var(--text-mono-caption); color: var(--color-muted); }
+  .index-note { margin-top: var(--gap-item); font-size: var(--text-mono-caption); color: var(--color-muted); }
 
   /* profile */
-  .profile { padding-block: var(--spacing-064); border-top: 1px solid var(--color-hairline); }
-  .pf-grid { display: grid; gap: var(--spacing-048); }
+  .profile { padding-block: var(--gap-section); border-top: 1px solid var(--color-hairline); }
+  .pf-grid { display: grid; gap: var(--gap-block); }
   /* the portrait arrives already halftoned; no filter, and no smoothing on
      scale-down or the dot pattern turns to porridge */
   .pf-portrait img {
@@ -287,13 +287,13 @@ const contacts = [
     display: block;
     image-rendering: -webkit-optimize-contrast;
   }
-  .pf-portrait figcaption { margin-top: var(--spacing-008); font-size: var(--text-mono-caption); letter-spacing: 0.1em; color: var(--color-muted); }
-  .pf-text > * + * { margin-top: var(--spacing-024); }
+  .pf-portrait figcaption { margin-top: var(--gap-tight); font-size: var(--text-mono-caption); letter-spacing: 0.1em; color: var(--color-muted); }
+  .pf-text > * + * { margin-top: var(--gap-item); }
   .pf-text p { max-width: 62ch; }
   /* Ruled rows. As a bare grid of label/value pairs this read as one continuous
      block - no boundary told you where a fact ended and the next began. */
   .pf-facts {
-    margin-top: var(--spacing-032);
+    margin-top: var(--gap-block);
     border-top: 1px solid var(--color-hairline);
   }
   .pf-facts div {
@@ -312,11 +312,11 @@ const contacts = [
   .pf-facts dd { font-size: 15px; line-height: 1.45; }
 
   /* contact */
-  .contact { padding-block: var(--spacing-064) var(--spacing-048); border-top: 1px solid var(--color-hairline); }
-  .ct-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--spacing-024); }
+  .contact { padding-block: var(--gap-section); border-top: 1px solid var(--color-hairline); }
+  .ct-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--gap-block); }
   .ct-title { font-family: var(--font-sans); font-weight: 900; font-size: clamp(40px, 9vw, 96px); line-height: 1; letter-spacing: -0.02em; }
   .ct-status { display: flex; flex-direction: column; font-size: var(--text-mono-caption); letter-spacing: 0.1em; color: var(--color-muted); }
-  .ct-list { list-style: none; margin-top: var(--spacing-048); display: grid; gap: var(--spacing-016); }
+  .ct-list { list-style: none; margin-top: var(--gap-block); display: grid; gap: var(--gap-item); }
   .ct-list a { font-size: clamp(20px, 3vw, 24px); border-bottom: 1px solid var(--color-hairline); }
   .ct-list a:hover { border-color: var(--color-primary); }
 
@@ -336,10 +336,10 @@ const contacts = [
       grid-template-columns: 90px minmax(0, 1fr) auto auto;
       grid-template-areas: 'n title meta go';
       align-items: baseline;
-      gap: var(--spacing-032);
+      gap: var(--gap-block);
     }
     .ix-meta { justify-content: flex-end; }
-    .pf-grid { grid-template-columns: 340px minmax(0, 1fr); gap: var(--spacing-048); }
-    .pf-facts div { grid-template-columns: 170px minmax(0, 1fr); gap: var(--spacing-024); align-items: baseline; }
+    .pf-grid { grid-template-columns: 340px minmax(0, 1fr); gap: var(--gap-block); }
+    .pf-facts div { grid-template-columns: 170px minmax(0, 1fr); gap: var(--gap-block); align-items: baseline; }
   }
 </style>

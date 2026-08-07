@@ -156,11 +156,12 @@ const n = () => String(++step).padStart(2, '0');
   <script>
     import { initWorkFrames, initFullViewLinks } from '../scripts/workframe';
     import { initMotion } from '../scripts/motion';
-    import { initReveals, initPageWipe } from '../scripts/reveal';
+    import { initReveals, initPageWipe, initFrameEntrance } from '../scripts/reveal';
     initMotion();
     initWorkFrames();
     initFullViewLinks();
     initReveals();
+    initFrameEntrance();
     initPageWipe();
   </script>
 </Base>
@@ -181,11 +182,11 @@ const n = () => String(++step).padStart(2, '0');
     padding-bottom: var(--spacing-080);
   }
 
-  .case-cover { padding-block: var(--spacing-064) var(--spacing-048); }
+  .case-cover { padding-block: var(--gap-section); }
   .cc-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--spacing-032);
+    gap: var(--gap-block);
     font-family: var(--font-mono);
     font-size: var(--text-mono-label);
     letter-spacing: 0.1em;
@@ -193,7 +194,7 @@ const n = () => String(++step).padStart(2, '0');
   }
   .cc-meta b { font-weight: 400; }
   .cc-title {
-    margin-top: var(--spacing-024);
+    margin-top: var(--gap-item);
     font-family: var(--font-sans);
     font-weight: 900;
     font-size: clamp(56px, 15vw, 180px);
@@ -201,17 +202,17 @@ const n = () => String(++step).padStart(2, '0');
     letter-spacing: -0.03em;
   }
   .cc-lead {
-    margin-top: var(--spacing-024);
+    margin-top: var(--gap-item);
     max-width: 640px;
     font-size: var(--text-body-lg);
     color: var(--color-muted);
   }
 
-  .facts, .meta { display: grid; gap: var(--spacing-024); }
+  .facts, .meta { display: grid; gap: var(--gap-block); }
   .facts { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
   .meta {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    margin-top: var(--spacing-048);
+    margin-top: var(--gap-block);
     padding-top: var(--spacing-024);
     border-top: 1px solid var(--color-hairline);
   }
@@ -224,7 +225,7 @@ const n = () => String(++step).padStart(2, '0');
   .facts dd { margin-top: 6px; font-weight: 700; font-size: 22px; line-height: 1.2; }
   .meta dd { margin-top: 6px; font-size: var(--text-body); }
 
-  .personas { display: grid; gap: var(--spacing-032); grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .personas { display: grid; gap: var(--gap-block); grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
   .persona figcaption { display: flex; flex-direction: column; gap: 2px; }
   .persona strong { font-size: 24px; font-weight: 700; }
   .persona span {
@@ -233,11 +234,11 @@ const n = () => String(++step).padStart(2, '0');
     letter-spacing: 0.06em;
     color: var(--color-muted);
   }
-  .persona blockquote { margin-top: var(--spacing-012); font-style: italic; color: var(--color-muted); }
+  .persona blockquote { margin-top: var(--gap-tight); font-style: italic; color: var(--color-muted); }
 
-  .decisions { display: grid; gap: var(--spacing-032); }
+  .decisions { display: grid; gap: var(--gap-block); }
   .decision {
-    max-width: 68ch;
+    max-width: var(--measure);
     padding-block: var(--spacing-024);
     border-top: 1px solid var(--color-hairline);
   }
@@ -248,10 +249,10 @@ const n = () => String(++step).padStart(2, '0');
     letter-spacing: 0.1em;
     color: var(--color-muted);
   }
-  .decision h3 { margin-top: var(--spacing-008); font-size: 28px; font-weight: 700; letter-spacing: -0.01em; }
-  .decision p { margin-top: var(--spacing-016); }
+  .decision h3 { margin-top: var(--gap-tight); font-size: 28px; font-weight: 700; letter-spacing: -0.01em; }
+  .decision p { margin-top: var(--gap-item); }
 
-  .screens { display: grid; gap: var(--spacing-024); grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .screens { display: grid; gap: var(--gap-block); grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
   .screen-open {
     position: relative;
     display: block;
@@ -277,14 +278,14 @@ const n = () => String(++step).padStart(2, '0');
   .screen-open:hover .screen-cue,
   .screen-open:focus-visible .screen-cue { opacity: 1; }
   .screen figcaption {
-    margin-top: var(--spacing-008);
+    margin-top: var(--gap-tight);
     font-family: var(--font-mono);
     font-size: var(--text-mono-caption);
     letter-spacing: 0.08em;
     color: var(--color-muted);
   }
 
-  .judges { display: grid; gap: var(--spacing-032); grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .judges { display: grid; gap: var(--gap-block); grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
   .judges blockquote {
     font-size: 20px;
     line-height: 1.45;
@@ -294,7 +295,7 @@ const n = () => String(++step).padStart(2, '0');
   }
   .judges-src {
     display: block;
-    margin-top: var(--spacing-024);
+    margin-top: var(--gap-item);
     font-size: var(--text-mono-caption);
     letter-spacing: 0.1em;
     color: var(--color-muted);

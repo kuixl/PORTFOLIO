@@ -109,6 +109,44 @@ export function initAssembleHeading(selector = '[data-assemble]') {
 }
 
 /**
+ * The work frame opens like a window: the chrome bar arrives, then the viewport
+ * unrolls beneath it. Scale would squash the screenshot inside, so the height
+ * is what animates, with the image held at its final size and clipped.
+ */
+export function initFrameEntrance() {
+  if (prm()) return;
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.querySelectorAll<HTMLElement>('.work-frame').forEach((frame) => {
+    const viewport = frame.querySelector<HTMLElement>('[data-viewport]');
+    const chrome = frame.querySelector<HTMLElement>('.wf-chrome');
+    if (!viewport || !chrome) return;
+
+    ScrollTrigger.create({
+      trigger: frame,
+      start: 'top 85%',
+      once: true,
+      onEnter: () => {
+        const full = viewport.clientHeight;
+        gsap.set(chrome, { opacity: 0, y: -8 });
+        gsap.set(viewport, { height: 0, overflow: 'hidden' });
+        gsap
+          .timeline({
+            // hand the measured height back so the pinned scroll-through keeps
+            // working off a real number rather than an inline leftover
+            onComplete: () => {
+              viewport.style.removeProperty('height');
+              ScrollTrigger.refresh();
+            },
+          })
+          .to(chrome, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' })
+          .to(viewport, { height: full, duration: 0.65, ease: 'power3.inOut' }, '-=0.1');
+      },
+    });
+  });
+}
+
+/**
  * ASCII wipe on internal navigation. Runs on click, before the browser leaves,
  * and again on arrival - a real page load, so the two halves are separate.
  */
