@@ -63,7 +63,7 @@ const n = () => String(++step).padStart(2, '0');
       </CaseSection>
     )}
 
-    <CaseSection n={n()} title="The brief">
+    <CaseSection n={n()} title="The brief" art={`${c.slug}-brief`}>
       {c.brief.map((p) => <p>{p}</p>)}
       <dl class="meta">
         {c.meta.map(([k, v]) => (
@@ -73,7 +73,7 @@ const n = () => String(++step).padStart(2, '0');
     </CaseSection>
 
     {c.broken && (
-      <CaseSection n={n()} title="Broken">
+      <CaseSection n={n()} title="Broken" art={`${c.slug}-broken`}>
         {c.broken.map((p) => <p>{p}</p>)}
       </CaseSection>
     )}
@@ -85,7 +85,7 @@ const n = () => String(++step).padStart(2, '0');
     )}
 
     {c.personas && (
-      <CaseSection n={n()} title="Research">
+      <CaseSection n={n()} title="Research" art={`${c.slug}-research`}>
         <div class="personas">
           {c.personas.map(([name, who, quote]) => (
             <figure class="persona">
@@ -131,7 +131,7 @@ const n = () => String(++step).padStart(2, '0');
     )}
 
     {c.system && (
-      <CaseSection n={n()} title="System">
+      <CaseSection n={n()} title="System" art={`${c.slug}-system`}>
         {c.system.map((p) => <p>{p}</p>)}
       </CaseSection>
     )}

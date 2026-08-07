@@ -18,20 +18,20 @@ interface Props {
 const { n, title, wide = false, id, art } = Astro.props;
 
 /**
- * The rail is empty for the height of a long section, which is exactly the
- * dead space the ASCII drawings were made for. Read at build time so the page
- * ships as text with no runtime fetch.
+ * The rail sits empty for the height of a long section. It gets the artwork
+ * itself, cut out and recoloured, rather than a re-conversion of it: a grid
+ * narrow enough to fit 240px has too few columns to keep a subject and comes
+ * out as scattered dots.
  */
 const ART_DIR = fileURLToPath(new URL('../../public/art/', import.meta.url));
-let artText = '';
+let artSrc = '';
 if (art) {
-  // the coarse variant: the fine one has to be set below readable size to fit
-  const files = readdirSync(ART_DIR).filter((f) => f.endsWith('.rail.txt')).sort();
+  const files = readdirSync(ART_DIR).filter((f) => f.endsWith('.cut.webp')).sort();
   if (files.length) {
     // stable per section: same seed, same drawing on every build
     let h = 0;
     for (const ch of art) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-    artText = readFileSync(ART_DIR + files[h % files.length], 'utf8');
+    artSrc = `/art/${files[h % files.length]}`;
   }
 }
 ---
@@ -39,8 +39,10 @@ if (art) {
   <div class="cs-rail">
     <span class="cs-n">{n}</span>
     <h2 class="cs-title">{title}</h2>
-    {artText && (
-      <div class="cs-art-box" aria-hidden="true"><pre class="cs-art">{artText}</pre></div>
+    {artSrc && (
+      <div class="cs-art-box" aria-hidden="true">
+        <img class="cs-art" src={artSrc} alt="" loading="lazy" decoding="async" />
+      </div>
     )}
   </div>
   <div class="cs-body" data-reveal data-reveal-children>
@@ -99,16 +101,12 @@ if (art) {
     /* Sized to fit the rail outright rather than scaled and clipped: clipping
        showed one corner of a drawing, which reads as a stray mark, not art.
        At 76 columns a 5.2px monospace advance lands just inside 240px. */
-    /* 40 columns at 11px lands just inside the 240px rail, and at 11px a
-       character is a character rather than a speck of dust */
     .cs-art {
-      font-family: ui-monospace, Consolas, monospace;
-      font-size: 11px;
-      line-height: 20px;
-      letter-spacing: 0;
-      color: var(--color-primary);
-      opacity: 0.42;
-      white-space: pre;
+      display: block;
+      width: 100%;
+      max-width: 220px;
+      height: auto;
+      opacity: 0.62;
     }
   }
 

@@ -308,18 +308,35 @@ const run = async () => {
       // set at ~5px to fit a 240px rail, which is below the size a character
       // reads at - it looked like dust. Forty columns fits the same rail at
       // 11px, where the glyphs are actually glyphs.
-      const railCols = 40;
-      // Denser than the fine grid on purpose. At 40 columns a 13% target leaves
-      // a handful of scattered marks instead of a subject: each cell now covers
-      // four times the area, so the same target draws far less of the drawing.
-      const railTarget = 0.3;
-      const railSample = await sample(path, railCols, blurDiv * 0.6, args.includes('--edge'));
-      const railLum = stretch(railSample.lum, preset.gamma, preset.stretch);
-      const railText = toText(railLum, railCols, railSample.rows, {
-        ...preset,
-        gain: autoGain(railLum, preset.floor, railTarget),
-      });
-      await writeFile(join(OUT, `${name}.rail.txt`), railText, 'utf8');
+      /**
+       * Cut-out for page margins.
+       *
+       * A converted grid does not survive a 240px rail: forty columns is not
+       * enough resolution to keep a subject, and the result reads as scattered
+       * dots rather than a drawing. The source is already artwork, so the
+       * margin gets the artwork itself, keyed to transparency and recoloured to
+       * the site's ink. Alpha comes from inverted luminance, so the strokes
+       * carry and the paper behind them drops out.
+       */
+      const cut = await sharp(path)
+        .flatten({ background: pol.lightOnDark ? '#000000' : '#ffffff' })
+        .greyscale()
+        .resize(560, null, { withoutEnlargement: true });
+      const { data: mask, info: maskInfo } = await (pol.lightOnDark ? cut : cut.negate())
+        .raw()
+        .toBuffer({ resolveWithObject: true });
+
+      const cutOut = await sharp({
+        create: {
+          width: maskInfo.width,
+          height: maskInfo.height,
+          channels: 3,
+          background: { r: 14, g: 14, b: 14 },
+        },
+      })
+        .joinChannel(mask, { raw: { width: maskInfo.width, height: maskInfo.height, channels: 1 } })
+        .webp({ quality: 88, alphaQuality: 90 })
+        .toFile(join(OUT, `${name}.cut.webp`));
       // The originals are the artwork as drawn and they beat any re-rendering
       // of them, so pages get a compressed copy. The character grid is for the
       // preloader, which needs glyphs it can move individually.
