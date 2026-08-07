@@ -79,7 +79,7 @@ const n = () => String(++step).padStart(2, '0');
     )}
 
     {c.myRole && (
-      <CaseSection n={n()} title="My role">
+      <CaseSection n={n()} title="My role" art={`${c.slug}-role`}>
         {c.myRole.map((p) => <p>{p}</p>)}
       </CaseSection>
     )}
@@ -97,13 +97,15 @@ const n = () => String(++step).padStart(2, '0');
       </CaseSection>
     )}
 
-    <CaseSection n={n()} title="Decisions">
+    <CaseSection n={n()} title="Decisions" art={`${c.slug}-decisions`}>
       <div class="decisions">
         {c.decisions.map((d) => (
           <article class="decision">
-            <span class="d-n">{d.n}</span>
-            <h3>{d.title}</h3>
-            {d.body.map((p) => <p>{p}</p>)}
+            <span class="d-n" aria-hidden="true">{d.n}</span>
+            <div class="d-body">
+              <h3>{d.title}</h3>
+              {d.body.map((p) => <p>{p}</p>)}
+            </div>
           </article>
         ))}
       </div>
@@ -143,7 +145,7 @@ const n = () => String(++step).padStart(2, '0');
       </CaseSection>
     )}
 
-    <CaseSection n={n()} title="What I would change">
+    <CaseSection n={n()} title="Retro" art={`${c.slug}-retro`}>
       {c.retro.map((p) => <p>{p}</p>)}
     </CaseSection>
 
@@ -208,13 +210,21 @@ const n = () => String(++step).padStart(2, '0');
     color: var(--color-muted);
   }
 
-  .facts, .meta { display: grid; gap: var(--gap-block); }
-  .facts { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
-  .meta {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    margin-top: var(--gap-block);
-    padding-top: var(--gap-item);
-    border-top: 1px solid var(--color-hairline);
+  .facts { display: grid; gap: var(--gap-block); grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+
+  /* auto-fit left a single orphan on a second row whenever the count was not a
+     multiple of the column count; ruled rows carry any number cleanly and match
+     the fact tables elsewhere on the site */
+  .meta { margin-top: var(--gap-block); border-top: 1px solid var(--color-hairline); }
+  .meta > div {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 5px;
+    padding-block: var(--gap-item);
+    border-bottom: 1px solid var(--color-hairline);
+  }
+  @media (min-width: 901px) {
+    .meta > div { grid-template-columns: 170px minmax(0, 1fr); gap: var(--gap-block); align-items: baseline; }
   }
   .facts dt, .meta dt {
     font-family: var(--font-mono);
@@ -236,21 +246,37 @@ const n = () => String(++step).padStart(2, '0');
   }
   .persona blockquote { margin-top: var(--gap-tight); font-style: italic; color: var(--color-muted); }
 
-  .decisions { display: grid; gap: var(--gap-item); }
+  /* Three identical stacks of label, bold line, two grey paragraphs read as one
+     undifferentiated column. A large numeral in its own gutter gives the eye a
+     place to land and turns the section into a list you can scan. */
+  .decisions { display: grid; gap: var(--gap-block); }
   .decision {
-    max-width: var(--measure);
-    padding-block: var(--gap-item);
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr);
+    gap: var(--gap-item);
+    align-items: start;
+    padding-block: var(--gap-block);
     border-top: 1px solid var(--color-hairline);
   }
   .decision:first-child { border-top: 0; padding-top: 0; }
   .d-n {
-    font-family: var(--font-mono);
-    font-size: var(--text-mono-caption);
-    letter-spacing: 0.1em;
-    color: var(--color-muted);
+    font-family: var(--font-sans);
+    font-weight: 900;
+    font-size: 44px;
+    line-height: 0.85;
+    letter-spacing: -0.03em;
+    color: var(--color-hairline);
   }
-  .decision h3 { margin-top: var(--gap-tight); font-size: 28px; font-weight: 700; letter-spacing: -0.01em; }
+  .d-body { max-width: var(--measure); }
+  .decision h3 {
+    font-size: clamp(22px, 2.4vw, 30px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+  }
   .decision p { margin-top: var(--gap-item); }
+  /* the opening sentence carries the claim; let it lead */
+  .decision p:first-of-type { font-size: 19px; line-height: 1.55; color: var(--color-primary); }
 
   /* On a phone one card per row turned Screens into 1800px of scrolling - a
      third of the page for a contact sheet. Two up: still legible as a

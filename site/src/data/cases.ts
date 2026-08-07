@@ -21,6 +21,8 @@ export type Case = {
   broken?: string[];
   personas?: [string, string, string][];
   decisions: { n: string; title: string; body: string[] }[];
+  /** short label for the retro section; long ones wrap badly in the rail */
+  retroLabel?: string;
   screens?: [string, string][];
   system?: string[];
   judges?: { quotes: string[]; source: string };
@@ -67,7 +69,7 @@ export const cases: Case[] = [
     ],
     decisions: [
       {
-        n: 'DECISION 01',
+        n: '1',
         title: 'No cart, no prices',
         body: [
           'The obvious move for a fashion site is commerce. I built the first structure with a product page, sizes and a buy button, then cut all of it. The moment a price appears, everything on the page becomes an argument for spending money. The photography starts selling, the copy starts persuading.',
@@ -75,7 +77,7 @@ export const cases: Case[] = [
         ],
       },
       {
-        n: 'DECISION 02',
+        n: '2',
         title: 'One object per month, not a catalogue',
         body: [
           'A catalogue was the safer option: more content and better search coverage. I chose the constraint instead. A single object per month forces every page to justify itself - there is no grid to hide a weak page in.',
@@ -83,7 +85,7 @@ export const cases: Case[] = [
         ],
       },
       {
-        n: 'DECISION 03',
+        n: '3',
         title: '3D in the browser, not more photos',
         body: [
           'Photography would have been faster and lighter. But the object is a shoe with a split toe, and its shape is the whole point - flat images kept losing it.',
@@ -145,21 +147,21 @@ export const cases: Case[] = [
     ],
     decisions: [
       {
-        n: 'DECISION 01',
+        n: '1',
         title: 'Structure before visuals',
         body: [
           'The fast route is to open Figma and start designing screens. We spent the first days on the question sequence instead, which felt slow at the time. It paid off: when the visual direction changed mid-sprint, the structure held and nothing had to be rebuilt.',
         ],
       },
       {
-        n: 'DECISION 02',
+        n: '2',
         title: 'Answering the objection, not hiding it',
         body: [
           '"Student project" is the first thing a visitor thinks and the hardest thing to argue with. We put it in the copy directly (not a course, a release) rather than dressing it up as something more corporate. Naming the doubt is faster than working around it.',
         ],
       },
       {
-        n: 'DECISION 03',
+        n: '3',
         title: 'A prototype instead of a deck',
         body: [
           'Showing the client static screens invites comments on colour. A clickable prototype moves the conversation to the flow, which is what we actually needed feedback on at that stage.',
@@ -207,7 +209,7 @@ export const cases: Case[] = [
     ],
     decisions: [
       {
-        n: 'DECISION 01',
+        n: '1',
         title: 'Nutrition data next to the price',
         body: [
           'The audience counts calories whether the site shows them or not. Hiding the numbers does not remove the question, it just moves it somewhere the site cannot answer.',
@@ -215,7 +217,7 @@ export const cases: Case[] = [
         ],
       },
       {
-        n: 'DECISION 02',
+        n: '2',
         title: 'Frequently ordered together',
         body: [
           'Sales data showed rolls going out with soups and gunkan more than anything else. The original site knew this and did nothing with it.',
@@ -223,7 +225,7 @@ export const cases: Case[] = [
         ],
       },
       {
-        n: 'DECISION 03',
+        n: '3',
         title: 'Filters people actually use',
         body: [
           'Calories and cooking time went out. Popularity and dish type went in.',
@@ -231,7 +233,7 @@ export const cases: Case[] = [
         ],
       },
       {
-        n: 'DECISION 04',
+        n: '4',
         title: 'Reviews on the page, not behind a tab',
         body: [
           'A tab is a decision the visitor has to make before they get the information. Most do not make it.',

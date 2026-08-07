@@ -4,18 +4,43 @@
  * left rail so the body copy keeps a readable measure instead of stretching
  * across the full grid.
  */
+import { readFileSync, readdirSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
 interface Props {
   n: string;
   title: string;
   wide?: boolean;
   id?: string;
+  /** drop a drawing into the rail; the seed picks a stable one per section */
+  art?: string;
 }
-const { n, title, wide = false, id } = Astro.props;
+const { n, title, wide = false, id, art } = Astro.props;
+
+/**
+ * The rail is empty for the height of a long section, which is exactly the
+ * dead space the ASCII drawings were made for. Read at build time so the page
+ * ships as text with no runtime fetch.
+ */
+const ART_DIR = fileURLToPath(new URL('../../public/art/', import.meta.url));
+let artText = '';
+if (art) {
+  const files = readdirSync(ART_DIR).filter((f) => f.endsWith('.txt')).sort();
+  if (files.length) {
+    // stable per section: same seed, same drawing on every build
+    let h = 0;
+    for (const ch of art) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    artText = readFileSync(ART_DIR + files[h % files.length], 'utf8');
+  }
+}
 ---
 <section class="case-section" id={id} data-wide={wide ? '' : undefined}>
   <div class="cs-rail">
     <span class="cs-n">{n}</span>
     <h2 class="cs-title">{title}</h2>
+    {artText && (
+      <div class="cs-art-box" aria-hidden="true"><pre class="cs-art">{artText}</pre></div>
+    )}
   </div>
   <div class="cs-body" data-reveal data-reveal-children>
     <slot />
@@ -56,6 +81,34 @@ const { n, title, wide = false, id } = Astro.props;
   }
   .cs-body > :global(* + *) { margin-top: var(--gap-item); }
 
+  /* Hidden on narrow screens: the rail collapses to a single line there and a
+     drawing would push the section it labels off the screen. */
+  .cs-art-box { display: none; }
+  @media (min-width: 901px) {
+    /* The clip has to live on a wrapper. `overflow: hidden` on the scaled
+       element itself clips its children, not its own transformed box, so the
+       drawing kept running out over the body copy. */
+    .cs-art-box {
+      display: block;
+      width: 100%;
+      margin-top: var(--gap-block);
+      pointer-events: none;
+      user-select: none;
+    }
+    /* Sized to fit the rail outright rather than scaled and clipped: clipping
+       showed one corner of a drawing, which reads as a stray mark, not art.
+       At 76 columns a 5.2px monospace advance lands just inside 240px. */
+    .cs-art {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 5.2px;
+      line-height: 9.9px;
+      letter-spacing: 0;
+      color: var(--color-muted);
+      opacity: 0.65;
+      white-space: pre;
+    }
+  }
+
   @media (min-width: 901px) {
     .case-section {
       grid-template-columns: 240px minmax(0, 1fr);
@@ -64,11 +117,15 @@ const { n, title, wide = false, id } = Astro.props;
     .cs-rail {
       flex-direction: row;
       align-items: baseline;
+      /* the drawing is a third child of a row - without this it lines up beside
+         the heading and runs into the body column */
+      flex-wrap: wrap;
       gap: var(--gap-tight);
       position: sticky;
       top: var(--gap-item);
       align-self: start;
     }
+    .cs-art-box { flex-basis: 100%; }
     .case-section[data-wide] { grid-template-columns: 1fr; }
     .case-section[data-wide] .cs-rail { flex-direction: row; align-items: baseline; }
   }
