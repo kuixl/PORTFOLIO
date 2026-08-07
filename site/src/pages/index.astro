@@ -89,7 +89,8 @@ const contacts = [
                   <span>{w.year}</span>
                   <span>{w.team}</span>
                 </span>
-                <span class="ix-go font-mono">{w.href ? 'CASE &rarr;' : 'FULL SITE &rarr;'}</span>
+                {/* a JS string is not HTML - an entity here prints literally */}
+                <span class="ix-go font-mono">{w.href ? 'CASE →' : 'FULL SITE →'}</span>
               </Tag>
             </li>
           );
