@@ -170,21 +170,23 @@ export function initPreloader(): Promise<void> {
       // raster the wordmark on a generous grid; `place` handles the sizing
       const word = rasterWord(150, 80).map((p) => ({ ...p, ch: '#' }));
 
-      // The wordmark is the one stage where density decides legibility - five
-      // letterforms spread over a few hundred glyphs read as five smudges.
-      // Sizing the swarm to the smallest drawing in the set starved it, so the
-      // count is set by the word and sparse drawings repeat cells instead.
-      const n = Math.min(1600, word.length);
       const order = (a: { c: number; r: number }) => a.c * 3 + a.r; // organic sweep
       const stages = [...arts.map((a) => [...a]), word].map((s) =>
         s.sort((x, y) => order(x) - order(y))
       );
+      // Never sample a drawing down: dropping cells punches holes along the
+      // sort order and the outline stops reading. Size the swarm to the largest
+      // stage instead - stages with fewer cells repeat theirs, and a slightly
+      // thickened stroke costs far less than a broken one.
+      const n = Math.min(3200, Math.max(...stages.map((s) => s.length)));
 
       nodes = [];
       stageF = [];
       stages.forEach((st, si) => {
         const isWord = si === stages.length - 1;
-        const p = place(st, isWord ? 0.64 : 0.78, isWord ? 0.34 : 0.74);
+        // sources are trimmed to the drawing now, so they can be pushed close
+        // to the edges without a margin of empty canvas coming along
+        const p = place(st, isWord ? 0.64 : 0.88, isWord ? 0.34 : 0.84);
         const step = st.length / n;
         const used = new Map<number, number>();
         nodes.push(
@@ -214,7 +216,14 @@ export function initPreloader(): Promise<void> {
       real.art = 1;
     }
 
-    loadArts().then(build).catch(() => (real.art = 1));
+    // Do not swallow build errors: a silent catch here once turned a crash in
+    // build() into a blank screen with a clean console.
+    loadArts()
+      .then(build)
+      .catch((e) => {
+        real.art = 1;
+        console.error('[preloader] art stage failed', e);
+      });
 
     // ---------- HUD ----------
     function hud(t: number, now: number, startedAt: number) {

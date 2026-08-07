@@ -35,15 +35,18 @@ const RAMPS = {
 };
 
 const DEFAULTS = {
-  cols: 78,
+  // These are outline drawings, and outlines need resolution and restraint.
+  // At 78 columns with 30% ink they came out as blobs: the strokes merged into
+  // fields and the subject disappeared. Finer grid, thinner ink, less blur.
+  cols: 76,
   ramp: 'line',
   gamma: 0.9,
   floor: 0.12,
-  blurDiv: 6,
+  blurDiv: 9,
   // Ink coverage in these sources runs from 4% to 13% of the canvas, so any
   // fixed gain floods one drawing while blanking another. Instead, aim for a
   // target share of filled cells and solve for the gain that produces it.
-  targetInk: 0.3,
+  targetInk: 0.17,
   // Percentile stretch is for photographs, where the useful range is unknown.
   // Line art on white is already calibrated - stretching it drags the white
   // background down into the ramp and floods the grid with characters.
@@ -51,9 +54,21 @@ const DEFAULTS = {
   invert: false,
 };
 
-/** per-file tuning; keys are matched against the source filename */
+/**
+ * Per-file tuning. These sources are ASCII art that was already rendered to
+ * PNG, so this is a second-generation encode and no single setting serves all
+ * of them - stroke weight and framing differ per drawing.
+ *
+ * `skip` drops a source from the preloader set. image-5 is 2040x684: at any
+ * grid that keeps its width readable it is six or seven rows tall, and the
+ * subject flattens into a horizontal smear.
+ */
 const PRESETS = {
-  // filled once the sources are named - see the report this script prints
+  'image-5': { skip: true },
+  'image-3': { targetInk: 0.13 },
+  'image-7': { targetInk: 0.13 },
+  '5c7cc0add121b721ffbcc5c31ea6ecbc-1': { targetInk: 0.13 },
+  'image-2': { targetInk: 0.14 },
 };
 
 const args = process.argv.slice(2);
@@ -96,9 +111,20 @@ async function polarity(path) {
 
 async function load(path) {
   const pol = await polarity(path);
-  let img = sharp(path).flatten({ background: pol.lightOnDark ? '#000000' : '#ffffff' }).greyscale();
+
+  // Trim the empty border first. Framing was the variable that made a single
+  // setting impossible: where the subject filled the source it converted
+  // cleanly, and where it sat small in a large canvas the same target density
+  // packed it into a solid blob. Cropping to the drawing removes the variable
+  // instead of compensating for it per file.
+  const trimmed = await sharp(path).trim({ threshold: 8 }).toBuffer({ resolveWithObject: true });
+
+  let img = sharp(trimmed.data)
+    .flatten({ background: pol.lightOnDark ? '#000000' : '#ffffff' })
+    .greyscale();
   if (pol.lightOnDark) img = img.negate(); // normalise to dark strokes on white
-  const meta = await sharp(path).metadata();
+
+  const meta = { width: trimmed.info.width, height: trimmed.info.height };
   return { img, meta, pol };
 }
 
@@ -129,9 +155,23 @@ function stretch(lum, gamma, enabled) {
 }
 
 /**
- * Solve for the gain that lands `target` of all cells above the ink floor.
- * A cell is ink when (1-v)*g >= floor, i.e. when (1-v) >= floor/g, so the gain
- * follows directly from the matching quantile - no search needed.
+ * Solve for the gain that fills `target` of the drawing's own bounding box.
+ *
+ * Measuring against the whole canvas made density depend on how much empty
+ * margin a source happened to carry: tightly framed drawings came out at 75%
+ * ink (a solid field) while loosely framed ones sat at 30%. The subject is what
+ * has to look consistent, so the box the subject occupies is what gets measured.
+ * Binary search rather than a quantile, because the box moves as the gain does.
+ */
+/**
+ * Gain that turns `target` of the grid into ink.
+ *
+ * Deliberately measured over the whole grid, not the drawing's bounding box.
+ * Box-relative targets were tried twice and both failed: the box moves with the
+ * gain, so the solver either collapses the drawing to a few cells or inflates
+ * it into a field. A whole-grid quantile is monotonic and predictable, and the
+ * per-file variation it leaves is handled by PRESETS, which is what presets are
+ * for.
  */
 function autoGain(lum, floor, target) {
   const ink = lum.map((v) => 1 - v).sort((a, b) => a - b);
@@ -177,6 +217,10 @@ const run = async () => {
     const path = join(SRC, file);
     const name = basename(file, extname(file)).replace(/[^a-z0-9]+/gi, '-').toLowerCase();
     const preset = { ...DEFAULTS, ...(PRESETS[name] ?? {}) };
+    if (preset.skip) {
+      console.log(`${file}\n  skipped by preset`);
+      continue;
+    }
     const cols = +flag('cols', preset.cols);
     const blurDiv = +flag('blur', preset.blurDiv);
 
