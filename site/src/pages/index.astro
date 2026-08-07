@@ -19,7 +19,8 @@ const profileFacts = [
   ['EDUCATION', 'IT-Hub College, Moscow, 4th year'],
   ['FOCUS', 'UX/UI, Web, Motion, 3D'],
   ['DESIGN', 'Figma, Blender, Three.js, GSAP'],
-  ['AI WORKFLOW', 'Agent-assisted prototyping, Claude Code, Figma MCP'],
+  ['AI WORKFLOW', 'Claude Code, Cursor, Figma MCP, agent-assisted prototyping'],
+  ['NOTES', 'Obsidian for research, decisions and case writing'],
   ['LANGUAGES', 'Russian native, English B2+'],
   ['FORMAT', 'Office, hybrid, remote'],
   ['LOCATION', 'Moscow, ready to relocate'],
@@ -51,10 +52,11 @@ const contacts = [
   <main id="main">
     <!-- HERO -->
     <section class="hero">
-      <div class="hero-tags">
-        <span>UX/UI &nbsp; WEB &nbsp; CODE</span>
-        <span>CLAUDE CODE &nbsp; FIGMA MCP &nbsp; AI WORKFLOW</span>
-      </div>
+      <ul class="hero-tags">
+        <li>UX/UI</li><li>WEB</li><li>CODE</li>
+        <li>CLAUDE CODE</li><li>CURSOR</li><li>FIGMA MCP</li>
+        <li>OBSIDIAN</li><li>AI WORKFLOW</li>
+      </ul>
       <h1 class="hero-title">Konstantin<br />Darovskiy</h1>
       <p class="hero-lead">I design interfaces. Then I ship them.</p>
       <!-- ruled cells, not a run-on line: without a boundary these read as one
@@ -116,9 +118,10 @@ const contacts = [
             design them, then build them.
           </p>
           <p>
-            I build with AI agents in the loop &mdash; Claude Code and Figma MCP for design
-            systems, prototypes and production code. The tools speed up execution. The
-            structure and the decisions are mine.
+            I build with AI agents in the loop &mdash; Claude Code and Cursor for production
+            code, Figma MCP for design systems and prototypes, Obsidian for the research
+            and the reasoning behind them. The tools speed up execution. The structure and
+            the decisions are mine.
           </p>
           <dl class="pf-facts">
             {profileFacts.map(([k, v]) => (
@@ -189,14 +192,21 @@ const contacts = [
 
   /* hero */
   .hero { position: relative; padding-block: var(--gap-block) var(--gap-section); min-height: 72vh; display: flex; flex-direction: column; justify-content: center; }
+  /* Two runs of capitals separated only by spaces read as one string. As
+     discrete cells each tool is countable, which is the point of listing them. */
   .hero-tags {
+    list-style: none;
     display: flex;
     flex-wrap: wrap;
-    gap: var(--gap-block);
+    gap: 6px;
     font-family: var(--font-mono);
-    font-size: var(--text-mono-label);
+    font-size: var(--text-mono-caption);
     letter-spacing: 0.1em;
     color: var(--color-muted);
+  }
+  .hero-tags li {
+    padding: 4px 10px;
+    border: 1px solid var(--color-hairline);
   }
   .hero-meta {
     display: grid;

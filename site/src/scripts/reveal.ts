@@ -101,21 +101,31 @@ export function initAssembleHeading(selector = '[data-assemble]') {
 
   ScrollTrigger.create({
     trigger: el,
-    start: 'top 80%',
+    // later than the other reveals: the heading should assemble while it is in
+    // view, not have finished before it arrives
+    start: 'top 92%',
     once: true,
     onEnter: () => {
-      const total = 34;
-      let frame = 0;
-      const settleAt = chars.map((_, i) => 8 + Math.floor((i / chars.length) * 20));
+      // Was 34 frames - about half a second, over before it registered as
+      // anything. Paced off the clock rather than the frame count so it reads
+      // the same on a 60Hz and a 144Hz screen, and slow enough to watch a
+      // letter resolve.
+      const RUN = 1800;
+      const HOLD = 380;                 // how long each character scrambles
+      const start = performance.now();
+      const settleAt = chars.map((_, i) => (i / Math.max(1, chars.length - 1)) * (RUN - HOLD));
       const tick = () => {
+        const t = performance.now() - start;
         el.textContent = chars
           .map((c, i) =>
-            locked[i] || frame >= settleAt[i]
+            locked[i] || t >= settleAt[i] + HOLD
               ? c
-              : GLYPHS[Math.floor(Math.random() * GLYPHS.length)]
+              : t >= settleAt[i]
+                ? GLYPHS[Math.floor(Math.random() * GLYPHS.length)]
+                : ' '
           )
           .join('');
-        if (++frame <= total) requestAnimationFrame(tick);
+        if (t <= RUN) requestAnimationFrame(tick);
         else el.textContent = final;
       };
       tick();
