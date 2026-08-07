@@ -70,7 +70,25 @@ const DEFAULTS = {
  * grid that keeps its width readable it is six or seven rows tall, and the
  * subject flattens into a horizontal smear.
  */
-const PRESETS = {};
+/**
+ * Sources dropped after looking at every converted grid side by side. Density
+ * and framing can be solved automatically; whether a subject survives the
+ * conversion cannot, so this list is a judgement, not a threshold. These eight
+ * come out as texture with no readable subject - three drawings are shown per
+ * visit, and a visitor who draws one of these sees noise.
+ */
+const PRESETS = Object.fromEntries(
+  [
+    '365fd35ef158903c7c317961c91c95f7',
+    '4ac6e27f8468625ad1c97f01539e917c',
+    '5ae6b1ab83d79cc778aba7e7e08d5257',
+    '727022fa66b4278eba91351a90be6eba',
+    'a35d9169f2d9c8941984402ff24f9466',
+    'bc1d752f03587317ede3f550b162472b',
+    'd1caf263c8d876cd17bb6acaeebda9da',
+    'f4e2c7f10400a93f2b5255e6c73cb866',
+  ].map((n) => [n, { skip: true }])
+);
 
 const args = process.argv.slice(2);
 const flag = (name, fallback) => {
