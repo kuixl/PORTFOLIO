@@ -24,7 +24,11 @@ const screens = (c.screens ?? [])
 
 // number the sections that actually exist on this case
 let step = 0;
-const n = () => String(++step).padStart(2, '0');
+const n = () => String(++step).padStart(2, "0");
+
+// walk the drawing set forward per section so a page never repeats one
+let artStep = 0;
+const ai = () => artStep++;
 ---
 <Base title={`${c.title} - case study - Konstantin Darovskiy`}>
   <header class="site-head">
@@ -63,7 +67,7 @@ const n = () => String(++step).padStart(2, '0');
       </CaseSection>
     )}
 
-    <CaseSection n={n()} title="The brief" art={`${c.slug}-brief`}>
+    <CaseSection n={n()} title="The brief" art={c.slug} artIndex={ai()}>
       {c.brief.map((p) => <p>{p}</p>)}
       <dl class="meta">
         {c.meta.map(([k, v]) => (
@@ -73,19 +77,19 @@ const n = () => String(++step).padStart(2, '0');
     </CaseSection>
 
     {c.broken && (
-      <CaseSection n={n()} title="Broken" art={`${c.slug}-broken`}>
+      <CaseSection n={n()} title="Broken" art={c.slug} artIndex={ai()}>
         {c.broken.map((p) => <p>{p}</p>)}
       </CaseSection>
     )}
 
     {c.myRole && (
-      <CaseSection n={n()} title="My role" art={`${c.slug}-role`}>
+      <CaseSection n={n()} title="My role" art={c.slug} artIndex={ai()}>
         {c.myRole.map((p) => <p>{p}</p>)}
       </CaseSection>
     )}
 
     {c.personas && (
-      <CaseSection n={n()} title="Research" art={`${c.slug}-research`}>
+      <CaseSection n={n()} title="Research" art={c.slug} artIndex={ai()}>
         <div class="personas">
           {c.personas.map(([name, who, quote]) => (
             <figure class="persona">
@@ -97,7 +101,7 @@ const n = () => String(++step).padStart(2, '0');
       </CaseSection>
     )}
 
-    <CaseSection n={n()} title="Decisions" art={`${c.slug}-decisions`}>
+    <CaseSection n={n()} title="Decisions" art={c.slug} artIndex={ai()}>
       <div class="decisions">
         {c.decisions.map((d) => (
           <article class="decision">
@@ -131,7 +135,7 @@ const n = () => String(++step).padStart(2, '0');
     )}
 
     {c.system && (
-      <CaseSection n={n()} title="System" art={`${c.slug}-system`}>
+      <CaseSection n={n()} title="System" art={c.slug} artIndex={ai()}>
         {c.system.map((p) => <p>{p}</p>)}
       </CaseSection>
     )}
@@ -145,7 +149,7 @@ const n = () => String(++step).padStart(2, '0');
       </CaseSection>
     )}
 
-    <CaseSection n={n()} title="Retro" art={`${c.slug}-retro`}>
+    <CaseSection n={n()} title="Retro" art={c.slug} artIndex={ai()}>
       {c.retro.map((p) => <p>{p}</p>)}
     </CaseSection>
 

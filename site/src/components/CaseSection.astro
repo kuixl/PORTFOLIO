@@ -12,10 +12,12 @@ interface Props {
   title: string;
   wide?: boolean;
   id?: string;
-  /** drop a drawing into the rail; the seed picks a stable one per section */
+  /** rail drawing: a per-case offset so two cases do not open on the same one */
   art?: string;
+  /** position within the case, so no drawing repeats on a page */
+  artIndex?: number;
 }
-const { n, title, wide = false, id, art } = Astro.props;
+const { n, title, wide = false, id, art, artIndex = 0 } = Astro.props;
 
 /**
  * The rail sits empty for the height of a long section. It gets the artwork
@@ -28,10 +30,13 @@ let artSrc = '';
 if (art) {
   const files = readdirSync(ART_DIR).filter((f) => f.endsWith('.cut.webp')).sort();
   if (files.length) {
-    // stable per section: same seed, same drawing on every build
+    // Hashing the section name alone repeated drawings within a page - with
+    // eleven files and five sections a collision is likely, and two identical
+    // drawings a screen apart read as a bug. The case name sets a starting
+    // point and sections walk forward from it, so a page never repeats.
     let h = 0;
     for (const ch of art) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-    artSrc = `/art/${files[h % files.length]}`;
+    artSrc = `/art/${files[(h + artIndex) % files.length]}`;
   }
 }
 ---
