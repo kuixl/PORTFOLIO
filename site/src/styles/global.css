@@ -148,6 +148,28 @@ html {
   color: var(--color-paper);
 }
 
+/* A visible focus ring is not optional - the whole site is keyboard reachable
+   and half of it is text on paper, where the browser default is easy to lose. */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+.skip-link {
+  position: absolute;
+  left: 20px;
+  top: -60px;
+  z-index: 400;
+  padding: 10px 16px;
+  font-family: var(--font-mono);
+  font-size: var(--text-mono-caption);
+  letter-spacing: 0.08em;
+  color: var(--color-paper);
+  background: var(--color-ink);
+  transition: top 0.15s ease;
+}
+.skip-link:focus { top: 12px; }
+
 /* while the preloader owns the screen, no scrolling underneath */
 html.is-preloading {
   overflow: hidden;

@@ -9,12 +9,18 @@ interface Props {
    * `overflow: hidden` on <html> for the life of the visit.
    */
   preload?: boolean;
+  /** social card image, relative to the site root */
+  image?: string;
 }
 const {
   title,
-  description = 'Portfolio of Konstantin Darovskiy, web designer.',
+  description = 'Konstantin Darovskiy - web designer. UX/UI, web and 3D, built with AI agents in the loop.',
   preload = false,
+  image = '/og.png',
 } = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://kuixl.github.io');
+const ogImage = new URL(image, Astro.site ?? 'https://kuixl.github.io');
 ---
 <!doctype html>
 <html lang="en" class={preload ? 'is-preloading' : undefined}>
@@ -22,12 +28,23 @@ const {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonical.href} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical.href} />
+    <meta property="og:image" content={ogImage.href} />
+    <meta name="twitter:card" content="summary_large_image" />
+
     <link rel="preload" href="/fonts/switzer-var-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/sligoil-micro-latin.woff2" as="font" type="font/woff2" crossorigin />
     <title>{title}</title>
   </head>
   <body class="bg-paper text-primary">
+    <!-- keyboard users should not have to tab through the header on every page -->
+    <a class="skip-link" href="#main">Skip to content</a>
     <slot />
   </body>
 </html>

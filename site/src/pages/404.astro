@@ -1,0 +1,82 @@
+---
+import Base from '../layouts/Base.astro';
+import { cases } from '../data/cases';
+---
+<Base title="Not found - Konstantin Darovskiy">
+  <header class="site-head">
+    <a href="/" class="font-mono text-mono-nav">kuixl</a>
+    <a href="/#contact" class="font-mono text-mono-nav">CONTACT</a>
+  </header>
+
+  <main id="main" class="nf">
+    <p class="nf-code font-mono">404</p>
+    <h1 class="nf-title">This page is not in the archive.</h1>
+    <p class="nf-lead">The address is wrong, or it moved. The work is all here:</p>
+    <ul class="nf-list">
+      {cases.map((c) => (
+        <li><a href={`/${c.slug}`}>{c.title}</a></li>
+      ))}
+      <li><a href="/">Everything else</a></li>
+    </ul>
+  </main>
+
+  <footer class="site-foot font-mono">
+    <span>kuixl</span>
+    <span>OPEN TO WORK</span>
+  </footer>
+</Base>
+
+<style>
+  .site-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    padding-inline: 20px;
+    border-bottom: 1px solid var(--color-hairline);
+  }
+  .nf {
+    max-width: 1240px;
+    margin-inline: auto;
+    padding: var(--gap-section) 20px;
+    min-height: 60vh;
+  }
+  .nf-code {
+    font-size: var(--text-mono-label);
+    letter-spacing: 0.2em;
+    color: var(--color-muted);
+  }
+  .nf-title {
+    margin-top: var(--gap-item);
+    max-width: 14ch;
+    font-family: var(--font-sans);
+    font-weight: 900;
+    font-size: clamp(40px, 8vw, 96px);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+  }
+  .nf-lead { margin-top: var(--gap-block); color: var(--color-muted); }
+  .nf-list {
+    list-style: none;
+    margin-top: var(--gap-item);
+    display: grid;
+    gap: var(--gap-tight);
+  }
+  .nf-list a {
+    font-size: 20px;
+    border-bottom: 1px solid var(--color-hairline);
+  }
+  .nf-list a:hover { border-color: var(--color-primary); }
+  .site-foot {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--gap-item) 20px;
+    border-top: 1px solid var(--color-hairline);
+    font-size: var(--text-mono-caption);
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
+  }
+  @media (min-width: 901px) {
+    .nf, .site-head, .site-foot { padding-inline: var(--spacing-080); }
+  }
+</style>
