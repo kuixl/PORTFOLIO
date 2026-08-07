@@ -35,7 +35,7 @@ async function startLoop() {
   loopSrc.loop = true;
   loopGain = ac.createGain();
   loopGain.gain.value = 0;
-  loopGain.gain.linearRampToValueAtTime(0.16, ac.currentTime + 0.6);
+  loopGain.gain.linearRampToValueAtTime(0.12, ac.currentTime + 0.8);
   loopSrc.connect(loopGain).connect(ac.destination);
   loopSrc.start();
 }
@@ -49,6 +49,11 @@ function stopLoopNow() {
   }
 }
 
+function syncButton() {
+  const btn = document.getElementById('sound-toggle');
+  if (btn) btn.textContent = enabled ? 'SOUND ON' : 'SOUND OFF';
+}
+
 export const sound = {
   get enabled() { return enabled; },
 
@@ -57,7 +62,33 @@ export const sound = {
     enabled = !enabled;
     if (enabled) await startLoop();
     else stopLoopNow();
+    syncButton();
     return enabled;
+  },
+
+  /**
+   * Autoplay is blocked until a user gesture, so true background audio is
+   * impossible. Closest legal thing: the first gesture anywhere (click, key,
+   * wheel, touch) starts the loop quietly. The corner toggle still turns it off.
+   */
+  armAutostart() {
+    if (prm) return;
+    const fire = async (e: Event) => {
+      if ((e.target as HTMLElement | null)?.closest?.('#sound-toggle')) return;
+      disarm();
+      if (!enabled) { enabled = true; await startLoop(); syncButton(); }
+    };
+    const opts = { once: true, capture: true } as AddEventListenerOptions;
+    const disarm = () => {
+      removeEventListener('pointerdown', fire, opts);
+      removeEventListener('keydown', fire, opts);
+      removeEventListener('wheel', fire, opts);
+      removeEventListener('touchstart', fire, opts);
+    };
+    addEventListener('pointerdown', fire, opts);
+    addEventListener('keydown', fire, opts);
+    addEventListener('wheel', fire, opts);
+    addEventListener('touchstart', fire, opts);
   },
 
   /** tiny typewriter click on symbol locks, throttled */
@@ -116,8 +147,4 @@ export const sound = {
 };
 
 // corner toggle
-const btn = document.getElementById('sound-toggle');
-btn?.addEventListener('click', async () => {
-  const on = await sound.toggle();
-  btn.textContent = on ? 'SOUND ON' : 'SOUND OFF';
-});
+document.getElementById('sound-toggle')?.addEventListener('click', () => sound.toggle());

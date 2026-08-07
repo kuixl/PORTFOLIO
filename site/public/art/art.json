@@ -1,0 +1,98 @@
+[
+  {
+    "name": "5c7cc0add121b721ffbcc5c31ea6ecbc-1",
+    "w": 65,
+    "h": 48,
+    "ink": 0.632,
+    "light": false,
+    "png": {
+      "w": 900,
+      "h": 1599,
+      "kb": 29
+    }
+  },
+  {
+    "name": "image-2",
+    "w": 50,
+    "h": 50,
+    "ink": 0.646,
+    "light": false,
+    "png": {
+      "w": 900,
+      "h": 1199,
+      "kb": 48
+    }
+  },
+  {
+    "name": "image-3",
+    "w": 43,
+    "h": 29,
+    "ink": 0.693,
+    "light": false,
+    "png": {
+      "w": 900,
+      "h": 734,
+      "kb": 15
+    }
+  },
+  {
+    "name": "image-4",
+    "w": 58,
+    "h": 26,
+    "ink": 0.799,
+    "light": true,
+    "png": {
+      "w": 900,
+      "h": 990,
+      "kb": 17
+    }
+  },
+  {
+    "name": "image-5",
+    "w": 60,
+    "h": 8,
+    "ink": 0.831,
+    "light": false,
+    "png": {
+      "w": 900,
+      "h": 302,
+      "kb": 12
+    }
+  },
+  {
+    "name": "image-6",
+    "w": 75,
+    "h": 38,
+    "ink": 0.472,
+    "light": false,
+    "png": {
+      "w": 900,
+      "h": 900,
+      "kb": 10
+    }
+  },
+  {
+    "name": "image-7",
+    "w": 47,
+    "h": 28,
+    "ink": 0.859,
+    "light": false,
+    "png": {
+      "w": 900,
+      "h": 919,
+      "kb": 16
+    }
+  },
+  {
+    "name": "image-8",
+    "w": 56,
+    "h": 24,
+    "ink": 0.804,
+    "light": false,
+    "png": {
+      "w": 900,
+      "h": 900,
+      "kb": 41
+    }
+  }
+]

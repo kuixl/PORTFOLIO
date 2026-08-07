@@ -1,7 +1,7 @@
 /**
- * Margin doodles for the preloader: quick pencil scribbles that pop up along
- * the edges, live a moment, disappear. Hand-jittered SVG, no vector polish.
- * Preloader only - the site itself never shows these.
+ * Margin doodles for the preloader. Each one DRAWS ITSELF stroke by stroke
+ * (dashoffset animation), lives a few seconds, fades. Hand-jittered paths,
+ * fresh randomness on every spawn - no vector polish. Preloader only.
  */
 import { sound } from './sound';
 
@@ -11,7 +11,6 @@ const prm = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const j = (v: number, amp = 2.2) => v + (Math.random() - 0.5) * amp * 2;
 
-/** polyline through jittered points */
 function path(pts: [number, number][], close = false): SVGPathElement {
   const p = document.createElementNS(NS, 'path');
   let d = `M ${j(pts[0][0])} ${j(pts[0][1])}`;
@@ -26,7 +25,6 @@ function path(pts: [number, number][], close = false): SVGPathElement {
   return p;
 }
 
-/** wobbly circle as a many-point polygon, never quite closed */
 function blob(cx: number, cy: number, r: number): SVGPathElement {
   const pts: [number, number][] = [];
   const n = 11;
@@ -35,51 +33,64 @@ function blob(cx: number, cy: number, r: number): SVGPathElement {
     const rr = r * (1 + (Math.random() - 0.5) * 0.16);
     pts.push([cx + Math.cos(a) * rr, cy + Math.sin(a) * rr]);
   }
-  pts.pop(); // leave the gap - hand never closes the loop
+  pts.pop(); // the hand never quite closes the loop
   return path(pts);
 }
 
+/** text as individual glyphs so they can appear one by one */
 function scribbleText(txt: string, size = 16): SVGGElement {
   const g = document.createElementNS(NS, 'g');
-  const t = document.createElementNS(NS, 'text');
-  t.setAttribute('font-family', '"Sligoil Micro", monospace');
-  t.setAttribute('font-size', String(size));
-  t.setAttribute('fill', PAPER);
+  g.dataset.kind = 'text';
   let x = 0;
   for (const ch of txt) {
-    const span = document.createElementNS(NS, 'tspan');
-    span.textContent = ch;
-    span.setAttribute('x', String(x));
-    span.setAttribute('y', String(j(0, 1.6)));
-    span.setAttribute('rotate', String((Math.random() - 0.5) * 14));
+    const t = document.createElementNS(NS, 'text');
+    t.textContent = ch;
+    t.setAttribute('font-family', '"Sligoil Micro", monospace');
+    t.setAttribute('font-size', String(size));
+    t.setAttribute('fill', PAPER);
+    t.setAttribute('x', String(x));
+    t.setAttribute('y', String(j(0, 1.6)));
+    t.setAttribute('transform', `rotate(${(Math.random() - 0.5) * 10} ${x} 0)`);
     x += size * 0.62;
-    t.appendChild(span);
+    g.appendChild(t);
   }
-  g.appendChild(t);
   return g;
 }
 
-// ---- original doodle faces: a couple of strokes each, drawn fresh every time
+// ---- original doodle faces, a few strokes each
 function face1(): SVGGElement {
   const g = document.createElementNS(NS, 'g');
-  g.appendChild(blob(20, 22, 17));                                  // head
-  g.appendChild(path([[8, 10], [14, 16]]));                         // bangs
+  g.appendChild(blob(20, 22, 17));                     // head
+  g.appendChild(path([[8, 10], [14, 16]]));            // bangs
   g.appendChild(path([[16, 7], [19, 15]]));
   g.appendChild(path([[26, 7], [25, 15]]));
-  g.appendChild(path([[14, 24], [15.5, 24.5]]));                    // dot eyes
+  g.appendChild(path([[14, 24], [15.5, 24.5]]));       // dot eyes
   g.appendChild(path([[26, 24], [27.5, 24.5]]));
-  g.appendChild(path([[18, 31], [23, 32]]));                        // mouth
+  g.appendChild(path([[18, 31], [23, 32]]));           // mouth
   return g;
 }
 function face2(): SVGGElement {
   const g = document.createElementNS(NS, 'g');
   g.appendChild(blob(20, 20, 15));
-  g.appendChild(path([[10, 9], [30, 7]]));                          // flat fringe
-  g.appendChild(path([[13, 20], [17, 17]]));                        // ^ ^ eyes
+  g.appendChild(path([[10, 9], [30, 7]]));             // flat fringe
+  g.appendChild(path([[13, 20], [17, 17]]));           // ^ ^ eyes
   g.appendChild(path([[17, 17], [20, 20]]));
   g.appendChild(path([[24, 20], [27, 17]]));
   g.appendChild(path([[27, 17], [30, 20]]));
   g.appendChild(path([[17, 28], [24, 28]]));
+  return g;
+}
+function face3(): SVGGElement {
+  // cat-ish: ears, closed happy eyes, tiny w-mouth, whisker ticks
+  const g = document.createElementNS(NS, 'g');
+  g.appendChild(blob(22, 24, 16));
+  g.appendChild(path([[10, 12], [7, 2], [17, 9]]));    // left ear
+  g.appendChild(path([[28, 9], [37, 2], [34, 12]]));   // right ear
+  g.appendChild(path([[14, 23], [17, 21], [20, 23]])); // closed eye
+  g.appendChild(path([[25, 23], [28, 21], [31, 23]]));
+  g.appendChild(path([[19, 30], [21, 32], [23, 30], [25, 32], [27, 30]])); // w
+  g.appendChild(path([[2, 26], [8, 27]]));             // whiskers
+  g.appendChild(path([[36, 27], [42, 26]]));
   return g;
 }
 
@@ -112,7 +123,9 @@ function circleDot(): SVGGElement {
   return g;
 }
 
+// faces carry triple weight - they are the heart of the bit
 const POOL: (() => SVGGElement)[] = [
+  face1, face1, face1, face2, face2, face2, face3, face3, face3,
   () => scribbleText('shq'),
   () => scribbleText('kevin'),
   () => scribbleText('kuixl'),
@@ -123,18 +136,16 @@ const POOL: (() => SVGGElement)[] = [
   () => scribbleText('i need money to exist', 12),
   () => scribbleText('^_^', 15),
   () => scribbleText('☆*:.｡. o(≧▽≦)o .｡.:*☆', 11),
-  face1, face2,
   placeholderBox, arrow, textLines, circleDot,
 ];
 
-/** edge slots: everywhere except the busy center */
 function slot(w: number, h: number): [number, number] {
-  const m = 24;
+  const m = 32;
   const band = Math.random();
-  if (band < 0.3) return [m + Math.random() * (w - 200), m + Math.random() * (h * 0.12)];            // top
-  if (band < 0.6) return [m + Math.random() * (w - 200), h * 0.84 + Math.random() * (h * 0.1)];      // bottom
-  if (band < 0.8) return [m + Math.random() * (w * 0.1), h * 0.18 + Math.random() * (h * 0.6)];      // left
-  return [w * 0.86 + Math.random() * (w * 0.08), h * 0.18 + Math.random() * (h * 0.6)];              // right
+  if (band < 0.3) return [m + Math.random() * (w - 320), m + Math.random() * (h * 0.1)];
+  if (band < 0.6) return [m + Math.random() * (w - 320), h * 0.82 + Math.random() * (h * 0.08)];
+  if (band < 0.8) return [m + Math.random() * (w * 0.09), h * 0.16 + Math.random() * (h * 0.6)];
+  return [w * 0.84 + Math.random() * (w * 0.07), h * 0.16 + Math.random() * (h * 0.6)];
 }
 
 export function initSketches(svg: SVGSVGElement, progress: () => number) {
@@ -145,26 +156,48 @@ export function initSketches(svg: SVGSVGElement, progress: () => number) {
   let stopped = false;
 
   function spawn() {
-    if (stopped || progress() > 0.88) return;
-    if (active < 2) {
+    if (stopped || progress() > 0.9) return;
+    if (active < 3) {
       active++;
       const g = POOL[Math.floor(Math.random() * POOL.length)]();
       const [x, y] = slot(W, H);
-      g.setAttribute('transform', `translate(${x} ${y}) rotate(${(Math.random() - 0.5) * 14})`);
-      g.setAttribute('opacity', '0');
+      const scale = 1.6 + Math.random() * 0.8;
+      g.setAttribute('transform',
+        `translate(${x} ${y}) rotate(${(Math.random() - 0.5) * 14}) scale(${scale})`);
       svg.appendChild(g);
       sound.sketch();
-      const alpha = 0.4 + Math.random() * 0.3;
-      const life = 1200 + Math.random() * 800;
-      g.animate([{ opacity: 0 }, { opacity: alpha }], { duration: 140, fill: 'forwards' });
+
+      const alpha = 0.45 + Math.random() * 0.25;
+      const kids = Array.from(g.children) as SVGGraphicsElement[];
+      if (g.dataset.kind === 'text') {
+        // glyphs pop in one after another, like quick handwriting
+        kids.forEach((el, i) => {
+          (el as SVGElement).setAttribute('opacity', '0');
+          el.animate([{ opacity: 0 }, { opacity: alpha }],
+            { duration: 60, delay: i * 55, fill: 'forwards' });
+        });
+      } else {
+        // strokes draw themselves in sequence
+        kids.forEach((el, i) => {
+          const p = el as SVGPathElement;
+          const len = p.getTotalLength();
+          p.setAttribute('stroke-dasharray', String(len));
+          p.setAttribute('stroke-dashoffset', String(len));
+          p.setAttribute('opacity', String(alpha));
+          p.animate([{ strokeDashoffset: len }, { strokeDashoffset: 0 }],
+            { duration: 240, delay: i * 130, fill: 'forwards', easing: 'ease-out' });
+        });
+      }
+
+      const life = 2600 + Math.random() * 1200;
       setTimeout(() => {
-        g.animate([{ opacity: alpha }, { opacity: 0 }], { duration: 220, fill: 'forwards' });
-        setTimeout(() => { g.remove(); active--; }, 240);
+        const out = g.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 400, fill: 'forwards' });
+        out.onfinish = () => { g.remove(); active--; };
       }, life);
     }
-    setTimeout(spawn, 420 + Math.random() * 520);
+    setTimeout(spawn, 650 + Math.random() * 400);
   }
-  setTimeout(spawn, 350);
+  spawn();
 
   return () => { stopped = true; };
 }
