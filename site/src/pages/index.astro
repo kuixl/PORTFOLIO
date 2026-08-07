@@ -1,4 +1,4 @@
----
+﻿---
 import Base from '../layouts/Base.astro';
 import works from '../../public/works/works.json';
 
@@ -57,11 +57,13 @@ const contacts = [
       </div>
       <h1 class="hero-title">Konstantin<br />Darovskiy</h1>
       <p class="hero-lead">I design interfaces. Then I ship them.</p>
-      <div class="hero-meta">
-        <span>IT-HUB COLLEGE &nbsp; 4TH YEAR</span>
-        <span>MOSCOW &nbsp; GMT+3</span>
-        <span>OFFICE &nbsp; HYBRID &nbsp; REMOTE</span>
-      </div>
+      <!-- ruled cells, not a run-on line: without a boundary these read as one
+           uninterrupted string of capitals -->
+      <dl class="hero-meta">
+        <div><dt>Study</dt><dd>IT-Hub College, 4th year</dd></div>
+        <div><dt>Based</dt><dd>Moscow, GMT+3</dd></div>
+        <div><dt>Format</dt><dd>Office, hybrid, remote</dd></div>
+      </dl>
       <span class="hero-scroll font-mono">SCROLL</span>
     </section>
 
@@ -87,14 +89,14 @@ const contacts = [
                   <span>{w.year}</span>
                   <span>{w.team}</span>
                 </span>
-                <span class="ix-go font-mono">{w.href ? 'CASE →' : 'FULL SITE →'}</span>
+                <span class="ix-go font-mono">{w.href ? 'CASE &rarr;' : 'FULL SITE &rarr;'}</span>
               </Tag>
             </li>
           );
         })}
       </ol>
       <p class="index-note font-mono">
-        Monolith shipped as a site but never got written up — the pages open in place.
+        Monolith shipped as a site but never got written up &mdash; the pages open in place.
       </p>
     </section>
 
@@ -109,11 +111,11 @@ const contacts = [
         <div class="pf-text">
           <p>
             4th year web design student at IT-Hub College, Moscow. I work across UX/UI,
-            motion and 3D. Most of my projects go from research to a working site — I
+            motion and 3D. Most of my projects go from research to a working site &mdash; I
             design them, then build them.
           </p>
           <p>
-            I build with AI agents in the loop — Claude Code and Figma MCP for design
+            I build with AI agents in the loop &mdash; Claude Code and Figma MCP for design
             systems, prototypes and production code. The tools speed up execution. The
             structure and the decisions are mine.
           </p>
@@ -180,12 +182,12 @@ const contacts = [
     font-size: clamp(40px, 9vw, 96px);
     line-height: 1;
     letter-spacing: -0.02em;
-    margin-bottom: var(--spacing-048);
+    margin-bottom: var(--spacing-032);
   }
 
   /* hero */
-  .hero { position: relative; padding-block: var(--spacing-080) var(--spacing-120); min-height: 78vh; display: flex; flex-direction: column; justify-content: center; }
-  .hero-tags, .hero-meta {
+  .hero { position: relative; padding-block: var(--spacing-048) var(--spacing-080); min-height: 72vh; display: flex; flex-direction: column; justify-content: center; }
+  .hero-tags {
     display: flex;
     flex-wrap: wrap;
     gap: var(--spacing-024);
@@ -194,6 +196,25 @@ const contacts = [
     letter-spacing: 0.1em;
     color: var(--color-muted);
   }
+  .hero-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    margin-top: var(--spacing-032);
+    border-top: 1px solid var(--color-hairline);
+  }
+  .hero-meta > div {
+    padding: var(--spacing-012) var(--spacing-016) var(--spacing-012) 0;
+    border-right: 1px solid var(--color-hairline);
+  }
+  .hero-meta > div:last-child { border-right: 0; }
+  .hero-meta dt {
+    font-family: var(--font-mono);
+    font-size: var(--text-mono-caption);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .hero-meta dd { margin-top: 4px; font-size: 15px; }
   .hero-title {
     margin-block: var(--spacing-032);
     font-family: var(--font-sans);
@@ -207,7 +228,7 @@ const contacts = [
   .hero-scroll { position: absolute; bottom: var(--spacing-024); left: 0; font-size: var(--text-mono-caption); color: var(--color-muted); }
 
   /* works index */
-  .works { padding-block: var(--spacing-120); border-top: 1px solid var(--color-hairline); }
+  .works { padding-block: var(--spacing-064); border-top: 1px solid var(--color-hairline); }
   .index { list-style: none; }
   .index-row + .index-row { border-top: 1px solid var(--color-hairline); }
   .index-link {
@@ -254,7 +275,7 @@ const contacts = [
   .index-note { margin-top: var(--spacing-024); font-size: var(--text-mono-caption); color: var(--color-muted); }
 
   /* profile */
-  .profile { padding-block: var(--spacing-120); border-top: 1px solid var(--color-hairline); }
+  .profile { padding-block: var(--spacing-064); border-top: 1px solid var(--color-hairline); }
   .pf-grid { display: grid; gap: var(--spacing-048); }
   /* the portrait arrives already halftoned; no filter, and no smoothing on
      scale-down or the dot pattern turns to porridge */
@@ -268,12 +289,29 @@ const contacts = [
   .pf-portrait figcaption { margin-top: var(--spacing-008); font-size: var(--text-mono-caption); letter-spacing: 0.1em; color: var(--color-muted); }
   .pf-text > * + * { margin-top: var(--spacing-024); }
   .pf-text p { max-width: 62ch; }
-  .pf-facts { display: grid; gap: var(--spacing-016); margin-top: var(--spacing-048); padding-top: var(--spacing-024); border-top: 1px solid var(--color-hairline); }
-  .pf-facts div { display: grid; grid-template-columns: 1fr; gap: 2px; }
-  .pf-facts dt { font-family: var(--font-mono); font-size: var(--text-mono-caption); letter-spacing: 0.1em; color: var(--color-muted); }
+  /* Ruled rows. As a bare grid of label/value pairs this read as one continuous
+     block - no boundary told you where a fact ended and the next began. */
+  .pf-facts {
+    margin-top: var(--spacing-032);
+    border-top: 1px solid var(--color-hairline);
+  }
+  .pf-facts div {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2px;
+    padding-block: var(--spacing-012);
+    border-bottom: 1px solid var(--color-hairline);
+  }
+  .pf-facts dt {
+    font-family: var(--font-mono);
+    font-size: var(--text-mono-caption);
+    letter-spacing: 0.12em;
+    color: var(--color-muted);
+  }
+  .pf-facts dd { font-size: 15px; line-height: 1.45; }
 
   /* contact */
-  .contact { padding-block: var(--spacing-120) var(--spacing-080); border-top: 1px solid var(--color-hairline); }
+  .contact { padding-block: var(--spacing-064) var(--spacing-048); border-top: 1px solid var(--color-hairline); }
   .ct-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--spacing-024); }
   .ct-title { font-family: var(--font-sans); font-weight: 900; font-size: clamp(40px, 9vw, 96px); line-height: 1; letter-spacing: -0.02em; }
   .ct-status { display: flex; flex-direction: column; font-size: var(--text-mono-caption); letter-spacing: 0.1em; color: var(--color-muted); }
@@ -300,7 +338,7 @@ const contacts = [
       gap: var(--spacing-032);
     }
     .ix-meta { justify-content: flex-end; }
-    .pf-grid { grid-template-columns: 400px minmax(0, 1fr); gap: var(--spacing-080); }
-    .pf-facts div { grid-template-columns: 200px minmax(0, 1fr); gap: var(--spacing-016); }
+    .pf-grid { grid-template-columns: 340px minmax(0, 1fr); gap: var(--spacing-048); }
+    .pf-facts div { grid-template-columns: 170px minmax(0, 1fr); gap: var(--spacing-024); align-items: baseline; }
   }
 </style>

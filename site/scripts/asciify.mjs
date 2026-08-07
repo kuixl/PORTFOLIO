@@ -38,15 +38,19 @@ const DEFAULTS = {
   // These are outline drawings, and outlines need resolution and restraint.
   // At 78 columns with 30% ink they came out as blobs: the strokes merged into
   // fields and the subject disappeared. Finer grid, thinner ink, less blur.
-  cols: 76,
+  // Finer and thinner than the first pass, but not as fine as it could be.
+  // Past roughly 110 columns the grid starts resolving the source's own
+  // character cells and the outline breaks into dots, so this sits just under
+  // that ceiling. Blur is matched to bridge those cells rather than erase them.
+  cols: 100,
   ramp: 'line',
   gamma: 0.9,
   floor: 0.12,
-  blurDiv: 9,
+  blurDiv: 7,
   // Ink coverage in these sources runs from 4% to 13% of the canvas, so any
   // fixed gain floods one drawing while blanking another. Instead, aim for a
   // target share of filled cells and solve for the gain that produces it.
-  targetInk: 0.17,
+  targetInk: 0.12,
   // Percentile stretch is for photographs, where the useful range is unknown.
   // Line art on white is already calibrated - stretching it drags the white
   // background down into the ramp and floods the grid with characters.
@@ -65,10 +69,6 @@ const DEFAULTS = {
  */
 const PRESETS = {
   'image-5': { skip: true },
-  'image-3': { targetInk: 0.13 },
-  'image-7': { targetInk: 0.13 },
-  '5c7cc0add121b721ffbcc5c31ea6ecbc-1': { targetInk: 0.13 },
-  'image-2': { targetInk: 0.14 },
 };
 
 const args = process.argv.slice(2);
@@ -128,20 +128,45 @@ async function load(path) {
   return { img, meta, pol };
 }
 
-async function sample(path, cols, blurDiv) {
+/**
+ * Sample the source into a cols x rows luminance grid.
+ *
+ * These sources are ASCII art rendered to PNG, so their "lines" are rows of
+ * discrete characters. That creates a trap: sample finely and the line breaks
+ * into the source's own dots; blur enough to bridge the dots and the shape
+ * fills in solid. Neither is a drawing.
+ *
+ * Edge mode escapes it. Blur once to fuse the dots into shapes, blur again
+ * wider, and take the difference - a difference of Gaussians, which responds at
+ * boundaries and cancels in flat areas. The result is a thin continuous outline
+ * that keeps detail the tonal path had to trade away.
+ */
+async function sample(path, cols, blurDiv, edge) {
   const { img, meta, pol } = await load(path);
   const rows = Math.max(1, Math.round((cols * meta.height) / meta.width * CELL_ASPECT));
-  // These sources are line art, often themselves rendered ASCII at roughly the
-  // density we are targeting. A little blur stops thin strokes from falling
-  // between sample points; too much merges neighbouring strokes into a solid
-  // blob and erases the drawing. blurDiv tunes that trade-off per source.
   const sigma = Math.max(0.3, meta.width / cols / blurDiv);
-  const { data } = await img
-    .blur(sigma)
-    .resize(cols, rows, { fit: 'fill', kernel: 'cubic' })
-    .raw()
-    .toBuffer({ resolveWithObject: true });
-  return { lum: Array.from(data, (v) => v / 255), cols, rows, meta, pol };
+
+  const grid = (s) =>
+    img
+      .clone()
+      .blur(s)
+      .resize(cols, rows, { fit: 'fill', kernel: 'cubic' })
+      .raw()
+      .toBuffer();
+
+  if (!edge) {
+    const data = await grid(sigma);
+    return { lum: Array.from(data, (v) => v / 255), cols, rows, meta, pol };
+  }
+
+  const [near, far] = await Promise.all([grid(sigma), grid(sigma * 3)]);
+  // |near - far| is the edge response; invert it back into "luminance" so the
+  // rest of the pipeline keeps treating dark as ink
+  const lum = new Array(near.length);
+  for (let i = 0; i < near.length; i++) {
+    lum[i] = 1 - Math.min(1, Math.abs(near[i] - far[i]) / 255 * 4);
+  }
+  return { lum, cols, rows, meta, pol };
 }
 
 /** percentile stretch so faint scans and hard blacks both land on the ramp */
@@ -224,7 +249,10 @@ const run = async () => {
     const cols = +flag('cols', preset.cols);
     const blurDiv = +flag('blur', preset.blurDiv);
 
-    const { lum, rows, meta, pol } = await sample(path, cols, blurDiv);
+    // Tonal by default. Edge mode reads the source's own character dots as
+    // edges and shatters the outline - it is kept for continuous-tone sources
+    // (actual photographs), where it does what it promises.
+    const { lum, rows, meta, pol } = await sample(path, cols, blurDiv, args.includes('--edge'));
     const stretched = stretch(lum, preset.gamma, args.includes('--stretch') || preset.stretch);
     const target = +flag('ink', preset.targetInk);
     const gain = autoGain(stretched, preset.floor, target);

@@ -27,7 +27,9 @@ const { n, title, wide = false, id } = Astro.props;
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--spacing-024);
-    padding-block: var(--spacing-120);
+    /* was 120 top and bottom - a rhythm that reads as unfinished rather than
+       generous once the sections carry real content */
+    padding-block: var(--spacing-064);
     border-top: 1px solid var(--color-hairline);
   }
   .cs-rail { display: flex; align-items: baseline; gap: var(--spacing-016); }
@@ -50,8 +52,8 @@ const { n, title, wide = false, id } = Astro.props;
 
   @media (min-width: 901px) {
     .case-section {
-      grid-template-columns: 300px minmax(0, 1fr);
-      gap: var(--spacing-080);
+      grid-template-columns: 240px minmax(0, 1fr);
+      gap: var(--spacing-048);
     }
     .cs-rail { flex-direction: column; gap: var(--spacing-012); }
     .case-section[data-wide] { grid-template-columns: 1fr; }

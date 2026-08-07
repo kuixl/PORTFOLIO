@@ -35,7 +35,7 @@ async function startLoop() {
   loopSrc.loop = true;
   loopGain = ac.createGain();
   loopGain.gain.value = 0;
-  loopGain.gain.linearRampToValueAtTime(0.12, ac.currentTime + 0.8);
+  loopGain.gain.linearRampToValueAtTime(0.09, ac.currentTime + 1.2);
   loopSrc.connect(loopGain).connect(ac.destination);
   loopSrc.start();
 }
@@ -88,7 +88,7 @@ export const sound = {
     const g = ctx.createGain();
     osc.type = 'square';
     osc.frequency.value = 1800 + Math.random() * 1600;
-    g.gain.setValueAtTime(0.045, now);
+    g.gain.setValueAtTime(0.03, now);
     g.gain.exponentialRampToValueAtTime(0.0001, now + 0.018);
     osc.connect(g).connect(ctx.destination);
     osc.start(now);
@@ -110,7 +110,7 @@ export const sound = {
     bp.frequency.value = 900 + Math.random() * 500;
     bp.Q.value = 1.2;
     const g = ctx.createGain();
-    g.gain.value = 0.04;
+    g.gain.value = 0.025;
     src.connect(bp).connect(g).connect(ctx.destination);
     src.start(now);
   },
@@ -123,7 +123,7 @@ export const sound = {
     const g = ctx.createGain();
     osc.type = 'sine';
     osc.frequency.value = 110;
-    g.gain.setValueAtTime(0.12, now);
+    g.gain.setValueAtTime(0.05, now);
     g.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
     osc.connect(g).connect(ctx.destination);
     osc.start(now);

@@ -16,9 +16,11 @@ const screens = (c.screens ?? [])
   .map(([label, page]) => {
     const set = (works as Record<string, any[]>)[c.frame?.project ?? c.slug] ?? [];
     const shot = set.find((s) => s.page === page && s.size === 'desktop');
-    return shot?.thumb ? { label, file: shot.thumb.file, w: shot.thumb.w, h: shot.thumb.h } : null;
+    return shot?.thumb
+      ? { label, file: shot.thumb.file, w: shot.thumb.w, h: shot.thumb.h, full: shot.parts[0].file }
+      : null;
   })
-  .filter(Boolean) as { label: string; file: string; w: number; h: number }[];
+  .filter(Boolean) as { label: string; file: string; w: number; h: number; full: string }[];
 
 // number the sections that actually exist on this case
 let step = 0;
@@ -112,8 +114,13 @@ const n = () => String(++step).padStart(2, '0');
         <div class="screens">
           {screens.map((s) => (
             <figure class="screen">
-              <img src={`/works/${c.frame?.project ?? c.slug}/${s.file}`} width={s.w} height={s.h}
-                alt={`${c.title} - ${s.label}`} loading="lazy" decoding="async" />
+              <button type="button" class="screen-open"
+                data-fullview={`/works/${c.frame?.project ?? c.slug}/${s.full}`}
+                data-fullview-label={`${c.title} - ${s.label}`}>
+                <img src={`/works/${c.frame?.project ?? c.slug}/${s.file}`} width={s.w} height={s.h}
+                  alt={`${c.title} - ${s.label}`} loading="lazy" decoding="async" />
+                <span class="screen-cue">OPEN</span>
+              </button>
               <figcaption>{s.label}</figcaption>
             </figure>
           ))}
@@ -147,11 +154,12 @@ const n = () => String(++step).padStart(2, '0');
   </main>
 
   <script>
-    import { initWorkFrames } from '../scripts/workframe';
+    import { initWorkFrames, initFullViewLinks } from '../scripts/workframe';
     import { initMotion } from '../scripts/motion';
     import { initReveals, initPageWipe } from '../scripts/reveal';
     initMotion();
     initWorkFrames();
+    initFullViewLinks();
     initReveals();
     initPageWipe();
   </script>
@@ -239,7 +247,30 @@ const n = () => String(++step).padStart(2, '0');
   .decision p { margin-top: var(--spacing-016); }
 
   .screens { display: grid; gap: var(--spacing-024); grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .screen-open {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
   .screen img { width: 100%; height: auto; display: block; border: 1px solid var(--color-hairline); }
+  .screen-cue {
+    position: absolute;
+    inset: auto 8px 8px auto;
+    padding: 4px 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--color-paper);
+    background: var(--color-ink);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .screen-open:hover .screen-cue,
+  .screen-open:focus-visible .screen-cue { opacity: 1; }
   .screen figcaption {
     margin-top: var(--spacing-008);
     font-family: var(--font-mono);
