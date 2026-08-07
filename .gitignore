@@ -18,3 +18,7 @@ art/source/
 
 # raw full-page captures (outside public/ so they never ship; webp is committed)
 captures/
+
+# scratch pages kept out of routing
+*.astro.bak
+

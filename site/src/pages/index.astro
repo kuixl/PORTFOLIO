@@ -1,12 +1,40 @@
 ---
 import Base from '../layouts/Base.astro';
+import works from '../../public/works/works.json';
+
+const monolithPages = ['index', 'archive', 'materials']
+  .map((p) => works.monolith.find((s) => s.page === p && s.size === 'desktop'))
+  .filter(Boolean)
+  .map((s) => `/works/monolith/${s!.parts[0].file}`)
+  .join(',');
+
+const index = [
+  { n: '01', title: 'nichive', kind: 'Digital archive', year: '2026', team: 'Solo', href: '/nichive' },
+  { n: '02', title: 'Yakitoria', kind: 'E-commerce', year: '2025', team: 'Solo', href: '/yakitoria' },
+  { n: '03', title: 'Monolith', kind: 'Type study', year: '2025', team: 'Solo', full: monolithPages },
+  { n: '04', title: 'BETA', kind: 'Landing', year: '2026', team: 'Team', href: '/beta' },
+];
+
+const profileFacts = [
+  ['EDUCATION', 'IT-Hub College, Moscow, 4th year'],
+  ['FOCUS', 'UX/UI, Web, Motion, 3D'],
+  ['DESIGN', 'Figma, Blender, Three.js, GSAP'],
+  ['AI WORKFLOW', 'Agent-assisted prototyping, Claude Code, Figma MCP'],
+  ['LANGUAGES', 'Russian native, English B2+'],
+  ['FORMAT', 'Office, hybrid, remote'],
+  ['LOCATION', 'Moscow, ready to relocate'],
+];
+
+const contacts = [
+  ['asrieldreemur1213@gmail.com', 'mailto:asrieldreemur1213@gmail.com'],
+  ['t.me/kuixl', 'https://t.me/kuixl'],
+  ['github.com/kuixl', 'https://github.com/kuixl'],
+];
 ---
 <Base title="Konstantin Darovskiy - web designer">
-  <!-- preloader: ink screen, ascii morph, margin sketches, optional sound -->
   <div id="preloader" aria-hidden="true">
     <canvas id="ascii-canvas"></canvas>
     <svg class="sketches" id="sketch-layer"></svg>
-    <!-- the real type the ASCII swarm resolves into -->
     <span id="preload-wordmark">kuixl</span>
     <div id="preload-invite">
       <span class="invite-key">PRESS ANY KEY</span>
@@ -15,33 +43,252 @@ import Base from '../layouts/Base.astro';
     <button id="sound-toggle" type="button">SOUND OFF</button>
   </div>
 
-  <!-- hero, revealed when the preloader dissolves -->
-  <header class="flex h-[56px] items-center justify-between border-b border-hairline px-020 md:h-[64px] md:px-080" style="padding-inline: 20px;">
+  <header class="site-head">
     <span class="font-mono text-mono-nav">kuixl</span>
-    <nav class="flex items-center gap-032">
-      <span class="font-mono text-mono-nav text-muted">RU / EN</span>
-      <a href="#contact" class="font-mono text-mono-nav">CONTACT</a>
-    </nav>
+    <a href="#contact" class="font-mono text-mono-nav">CONTACT</a>
   </header>
 
-  <section class="relative flex min-h-[calc(100vh-64px)] flex-col justify-center px-[20px] md:px-080">
-    <h1 class="text-display-xl-m font-sans md:text-display-xl">
-      Konstantin<br />Darovskiy
-    </h1>
-    <p class="mt-024 text-body-lg text-muted">I design interfaces. Then I ship them.</p>
+  <main>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-tags">
+        <span>UX/UI &nbsp; WEB &nbsp; CODE</span>
+        <span>CLAUDE CODE &nbsp; FIGMA MCP &nbsp; AI WORKFLOW</span>
+      </div>
+      <h1 class="hero-title">Konstantin<br />Darovskiy</h1>
+      <p class="hero-lead">I design interfaces. Then I ship them.</p>
+      <div class="hero-meta">
+        <span>IT-HUB COLLEGE &nbsp; 4TH YEAR</span>
+        <span>MOSCOW &nbsp; GMT+3</span>
+        <span>OFFICE &nbsp; HYBRID &nbsp; REMOTE</span>
+      </div>
+      <span class="hero-scroll font-mono">SCROLL</span>
+    </section>
 
-    <ul class="mt-048 space-y-016 font-mono text-mono-label text-muted md:hidden">
-      <li class="border-l border-hairline pl-016">UX/UI&nbsp;&nbsp;&nbsp;WEB&nbsp;&nbsp;&nbsp;CODE</li>
-      <li class="border-l border-hairline pl-016">CLAUDE CODE&nbsp;&nbsp;&nbsp;FIGMA MCP&nbsp;&nbsp;&nbsp;AI WORKFLOW</li>
-      <li class="border-l border-hairline pl-016">MOSCOW&nbsp;&nbsp;&nbsp;GMT+3</li>
-    </ul>
+    <!-- WORKS -->
+    <section class="works" id="works">
+      <h2 class="sec-title">Works</h2>
+      <ol class="index">
+        {index.map((w) => {
+          const Tag = w.href ? 'a' : 'button';
+          return (
+            <li class="index-row">
+              <Tag
+                class="index-link"
+                href={w.href}
+                type={w.href ? undefined : 'button'}
+                data-fullview={w.full}
+                data-fullview-label={w.full ? `${w.title} - full site` : undefined}
+              >
+                <span class="ix-n">{w.n}</span>
+                <span class="ix-title">{w.title}</span>
+                <span class="ix-meta">
+                  <span>{w.kind}</span>
+                  <span>{w.year}</span>
+                  <span>{w.team}</span>
+                </span>
+                <span class="ix-go font-mono">{w.href ? 'CASE →' : 'FULL SITE →'}</span>
+              </Tag>
+            </li>
+          );
+        })}
+      </ol>
+      <p class="index-note font-mono">
+        Monolith shipped as a site but never got written up — the pages open in place.
+      </p>
+    </section>
 
-    <span class="absolute bottom-048 left-[20px] font-mono text-mono-caption text-muted md:left-080">SCROLL</span>
-  </section>
+    <!-- PROFILE -->
+    <section class="profile" id="profile">
+      <h2 class="sec-title">Profile</h2>
+      <div class="pf-grid">
+        <figure class="pf-portrait">
+          <img src="/portrait.jpg" alt="Konstantin Darovskiy" width="400" height="520" loading="lazy" />
+          <figcaption class="font-mono">PORTRAIT</figcaption>
+        </figure>
+        <div class="pf-text">
+          <p>
+            4th year web design student at IT-Hub College, Moscow. I work across UX/UI,
+            motion and 3D. Most of my projects go from research to a working site — I
+            design them, then build them.
+          </p>
+          <p>
+            I build with AI agents in the loop — Claude Code and Figma MCP for design
+            systems, prototypes and production code. The tools speed up execution. The
+            structure and the decisions are mine.
+          </p>
+          <dl class="pf-facts">
+            {profileFacts.map(([k, v]) => (
+              <div><dt>{k}</dt><dd>{v}</dd></div>
+            ))}
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="contact" id="contact">
+      <div class="ct-head">
+        <h2 class="ct-title">Let&rsquo;s talk.</h2>
+        <div class="ct-status font-mono">
+          <span>MOSCOW &nbsp; GMT+3</span>
+          <span>OPEN TO WORK</span>
+        </div>
+      </div>
+      <ul class="ct-list">
+        {contacts.map(([label, href]) => (
+          <li><a href={href}>{label}</a></li>
+        ))}
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-foot font-mono">
+    <span>kuixl</span>
+    <span>OPEN TO WORK</span>
+  </footer>
 
   <script>
     import { initPreloader } from '../scripts/preloader';
     import { initMotion } from '../scripts/motion';
-    initPreloader().then(() => initMotion());
+    import { initFullViewLinks } from '../scripts/workframe';
+    initPreloader().then(() => {
+      initMotion();
+      initFullViewLinks();
+    });
   </script>
 </Base>
+
+<style>
+  .site-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    padding-inline: 20px;
+    border-bottom: 1px solid var(--color-hairline);
+  }
+  main { max-width: 1240px; margin-inline: auto; padding-inline: 20px; }
+
+  .sec-title {
+    font-family: var(--font-sans);
+    font-weight: 900;
+    font-size: clamp(40px, 9vw, 96px);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-bottom: var(--spacing-048);
+  }
+
+  /* hero */
+  .hero { position: relative; padding-block: var(--spacing-080) var(--spacing-120); min-height: 78vh; display: flex; flex-direction: column; justify-content: center; }
+  .hero-tags, .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-024);
+    font-family: var(--font-mono);
+    font-size: var(--text-mono-label);
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
+  }
+  .hero-title {
+    margin-block: var(--spacing-032);
+    font-family: var(--font-sans);
+    font-weight: 900;
+    font-size: clamp(56px, 13vw, 180px);
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+  }
+  .hero-lead { font-size: var(--text-body-lg); color: var(--color-muted); }
+  .hero-meta { margin-top: var(--spacing-032); }
+  .hero-scroll { position: absolute; bottom: var(--spacing-024); left: 0; font-size: var(--text-mono-caption); color: var(--color-muted); }
+
+  /* works index */
+  .works { padding-block: var(--spacing-120); border-top: 1px solid var(--color-hairline); }
+  .index { list-style: none; }
+  .index-row + .index-row { border-top: 1px solid var(--color-hairline); }
+  .index-link {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas: 'n title' '. meta' '. go';
+    gap: var(--spacing-008) var(--spacing-024);
+    width: 100%;
+    padding-block: var(--spacing-032);
+    text-align: left;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    transition: opacity 0.2s;
+  }
+  .index-link:hover { opacity: 0.55; }
+  .ix-n {
+    grid-area: n;
+    font-family: var(--font-mono);
+    font-size: clamp(24px, 5vw, 40px);
+    color: var(--color-muted);
+  }
+  .ix-title {
+    grid-area: title;
+    font-family: var(--font-sans);
+    font-weight: 900;
+    font-size: clamp(32px, 7vw, 72px);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .ix-meta {
+    grid-area: meta;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-016);
+    font-family: var(--font-mono);
+    font-size: var(--text-mono-caption);
+    letter-spacing: 0.08em;
+    color: var(--color-muted);
+  }
+  .ix-go { grid-area: go; font-size: var(--text-mono-caption); letter-spacing: 0.1em; }
+  .index-note { margin-top: var(--spacing-024); font-size: var(--text-mono-caption); color: var(--color-muted); }
+
+  /* profile */
+  .profile { padding-block: var(--spacing-120); border-top: 1px solid var(--color-hairline); }
+  .pf-grid { display: grid; gap: var(--spacing-048); }
+  .pf-portrait img { width: 100%; max-width: 400px; height: auto; display: block; filter: grayscale(1); }
+  .pf-portrait figcaption { margin-top: var(--spacing-008); font-size: var(--text-mono-caption); letter-spacing: 0.1em; color: var(--color-muted); }
+  .pf-text > * + * { margin-top: var(--spacing-024); }
+  .pf-text p { max-width: 62ch; }
+  .pf-facts { display: grid; gap: var(--spacing-016); margin-top: var(--spacing-048); padding-top: var(--spacing-024); border-top: 1px solid var(--color-hairline); }
+  .pf-facts div { display: grid; grid-template-columns: 1fr; gap: 2px; }
+  .pf-facts dt { font-family: var(--font-mono); font-size: var(--text-mono-caption); letter-spacing: 0.1em; color: var(--color-muted); }
+
+  /* contact */
+  .contact { padding-block: var(--spacing-120) var(--spacing-080); border-top: 1px solid var(--color-hairline); }
+  .ct-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--spacing-024); }
+  .ct-title { font-family: var(--font-sans); font-weight: 900; font-size: clamp(40px, 9vw, 96px); line-height: 1; letter-spacing: -0.02em; }
+  .ct-status { display: flex; flex-direction: column; font-size: var(--text-mono-caption); letter-spacing: 0.1em; color: var(--color-muted); }
+  .ct-list { list-style: none; margin-top: var(--spacing-048); display: grid; gap: var(--spacing-016); }
+  .ct-list a { font-size: clamp(20px, 3vw, 24px); border-bottom: 1px solid var(--color-hairline); }
+  .ct-list a:hover { border-color: var(--color-primary); }
+
+  .site-foot {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--spacing-024) 20px;
+    border-top: 1px solid var(--color-hairline);
+    font-size: var(--text-mono-caption);
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
+  }
+
+  @media (min-width: 901px) {
+    main, .site-head, .site-foot { padding-inline: var(--spacing-080); }
+    .index-link {
+      grid-template-columns: 90px minmax(0, 1fr) auto auto;
+      grid-template-areas: 'n title meta go';
+      align-items: baseline;
+      gap: var(--spacing-032);
+    }
+    .ix-meta { justify-content: flex-end; }
+    .pf-grid { grid-template-columns: 400px minmax(0, 1fr); gap: var(--spacing-080); }
+    .pf-facts div { grid-template-columns: 200px minmax(0, 1fr); gap: var(--spacing-016); }
+  }
+</style>

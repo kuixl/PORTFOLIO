@@ -205,10 +205,15 @@ html.is-preloading {
   display: flex;
   justify-content: center;
 }
-.wf-overlay-scroll img {
+.wf-overlay-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
   width: min(100%, 1100px);
+}
+.wf-overlay-scroll img {
+  width: 100%;
   height: auto;
-  align-self: flex-start;
 }
 
 /* the real Switzer the ASCII swarm resolves into; the script drives opacity,

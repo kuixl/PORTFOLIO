@@ -60,8 +60,9 @@ function show(root: HTMLElement, state: FrameState) {
 // ---------- full-screen reader ----------
 let overlay: HTMLElement | null = null;
 
-function openFull(src: string, label: string) {
+function openFull(src: string | string[], label: string) {
   close();
+  const list = Array.isArray(src) ? src : [src];
   overlay = document.createElement('div');
   overlay.className = 'wf-overlay';
   overlay.innerHTML = `
@@ -69,7 +70,11 @@ function openFull(src: string, label: string) {
       <span>${label}</span>
       <button type="button" aria-label="Close">CLOSE &times;</button>
     </div>
-    <div class="wf-overlay-scroll"><img src="${src}" alt="${label}"></div>`;
+    <div class="wf-overlay-scroll">
+      <div class="wf-overlay-stack">
+        ${list.map((s) => `<img src="${s}" alt="${label}">`).join('')}
+      </div>
+    </div>`;
   document.body.appendChild(overlay);
   document.documentElement.style.overflow = 'hidden';
   overlay.querySelector('button')!.addEventListener('click', close);
@@ -90,6 +95,20 @@ function close() {
   overlay = null;
   document.documentElement.style.overflow = '';
   removeEventListener('keydown', onKey);
+}
+
+/**
+ * Anything with data-fullview opens the reader directly, no frame involved.
+ * Monolith has no case page, so its row in the index is the only way in.
+ */
+export function initFullViewLinks() {
+  document.querySelectorAll<HTMLElement>('[data-fullview]').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      const srcs = (el.dataset.fullview || '').split(',').filter(Boolean);
+      if (srcs.length) openFull(srcs, el.dataset.fullviewLabel || 'Full view');
+    });
+  });
 }
 
 export function initWorkFrames() {
