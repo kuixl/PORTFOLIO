@@ -163,6 +163,28 @@ html.is-preloading {
   pointer-events: none;
 }
 
+/* ---------- ASCII wipe between pages ---------- */
+.page-wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  pointer-events: none;
+  white-space: pre;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 14px;
+  line-height: 19px;
+  letter-spacing: 0;
+  color: var(--color-primary);
+  background: transparent;
+}
+.page-wipe.is-in { color: var(--color-primary); }
+@media (prefers-reduced-motion: reduce) {
+  .page-wipe { display: none; }
+}
+
 /* ---------- full-screen work reader ----------
    Created by script outside any component, so the styles live here. */
 .wf-overlay {

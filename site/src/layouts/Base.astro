@@ -1,14 +1,28 @@
 ---
 import '../styles/global.css';
-interface Props { title: string; description?: string; }
-const { title, description = 'Portfolio of Konstantin Darovskiy, web designer.' } = Astro.props;
+interface Props {
+  title: string;
+  description?: string;
+  /**
+   * Only the home page runs the preloader. The lock class has to be scoped to
+   * it: nothing else removes `is-preloading`, so on a case page it would leave
+   * `overflow: hidden` on <html> for the life of the visit.
+   */
+  preload?: boolean;
+}
+const {
+  title,
+  description = 'Portfolio of Konstantin Darovskiy, web designer.',
+  preload = false,
+} = Astro.props;
 ---
 <!doctype html>
-<html lang="en" class="is-preloading">
+<html lang="en" class={preload ? 'is-preloading' : undefined}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preload" href="/fonts/switzer-var-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/sligoil-micro-latin.woff2" as="font" type="font/woff2" crossorigin />
     <title>{title}</title>

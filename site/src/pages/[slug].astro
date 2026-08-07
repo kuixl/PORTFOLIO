@@ -149,8 +149,11 @@ const n = () => String(++step).padStart(2, '0');
   <script>
     import { initWorkFrames } from '../scripts/workframe';
     import { initMotion } from '../scripts/motion';
+    import { initReveals, initPageWipe } from '../scripts/reveal';
     initMotion();
     initWorkFrames();
+    initReveals();
+    initPageWipe();
   </script>
 </Base>
 

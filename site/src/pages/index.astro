@@ -31,7 +31,7 @@ const contacts = [
   ['github.com/kuixl', 'https://github.com/kuixl'],
 ];
 ---
-<Base title="Konstantin Darovskiy - web designer">
+<Base title="Konstantin Darovskiy - web designer" preload>
   <div id="preloader" aria-hidden="true">
     <canvas id="ascii-canvas"></canvas>
     <svg class="sketches" id="sketch-layer"></svg>
@@ -67,8 +67,8 @@ const contacts = [
 
     <!-- WORKS -->
     <section class="works" id="works">
-      <h2 class="sec-title">Works</h2>
-      <ol class="index">
+      <h2 class="sec-title" data-reveal>Works</h2>
+      <ol class="index" data-reveal data-reveal-children>
         {index.map((w) => {
           const Tag = w.href ? 'a' : 'button';
           return (
@@ -100,10 +100,10 @@ const contacts = [
 
     <!-- PROFILE -->
     <section class="profile" id="profile">
-      <h2 class="sec-title">Profile</h2>
-      <div class="pf-grid">
+      <h2 class="sec-title" data-reveal>Profile</h2>
+      <div class="pf-grid" data-reveal data-reveal-children>
         <figure class="pf-portrait">
-          <img src="/portrait.jpg" alt="Konstantin Darovskiy" width="400" height="520" loading="lazy" />
+          <img src="/portrait.webp" alt="Konstantin Darovskiy" width="1200" height="1560" loading="lazy" />
           <figcaption class="font-mono">PORTRAIT</figcaption>
         </figure>
         <div class="pf-text">
@@ -129,7 +129,7 @@ const contacts = [
     <!-- CONTACT -->
     <section class="contact" id="contact">
       <div class="ct-head">
-        <h2 class="ct-title">Let&rsquo;s talk.</h2>
+        <h2 class="ct-title" data-assemble>Let&rsquo;s talk.</h2>
         <div class="ct-status font-mono">
           <span>MOSCOW &nbsp; GMT+3</span>
           <span>OPEN TO WORK</span>
@@ -152,9 +152,13 @@ const contacts = [
     import { initPreloader } from '../scripts/preloader';
     import { initMotion } from '../scripts/motion';
     import { initFullViewLinks } from '../scripts/workframe';
+    import { initReveals, initAssembleHeading, initPageWipe } from '../scripts/reveal';
     initPreloader().then(() => {
       initMotion();
       initFullViewLinks();
+      initReveals();
+      initAssembleHeading();
+      initPageWipe();
     });
   </script>
 </Base>
@@ -252,7 +256,15 @@ const contacts = [
   /* profile */
   .profile { padding-block: var(--spacing-120); border-top: 1px solid var(--color-hairline); }
   .pf-grid { display: grid; gap: var(--spacing-048); }
-  .pf-portrait img { width: 100%; max-width: 400px; height: auto; display: block; filter: grayscale(1); }
+  /* the portrait arrives already halftoned; no filter, and no smoothing on
+     scale-down or the dot pattern turns to porridge */
+  .pf-portrait img {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    display: block;
+    image-rendering: -webkit-optimize-contrast;
+  }
   .pf-portrait figcaption { margin-top: var(--spacing-008); font-size: var(--text-mono-caption); letter-spacing: 0.1em; color: var(--color-muted); }
   .pf-text > * + * { margin-top: var(--spacing-024); }
   .pf-text p { max-width: 62ch; }

@@ -17,7 +17,7 @@ const { n, title, wide = false, id } = Astro.props;
     <span class="cs-n">{n}</span>
     <h2 class="cs-title">{title}</h2>
   </div>
-  <div class="cs-body">
+  <div class="cs-body" data-reveal data-reveal-children>
     <slot />
   </div>
 </section>
