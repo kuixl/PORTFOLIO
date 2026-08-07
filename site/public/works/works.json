@@ -12,7 +12,13 @@
           "h": 4096,
           "kb": 263
         }
-      ]
+      ],
+      "thumb": {
+        "file": "landing-desktop.thumb.webp",
+        "w": 720,
+        "h": 518,
+        "kb": 25
+      }
     }
   ],
   "monolith": [
@@ -28,7 +34,13 @@
           "h": 1383,
           "kb": 69
         }
-      ]
+      ],
+      "thumb": {
+        "file": "archive-desktop.thumb.webp",
+        "w": 720,
+        "h": 518,
+        "kb": 16
+      }
     },
     {
       "page": "index",
@@ -42,7 +54,13 @@
           "h": 1314,
           "kb": 84
         }
-      ]
+      ],
+      "thumb": {
+        "file": "index-desktop.thumb.webp",
+        "w": 720,
+        "h": 518,
+        "kb": 25
+      }
     },
     {
       "page": "materials",
@@ -56,7 +74,13 @@
           "h": 2789,
           "kb": 211
         }
-      ]
+      ],
+      "thumb": {
+        "file": "materials-desktop.thumb.webp",
+        "w": 720,
+        "h": 518,
+        "kb": 24
+      }
     }
   ],
   "nichive": [
@@ -72,7 +96,13 @@
           "h": 3051,
           "kb": 133
         }
-      ]
+      ],
+      "thumb": {
+        "file": "exhibitions-desktop.thumb.webp",
+        "w": 720,
+        "h": 518,
+        "kb": 15
+      }
     },
     {
       "page": "exhibitions",
@@ -86,7 +116,13 @@
           "h": 4084,
           "kb": 107
         }
-      ]
+      ],
+      "thumb": {
+        "file": "exhibitions-mobile.thumb.webp",
+        "w": 720,
+        "h": 518,
+        "kb": 11
+      }
     },
     {
       "page": "index",
@@ -100,7 +136,13 @@
           "h": 4764,
           "kb": 209
         }
-      ]
+      ],
+      "thumb": {
+        "file": "index-desktop.thumb.webp",
+        "w": 720,
+        "h": 518,
+        "kb": 16
+      }
     },
     {
       "page": "index",
@@ -114,7 +156,33 @@
           "h": 5487,
           "kb": 141
         }
-      ]
+      ],
+      "thumb": {
+        "file": "index-mobile.thumb.webp",
+        "w": 720,
+        "h": 518,
+        "kb": 10
+      }
+    },
+    {
+      "page": "manifesto",
+      "size": "desktop",
+      "w": 1425,
+      "h": 2829,
+      "parts": [
+        {
+          "file": "manifesto-desktop.webp",
+          "w": 1425,
+          "h": 2829,
+          "kb": 150
+        }
+      ],
+      "thumb": {
+        "file": "manifesto-desktop.thumb.webp",
+        "w": 720,
+        "h": 518,
+        "kb": 23
+      }
     },
     {
       "page": "materials",
@@ -128,7 +196,13 @@
           "h": 2283,
           "kb": 116
         }
-      ]
+      ],
+      "thumb": {
+        "file": "materials-desktop.thumb.webp",
+        "w": 720,
+        "h": 518,
+        "kb": 23
+      }
     },
     {
       "page": "materials",
@@ -142,7 +216,53 @@
           "h": 2999,
           "kb": 88
         }
-      ]
+      ],
+      "thumb": {
+        "file": "materials-mobile.thumb.webp",
+        "w": 720,
+        "h": 518,
+        "kb": 12
+      }
+    },
+    {
+      "page": "stories",
+      "size": "desktop",
+      "w": 1425,
+      "h": 5087,
+      "parts": [
+        {
+          "file": "stories-desktop.webp",
+          "w": 1425,
+          "h": 5087,
+          "kb": 295
+        }
+      ],
+      "thumb": {
+        "file": "stories-desktop.thumb.webp",
+        "w": 720,
+        "h": 518,
+        "kb": 22
+      }
+    },
+    {
+      "page": "subscribe",
+      "size": "desktop",
+      "w": 1425,
+      "h": 2307,
+      "parts": [
+        {
+          "file": "subscribe-desktop.webp",
+          "w": 1425,
+          "h": 2307,
+          "kb": 87
+        }
+      ],
+      "thumb": {
+        "file": "subscribe-desktop.thumb.webp",
+        "w": 720,
+        "h": 518,
+        "kb": 13
+      }
     }
   ],
   "yakitoria": [
@@ -158,7 +278,13 @@
           "h": 4096,
           "kb": 359
         }
-      ]
+      ],
+      "thumb": {
+        "file": "menu-desktop.thumb.webp",
+        "w": 720,
+        "h": 518,
+        "kb": 25
+      }
     }
   ]
 }

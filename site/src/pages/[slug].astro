@@ -1,0 +1,282 @@
+---
+import Base from '../layouts/Base.astro';
+import CaseSection from '../components/CaseSection.astro';
+import WorkFrame from '../components/WorkFrame.astro';
+import { cases } from '../data/cases';
+import works from '../../public/works/works.json';
+
+export function getStaticPaths() {
+  return cases.map((c) => ({ params: { slug: c.slug }, props: { c } }));
+}
+const { c } = Astro.props;
+
+// only render screens we actually captured, rather than promising a grid of
+// placeholders where a project has one page
+const screens = (c.screens ?? [])
+  .map(([label, page]) => {
+    const set = (works as Record<string, any[]>)[c.frame?.project ?? c.slug] ?? [];
+    const shot = set.find((s) => s.page === page && s.size === 'desktop');
+    return shot?.thumb ? { label, file: shot.thumb.file, w: shot.thumb.w, h: shot.thumb.h } : null;
+  })
+  .filter(Boolean) as { label: string; file: string; w: number; h: number }[];
+
+// number the sections that actually exist on this case
+let step = 0;
+const n = () => String(++step).padStart(2, '0');
+---
+<Base title={`${c.title} - case study - Konstantin Darovskiy`}>
+  <header class="site-head">
+    <a href="/" class="font-mono text-mono-nav">kuixl</a>
+    <a href="/#contact" class="font-mono text-mono-nav">CONTACT</a>
+  </header>
+
+  <main class="case">
+    <section class="case-cover">
+      <div class="cc-meta">
+        {c.coverMeta.map(([k, v]) => (
+          <span><b>{k}</b>&nbsp;&nbsp;{v}</span>
+        ))}
+      </div>
+      <h1 class="cc-title">{c.title}</h1>
+      <p class="cc-lead">{c.lead}</p>
+    </section>
+
+    <CaseSection n={n()} title="Result" wide>
+      <dl class="facts">
+        {c.facts.map(([k, v]) => (
+          <div><dt>{k}</dt><dd>{v}</dd></div>
+        ))}
+      </dl>
+    </CaseSection>
+
+    {c.frame && (
+      <CaseSection n={n()} title="The work" wide>
+        <WorkFrame
+          project={c.frame.project}
+          title={c.title}
+          url={c.frame.url}
+          note={c.frame.note}
+          tabs={c.frame.tabs}
+        />
+      </CaseSection>
+    )}
+
+    <CaseSection n={n()} title="The brief">
+      {c.brief.map((p) => <p>{p}</p>)}
+      <dl class="meta">
+        {c.meta.map(([k, v]) => (
+          <div><dt>{k}</dt><dd>{v}</dd></div>
+        ))}
+      </dl>
+    </CaseSection>
+
+    {c.broken && (
+      <CaseSection n={n()} title="Broken">
+        {c.broken.map((p) => <p>{p}</p>)}
+      </CaseSection>
+    )}
+
+    {c.myRole && (
+      <CaseSection n={n()} title="My role">
+        {c.myRole.map((p) => <p>{p}</p>)}
+      </CaseSection>
+    )}
+
+    {c.personas && (
+      <CaseSection n={n()} title="Research">
+        <div class="personas">
+          {c.personas.map(([name, who, quote]) => (
+            <figure class="persona">
+              <figcaption><strong>{name}</strong><span>{who}</span></figcaption>
+              <blockquote>&laquo;{quote}&raquo;</blockquote>
+            </figure>
+          ))}
+        </div>
+      </CaseSection>
+    )}
+
+    <CaseSection n={n()} title="Decisions">
+      <div class="decisions">
+        {c.decisions.map((d) => (
+          <article class="decision">
+            <span class="d-n">{d.n}</span>
+            <h3>{d.title}</h3>
+            {d.body.map((p) => <p>{p}</p>)}
+          </article>
+        ))}
+      </div>
+    </CaseSection>
+
+    {screens.length > 1 && (
+      <CaseSection n={n()} title="Screens" wide>
+        <div class="screens">
+          {screens.map((s) => (
+            <figure class="screen">
+              <img src={`/works/${c.frame?.project ?? c.slug}/${s.file}`} width={s.w} height={s.h}
+                alt={`${c.title} - ${s.label}`} loading="lazy" decoding="async" />
+              <figcaption>{s.label}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </CaseSection>
+    )}
+
+    {c.system && (
+      <CaseSection n={n()} title="System">
+        {c.system.map((p) => <p>{p}</p>)}
+      </CaseSection>
+    )}
+
+    {c.judges && (
+      <CaseSection n={n()} title="Judges" wide>
+        <div class="judges">
+          {c.judges.quotes.map((q) => <blockquote>&laquo;{q}&raquo;</blockquote>)}
+        </div>
+        <span class="judges-src font-mono">{c.judges.source}</span>
+      </CaseSection>
+    )}
+
+    <CaseSection n={n()} title="What I would change">
+      {c.retro.map((p) => <p>{p}</p>)}
+    </CaseSection>
+
+    <a class="case-next" href={`/${c.next.slug}`}>
+      <span class="font-mono text-mono-label">NEXT</span>
+      <span class="cn-title">{c.next.title}</span>
+    </a>
+  </main>
+
+  <script>
+    import { initWorkFrames } from '../scripts/workframe';
+    import { initMotion } from '../scripts/motion';
+    initMotion();
+    initWorkFrames();
+  </script>
+</Base>
+
+<style>
+  .site-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    padding-inline: 20px;
+    border-bottom: 1px solid var(--color-hairline);
+  }
+  .case {
+    max-width: 1240px;
+    margin-inline: auto;
+    padding-inline: 20px;
+    padding-bottom: var(--spacing-160);
+  }
+
+  .case-cover { padding-block: var(--spacing-120) var(--spacing-080); }
+  .cc-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-032);
+    font-family: var(--font-mono);
+    font-size: var(--text-mono-label);
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
+  }
+  .cc-meta b { font-weight: 400; }
+  .cc-title {
+    margin-top: var(--spacing-024);
+    font-family: var(--font-sans);
+    font-weight: 900;
+    font-size: clamp(56px, 15vw, 180px);
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+  }
+  .cc-lead {
+    margin-top: var(--spacing-024);
+    max-width: 640px;
+    font-size: var(--text-body-lg);
+    color: var(--color-muted);
+  }
+
+  .facts, .meta { display: grid; gap: var(--spacing-024); }
+  .facts { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+  .meta {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    margin-top: var(--spacing-048);
+    padding-top: var(--spacing-024);
+    border-top: 1px solid var(--color-hairline);
+  }
+  .facts dt, .meta dt {
+    font-family: var(--font-mono);
+    font-size: var(--text-mono-caption);
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
+  }
+  .facts dd { margin-top: 6px; font-weight: 700; font-size: 22px; line-height: 1.2; }
+  .meta dd { margin-top: 6px; font-size: var(--text-body); }
+
+  .personas { display: grid; gap: var(--spacing-032); grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .persona figcaption { display: flex; flex-direction: column; gap: 2px; }
+  .persona strong { font-size: 24px; font-weight: 700; }
+  .persona span {
+    font-family: var(--font-mono);
+    font-size: var(--text-mono-caption);
+    letter-spacing: 0.06em;
+    color: var(--color-muted);
+  }
+  .persona blockquote { margin-top: var(--spacing-012); font-style: italic; color: var(--color-muted); }
+
+  .decisions { display: grid; gap: var(--spacing-064); }
+  .decision { max-width: 68ch; }
+  .d-n {
+    font-family: var(--font-mono);
+    font-size: var(--text-mono-caption);
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
+  }
+  .decision h3 { margin-top: var(--spacing-008); font-size: 28px; font-weight: 700; letter-spacing: -0.01em; }
+  .decision p { margin-top: var(--spacing-016); }
+
+  .screens { display: grid; gap: var(--spacing-024); grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .screen img { width: 100%; height: auto; display: block; border: 1px solid var(--color-hairline); }
+  .screen figcaption {
+    margin-top: var(--spacing-008);
+    font-family: var(--font-mono);
+    font-size: var(--text-mono-caption);
+    letter-spacing: 0.08em;
+    color: var(--color-muted);
+  }
+
+  .judges { display: grid; gap: var(--spacing-032); grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .judges blockquote {
+    font-size: 20px;
+    line-height: 1.45;
+    font-style: italic;
+    padding-left: var(--spacing-016);
+    border-left: 1px solid var(--color-hairline);
+  }
+  .judges-src {
+    display: block;
+    margin-top: var(--spacing-024);
+    font-size: var(--text-mono-caption);
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
+  }
+
+  .case-next {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-008);
+    padding-top: var(--spacing-080);
+    border-top: 1px solid var(--color-hairline);
+  }
+  .cn-title {
+    font-family: var(--font-sans);
+    font-weight: 900;
+    font-size: clamp(48px, 10vw, 96px);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  @media (min-width: 901px) {
+    .case, .site-head { padding-inline: var(--spacing-080); }
+  }
+</style>

@@ -56,9 +56,23 @@ const run = async () => {
         parts.push({ file: out, w: info.width, h: info.height, kb: Math.round(info.size / 1024) });
       }
 
+      // A card-sized crop of the top of the page, for screen grids. Cropping
+      // beats scaling the whole page down: a 5000px page shrunk to card height
+      // is an unreadable smear.
+      const thumbH = Math.min(height, Math.round(width * 0.72));
+      const thumbName = `${name}.thumb.webp`;
+      const thumb = await sharp(src)
+        .extract({ left: 0, top: 0, width, height: thumbH })
+        .resize(720, null)
+        .webp({ quality: 78 })
+        .toFile(join(outDir, thumbName));
+
       const outKb = parts.reduce((s, p) => s + p.kb, 0);
       const [page, size] = name.split('-');
-      manifest[project].push({ page, size, w: width, h: height, parts });
+      manifest[project].push({
+        page, size, w: width, h: height, parts,
+        thumb: { file: thumbName, w: thumb.width, h: thumb.height, kb: Math.round(thumb.size / 1024) },
+      });
       console.log(
         `${project}/${file}  ${width}x${height}  ${srcKb} KB -> ${outKb} KB` +
           (tiles > 1 ? `  (${tiles} tiles)` : '')

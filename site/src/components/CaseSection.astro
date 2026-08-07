@@ -1,0 +1,60 @@
+---
+/**
+ * One numbered section of a case page. The number and title sit in a narrow
+ * left rail so the body copy keeps a readable measure instead of stretching
+ * across the full grid.
+ */
+interface Props {
+  n: string;
+  title: string;
+  wide?: boolean;
+  id?: string;
+}
+const { n, title, wide = false, id } = Astro.props;
+---
+<section class="case-section" id={id} data-wide={wide ? '' : undefined}>
+  <div class="cs-rail">
+    <span class="cs-n">{n}</span>
+    <h2 class="cs-title">{title}</h2>
+  </div>
+  <div class="cs-body">
+    <slot />
+  </div>
+</section>
+
+<style>
+  .case-section {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-024);
+    padding-block: var(--spacing-120);
+    border-top: 1px solid var(--color-hairline);
+  }
+  .cs-rail { display: flex; align-items: baseline; gap: var(--spacing-016); }
+  .cs-n {
+    font-family: var(--font-mono);
+    font-size: var(--text-mono-label);
+    color: var(--color-muted);
+  }
+  .cs-title {
+    font-family: var(--font-sans);
+    font-weight: 900;
+    font-size: clamp(32px, 6vw, 64px);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    /* long section names must not break mid-word on narrow rails */
+    hyphens: none;
+    overflow-wrap: normal;
+  }
+  .cs-body > :global(* + *) { margin-top: var(--spacing-024); }
+
+  @media (min-width: 901px) {
+    .case-section {
+      grid-template-columns: 300px minmax(0, 1fr);
+      gap: var(--spacing-080);
+    }
+    .cs-rail { flex-direction: column; gap: var(--spacing-012); }
+    .case-section[data-wide] { grid-template-columns: 1fr; }
+    .case-section[data-wide] .cs-rail { flex-direction: row; align-items: baseline; }
+  }
+</style>

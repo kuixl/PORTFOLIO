@@ -19,13 +19,16 @@ interface Props {
   title: string;
   url?: string;
   note?: string;
+  /** limit which pages get a tab; the rest stay available for screen grids */
+  tabs?: string[];
 }
-const { project, title, url, note } = Astro.props;
+const { project, title, url, note, tabs } = Astro.props;
 
-const shots = works[project] as {
+const all = works[project] as {
   page: string; size: string; w: number; h: number;
   parts: { file: string; w: number; h: number; kb: number }[];
 }[];
+const shots = tabs ? all.filter((s) => tabs.includes(s.page)) : all;
 
 // the entry page leads regardless of how the files sort alphabetically -
 // otherwise nichive opens on "exhibitions" because e comes before i
