@@ -39,13 +39,13 @@ export const home: Record<Lang, Home> = {
     ],
     scroll: 'SCROLL',
     works: 'Works',
-    worksNote: 'Monolith shipped but I never wrote it up. The pages open here instead.',
+    worksNote: 'Monolith was drawn in full and never went live. The pages open here instead.',
     caseLink: 'CASE →',
     fullLink: 'FULL SITE →',
     kinds: {
       nichive: 'Digital archive',
       yakitoria: 'E-commerce',
-      monolith: 'Type study',
+      monolith: 'Side project',
       beta: 'Landing',
     },
     teams: { solo: 'Solo', team: 'Team' },
@@ -71,7 +71,7 @@ export const home: Record<Lang, Home> = {
 
   ru: {
     title: 'Константин\nДаровский',
-    lead: 'Проектирую интерфейсы. Потом собираю их сам.',
+    lead: 'Придумываю интерфейсы и сам их собираю.',
     tags: ['UX/UI', 'ВЕБ', 'КОД', 'CLAUDE CODE', 'CURSOR', 'FIGMA MCP', 'OBSIDIAN', 'AI WORKFLOW'],
     meta: [
       ['Учёба', 'IT-Hub College, 4 курс'],
@@ -80,20 +80,20 @@ export const home: Record<Lang, Home> = {
     ],
     scroll: 'ВНИЗ',
     works: 'Работы',
-    worksNote: 'Monolith я выпустил, но кейс так и не написал. Страницы открываются прямо здесь.',
+    worksNote: 'Monolith я нарисовал целиком, но до запуска он так и не дошёл. Страницы открываются прямо здесь.',
     caseLink: 'КЕЙС →',
     fullLink: 'ВЕСЬ САЙТ →',
     kinds: {
       nichive: 'Цифровой архив',
-      yakitoria: 'Электронная торговля',
-      monolith: 'Работа со шрифтом',
+      yakitoria: 'Интернет-магазин',
+      monolith: 'Побочный проект',
       beta: 'Лендинг',
     },
     teams: { solo: 'Один', team: 'Команда' },
     profile: 'О себе',
     profileText: [
-      'Учусь на 4 курсе веб-дизайна в IT-Hub College в Москве. Работаю с UX/UI, моушеном и 3D. Почти всё, что делаю, доходит от исследования до сайта, который работает. Сначала проектирую, потом собираю.',
-      'Работаю с ИИ-агентами в связке. Claude Code и Cursor пишут продакшн-код вместе со мной, Figma MCP держит дизайн-системы и прототипы, а исследование и рассуждения живут в Obsidian. Инструменты ускоряют работу. Что строить и зачем, решаю всё равно я.',
+      'Четвёртый курс веб-дизайна в IT-Hub College, Москва. Занимаюсь UX/UI, моушеном и 3D. Почти всё, за что берусь, довожу до работающего сайта: сначала придумываю, потом сам собираю.',
+      'Работаю в связке с ИИ-агентами. Claude Code и Cursor пишут со мной продакшн-код, Figma MCP держит дизайн-системы и прототипы, черновики и исследование лежат в Obsidian. Инструменты экономят время на исполнении. Что делать и зачем, решаю я.',
     ],
     facts: [
       ['ОБРАЗОВАНИЕ', 'IT-Hub College, Москва, 4 курс'],
@@ -105,8 +105,8 @@ export const home: Record<Lang, Home> = {
       ['ФОРМАТ', 'Офис, гибрид, удалёнка'],
       ['ГОРОД', 'Москва, готов к переезду'],
     ],
-    contact: 'Давай поговорим.',
-    status: ['МОСКВА  GMT+3', 'ОТКРЫТ К РАБОТЕ'],
+    contact: 'Пишите.',
+    status: ['МОСКВА  GMT+3', 'ОТКРЫТ К ПРЕДЛОЖЕНИЯМ'],
     portrait: 'ПОРТРЕТ',
   },
 };

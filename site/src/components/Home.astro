@@ -17,11 +17,18 @@ const monolithPages = ['index', 'archive', 'materials']
   .map((s) => `/works/monolith/${s!.parts[0].file}`)
   .join(',');
 
+/**
+ * Monolith sits last and quieter on purpose. It is the only entry without a
+ * written case, so giving it the same weight as three finished projects
+ * oversells it. Demoted rather than dropped: the design exists and is worth
+ * seeing, and saying plainly that it never launched is more convincing than
+ * hiding it.
+ */
 const index = [
   { n: '01', title: 'nichive', kind: 'nichive', year: '2026', team: 'solo', href: `${p}/nichive` },
   { n: '02', title: 'Yakitoria', kind: 'yakitoria', year: '2025', team: 'solo', href: `${p}/yakitoria` },
-  { n: '03', title: 'Monolith', kind: 'monolith', year: '2025', team: 'solo', full: monolithPages },
-  { n: '04', title: 'BETA', kind: 'beta', year: '2026', team: 'team', href: `${p}/beta` },
+  { n: '03', title: 'BETA', kind: 'beta', year: '2026', team: 'team', href: `${p}/beta` },
+  { n: '04', title: 'Monolith', kind: 'monolith', year: '2025', team: 'solo', full: monolithPages, quiet: true },
 ];
 
 const contacts = [
@@ -57,7 +64,7 @@ const contacts = [
       {index.map((w) => {
         const Tag = w.href ? 'a' : 'button';
         return (
-          <li class="index-row">
+          <li class="index-row" data-quiet={w.quiet ? '' : undefined}>
             <Tag class="index-link" href={w.href} type={w.href ? undefined : 'button'}
               data-fullview={w.full}
               data-fullview-label={w.full ? `${w.title} - full site` : undefined}>
@@ -249,6 +256,12 @@ const contacts = [
     color: var(--color-muted);
   }
   .ix-go { grid-area: go; font-size: var(--text-mono-caption); letter-spacing: 0.1em; }
+  /* the unfinished one: smaller, paler, still openable */
+  .index-row[data-quiet] .ix-title { font-size: clamp(24px, 4vw, 40px); color: var(--color-muted); }
+  .index-row[data-quiet] .ix-n { font-size: clamp(18px, 3vw, 26px); }
+  .index-row[data-quiet] .ix-go { color: var(--color-muted); }
+  .index-row[data-quiet] .index-link { padding-block: var(--gap-item); }
+
   .index-note { margin-top: var(--gap-item); font-size: var(--text-mono-caption); color: var(--color-muted); }
 
   .profile { padding-block: var(--gap-section); border-top: 1px solid var(--color-hairline); }
