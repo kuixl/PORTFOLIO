@@ -22,3 +22,11 @@ captures/
 # scratch pages kept out of routing
 *.astro.bak
 
+
+# raw project exports dropped in for processing
+якитория/
+Десктоп/
+Мобайл/
+work/
+*.svg
+!site/public/**/*.svg

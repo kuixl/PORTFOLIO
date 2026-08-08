@@ -287,6 +287,26 @@
       }
     },
     {
+      "page": "menu",
+      "size": "mobile",
+      "w": 750,
+      "h": 4655,
+      "parts": [
+        {
+          "file": "menu-mobile.webp",
+          "w": 750,
+          "h": 4655,
+          "kb": 265
+        }
+      ],
+      "thumb": {
+        "file": "menu-mobile.thumb.webp",
+        "w": 720,
+        "h": 518,
+        "kb": 10
+      }
+    },
+    {
       "page": "product",
       "size": "desktop",
       "w": 1896,
@@ -324,6 +344,26 @@
         "w": 720,
         "h": 518,
         "kb": 36
+      }
+    },
+    {
+      "page": "reviews",
+      "size": "mobile",
+      "w": 750,
+      "h": 3398,
+      "parts": [
+        {
+          "file": "reviews-mobile.webp",
+          "w": 750,
+          "h": 3398,
+          "kb": 123
+        }
+      ],
+      "thumb": {
+        "file": "reviews-mobile.thumb.webp",
+        "w": 720,
+        "h": 518,
+        "kb": 11
       }
     }
   ]
