@@ -9,7 +9,11 @@ export type Lang = 'en' | 'ru';
 
 type Home = {
   title: string;
+  /** written out in the alphabet of its own version, for the portrait alt */
+  name: string;
   lead: string;
+  /** shown instead of a link label on the entry that has no case page */
+  noCase: string;
   tags: string[];
   meta: [string, string][];
   scroll: string;
@@ -30,39 +34,40 @@ type Home = {
 export const home: Record<Lang, Home> = {
   en: {
     title: 'Konstantin\nDarovskiy',
-    lead: 'I design interfaces. Then I ship them.',
-    tags: ['UX/UI', 'WEB', 'CODE', 'CLAUDE CODE', 'CURSOR', 'FIGMA MCP', 'OBSIDIAN', 'AI WORKFLOW'],
-    meta: [
-      ['Study', 'IT-Hub College, 4th year'],
-      ['Based', 'Moscow, GMT+3'],
-      ['Format', 'Office, hybrid, remote'],
-    ],
+    name: 'Konstantin Darovskiy',
+    lead: 'I design interfaces. Then I build them in code.',
+    /* "No case" said nothing about why it is in the list at all. This doubles
+       as the caption for the line drawn up to nichive, which is why the line
+       itself carries no label. */
+    noCase: 'nichive draft, first run at the same idea',
+    /* Five, not eight. OBSIDIAN is a notes app rather than a skill and AI
+       WORKFLOW names nothing at all; both were padding. */
+    tags: ['UX/UI', 'WEB', 'CODE', 'CLAUDE CODE', 'FIGMA MCP'],
+    meta: [],
     scroll: 'SCROLL',
     works: 'Works',
-    worksNote: 'Monolith was drawn in full and never went live. The pages open here instead.',
-    caseLink: 'CASE →',
-    fullLink: 'FULL SITE →',
+    worksNote: 'Monolith was drawn in full and never went live.',
+    caseLink: 'CASE',
+    fullLink: 'FULL SITE',
     kinds: {
       nichive: 'Digital archive',
       yakitoria: 'E-commerce',
       monolith: 'Side project',
       beta: 'Landing',
     },
-    teams: { solo: 'Solo', team: 'Team' },
+    teams: { solo: 'Solo', team: 'Team of 5' },
     profile: 'Profile',
     profileText: [
-      '4th year web design student at IT-Hub College in Moscow. I work across UX/UI, motion and 3D. Most of what I make goes from research to a site that runs. I design it, then I build it.',
-      'I work with AI agents in the loop. Claude Code and Cursor write production code with me, Figma MCP handles design systems and prototypes, and the research and reasoning live in Obsidian. The tools make execution faster. What to build, and why, is still my call.',
+      '4th year web design student at IT-Hub College in Moscow. I work across UX/UI, motion and 3D, and most of what I make ends up as a site that runs.',
+      'AI agents are in the loop: Claude Code writes code with me, Figma MCP handles design systems. The decisions are still mine.',
     ],
     facts: [
       ['EDUCATION', 'IT-Hub College, Moscow, 4th year'],
       ['FOCUS', 'UX/UI, Web, Motion, 3D'],
       ['DESIGN', 'Figma, Blender, Three.js, GSAP'],
-      ['AI WORKFLOW', 'Claude Code, Cursor, Figma MCP, agent-assisted prototyping'],
-      ['NOTES', 'Obsidian, where the research and the case writing live'],
+      ['AI', 'Claude Code, Cursor, Figma MCP'],
       ['LANGUAGES', 'Russian native, English B2+'],
-      ['FORMAT', 'Office, hybrid, remote'],
-      ['LOCATION', 'Moscow, ready to relocate'],
+      ['FORMAT', 'Office, hybrid, remote. Moscow, ready to relocate'],
     ],
     contact: 'Let’s talk.',
     status: ['MOSCOW  GMT+3', 'OPEN TO WORK'],
@@ -71,39 +76,38 @@ export const home: Record<Lang, Home> = {
 
   ru: {
     title: 'Константин\nДаровский',
-    lead: 'Проектирую интерфейсы. И сам их выпускаю.',
-    tags: ['UX/UI', 'ВЕБ', 'КОД', 'CLAUDE CODE', 'CURSOR', 'FIGMA MCP', 'OBSIDIAN', 'AI WORKFLOW'],
-    meta: [
-      ['Учёба', 'IT-Hub College, 4 курс'],
-      ['Город', 'Москва, GMT+3'],
-      ['Формат', 'Офис, гибрид, удалёнка'],
-    ],
+    name: 'Константин Даровский',
+    /* «Выпускаю» is what you do with records and product lines, not
+       interfaces; it was a literal reading of the English "ship". */
+    lead: 'Проектирую интерфейсы. Дальше сам собираю их в коде.',
+    noCase: 'Черновик nichive, первый заход на ту же идею',
+    tags: ['UX/UI', 'ВЕБ', 'КОД', 'CLAUDE CODE', 'FIGMA MCP'],
+    meta: [],
     scroll: 'ВНИЗ',
     works: 'Работы',
-    worksNote: 'Monolith я нарисовал целиком, но до запуска он так и не дошёл. Страницы открываются прямо здесь.',
-    caseLink: 'КЕЙС →',
-    fullLink: 'ВЕСЬ САЙТ →',
+    worksNote: 'Monolith я нарисовал целиком, но до запуска он так и не дошёл.',
+    caseLink: 'КЕЙС',
+    fullLink: 'ВЕСЬ САЙТ',
     kinds: {
       nichive: 'Цифровой архив',
       yakitoria: 'Интернет-магазин',
       monolith: 'Побочный проект',
       beta: 'Лендинг',
     },
-    teams: { solo: 'Один', team: 'Команда' },
+    /* "Один" in a metadata column reads as a count, not as "worked alone". */
+    teams: { solo: 'Соло', team: 'Команда из 5' },
     profile: 'О себе',
     profileText: [
-      'Четвёртый курс веб-дизайна в IT-Hub College, Москва. Занимаюсь UX/UI, моушеном и 3D. Почти всё, за что берусь, довожу до работающего сайта: сначала проектирую, потом собираю сам.',
-      'Работаю в связке с ИИ-агентами. Claude Code и Cursor пишут со мной продакшн-код, Figma MCP держит дизайн-системы и прототипы, черновики и исследование лежат в Obsidian. Инструменты экономят время на исполнении. Что делать и зачем, решаю я.',
+      'Четвёртый курс веб-дизайна в IT-Hub College, Москва. Занимаюсь UX/UI, моушеном и 3D, почти всё довожу до работающего сайта.',
+      'Работаю в связке с ИИ-агентами: Claude Code пишет со мной код, Figma MCP держит дизайн-системы. Решения при этом мои.',
     ],
     facts: [
       ['ОБРАЗОВАНИЕ', 'IT-Hub College, Москва, 4 курс'],
       ['НАПРАВЛЕНИЕ', 'UX/UI, веб, моушен, 3D'],
       ['ДИЗАЙН', 'Figma, Blender, Three.js, GSAP'],
-      ['AI WORKFLOW', 'Claude Code, Cursor, Figma MCP, прототипы с агентами'],
-      ['ЗАМЕТКИ', 'Obsidian, там живут исследование и тексты кейсов'],
+      ['AI', 'Claude Code, Cursor, Figma MCP'],
       ['ЯЗЫКИ', 'Русский родной, английский B2+'],
-      ['ФОРМАТ', 'Офис, гибрид, удалёнка'],
-      ['ГОРОД', 'Москва, готов к переезду'],
+      ['ФОРМАТ', 'Офис, гибрид, удалёнка. Москва, готов к переезду'],
     ],
     contact: 'Пишите.',
     status: ['МОСКВА  GMT+3', 'ОТКРЫТ К ПРЕДЛОЖЕНИЯМ'],

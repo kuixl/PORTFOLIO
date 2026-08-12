@@ -5,14 +5,12 @@
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { reducedMotion } from './motionPref';
 
 export function initMotion() {
   gsap.registerPlugin(ScrollTrigger);
 
-  // `?motion` overrides the system preference for the session - see reveal.ts
-  const forced = sessionStorage.getItem('kuixl:motion') === '1' ||
-    new URLSearchParams(location.search).has('motion');
-  if (!forced && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (reducedMotion()) return;
 
   const lenis = new Lenis({
     autoRaf: false,

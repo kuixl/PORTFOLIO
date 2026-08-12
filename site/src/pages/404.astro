@@ -1,44 +1,95 @@
 ---
+/**
+ * One file serves every wrong address.
+ *
+ * A static host answers /ru/anything with this same 404.html, so there is no
+ * second Russian page to build. It arrives in English and switches itself the
+ * moment it can see the path, which is the only thing that distinguishes a
+ * Russian miss from an English one. Both texts ship in the markup, so the
+ * switch is a rename rather than a fetch.
+ */
 import Base from '../layouts/Base.astro';
 import { cases } from '../data/cases';
 ---
-<Base title="Not found - Konstantin Darovskiy">
+<Base title="Not found - Konstantin Darovskiy" noindex>
   <header class="site-head">
-    <a href="/" class="font-mono text-mono-nav">kuixl</a>
-    <a href="/#contact" class="font-mono text-mono-nav">CONTACT</a>
+    <a href="/" class="font-mono text-mono-nav" data-home-link>kuixl</a>
+    <nav class="head-nav font-mono text-mono-nav">
+      <a href="/" data-lang-en class="is-on">EN</a>
+      <span class="sep" aria-hidden="true">/</span>
+      <a href="/ru" data-lang-ru>RU</a>
+      <a href="/#contact" class="head-contact" data-contact-link data-en="CONTACT" data-ru="КОНТАКТЫ">CONTACT</a>
+    </nav>
   </header>
 
   <main id="main" class="nf">
     <p class="nf-code font-mono">404</p>
-    <h1 class="nf-title">Nothing here.</h1>
-    <p class="nf-lead">Wrong address, or it moved. The work is all still there:</p>
+    <h1 class="nf-title" data-en="Nothing here." data-ru="Здесь пусто.">Nothing here.</h1>
+    <p class="nf-lead"
+      data-en="Wrong address, or it moved. The work is all still there:"
+      data-ru="Неверный адрес или страница переехала. Работы на месте:">
+      Wrong address, or it moved. The work is all still there:
+    </p>
     <ul class="nf-list">
       {cases.map((c) => (
-        <li><a href={`/${c.slug}`}>{c.title}</a></li>
+        <li><a href={`/${c.slug}`} data-slug={c.slug}>{c.title}</a></li>
       ))}
-      <li><a href="/">Everything else</a></li>
+      <li><a href="/" data-home data-en="Everything else" data-ru="Всё остальное">Everything else</a></li>
     </ul>
   </main>
 
   <footer class="site-foot font-mono">
     <span>kuixl</span>
-    <span>OPEN TO WORK</span>
+    <span data-en="OPEN TO WORK" data-ru="ОТКРЫТ К ПРЕДЛОЖЕНИЯМ">OPEN TO WORK</span>
   </footer>
+
+  <script is:inline>
+    if (location.pathname.startsWith('/ru')) {
+      document.documentElement.lang = 'ru';
+      document.title = 'Страница не найдена - Константин Даровский';
+      for (const el of document.querySelectorAll('[data-ru]')) el.textContent = el.dataset.ru;
+      // the skip link is rendered by the layout from `lang`, which is always
+      // "en" for this file, so it is the one string the loop above misses
+      const skip = document.querySelector('.skip-link');
+      if (skip) skip.textContent = 'Перейти к содержимому';
+      // keep the reader inside the language they were browsing
+      for (const a of document.querySelectorAll('[data-slug]')) a.href = '/ru/' + a.dataset.slug;
+      const home = document.querySelector('[data-home]');
+      if (home) home.href = '/ru';
+      const wordmark = document.querySelector('[data-home-link]');
+      if (wordmark) wordmark.href = '/ru';
+      const contact = document.querySelector('[data-contact-link]');
+      if (contact) contact.href = '/ru/#contact';
+      document.querySelector('[data-lang-en]')?.classList.remove('is-on');
+      document.querySelector('[data-lang-ru]')?.classList.add('is-on');
+    }
+  </script>
 </Base>
 
 <style>
+  /* Same container and the same scale as every other page. This one kept a
+     rule under the header, its own 80px gutter and its own paddings from
+     before the spacing tokens landed. */
+  .site-head, .nf, .site-foot {
+    max-width: 1240px;
+    margin-inline: auto;
+    padding-inline: 20px;
+  }
   .site-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
     height: 64px;
-    padding-inline: 20px;
-    border-bottom: 1px solid var(--color-hairline);
   }
+  .head-nav { display: flex; align-items: center; gap: var(--gap-tight); }
+  .head-nav a { color: var(--color-muted); transition: color 0.15s; }
+  .head-nav a:hover { color: var(--color-primary); }
+  .head-nav a.is-on { color: var(--color-primary); }
+  .head-nav .sep { color: var(--color-muted); }
+  .head-contact { margin-left: var(--gap-block); color: var(--color-primary) !important; }
+  .head-contact:hover { text-decoration: underline; text-underline-offset: 5px; }
   .nf {
-    max-width: 1240px;
-    margin-inline: auto;
-    padding: var(--gap-section) 20px;
+    padding-block: var(--gap-section);
     min-height: 60vh;
   }
   .nf-code {
@@ -70,13 +121,13 @@ import { cases } from '../data/cases';
   .site-foot {
     display: flex;
     justify-content: space-between;
-    padding: var(--gap-item) 20px;
+    padding-block: var(--gap-item);
     border-top: 1px solid var(--color-hairline);
     font-size: var(--text-mono-caption);
     letter-spacing: 0.1em;
     color: var(--color-muted);
   }
   @media (min-width: 901px) {
-    .nf, .site-head, .site-foot { padding-inline: var(--spacing-080); }
+    .nf, .site-head, .site-foot { padding-inline: var(--spacing-048); }
   }
 </style>

@@ -18,6 +18,7 @@
  */
 import { initSketches } from './sketches';
 import { sound } from './sound';
+import { reducedMotion } from './motionPref';
 
 const RUN_MS = 4500;
 const INVITE_MAX = 1500;
@@ -37,13 +38,12 @@ type Cell = { c: number; r: number; ch: string };
 type Node = { ch: string; x: number; y: number };
 
 /**
- * `?replay` forces the full sequence: it ignores the once-per-session flag and
- * overrides reduced motion. Asking for it by hand is explicit consent, unlike
- * the ambient OS setting - and without it nobody whose system has animations
- * switched off can ever see this thing, including its author.
+ * `?replay` additionally ignores the once-per-session flag, so the sequence can
+ * be watched again without opening a new tab. Whether it is allowed to move at
+ * all is motionPref's decision, and `?replay` implies `?motion` there.
  */
 const FORCED = new URLSearchParams(location.search).has('replay');
-const prm = !FORCED && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const prm = reducedMotion();
 
 /**
  * Order glyphs the way a pen would travel: a greedy nearest-neighbour chain
@@ -150,6 +150,9 @@ export function initPreloader(): Promise<void> {
     // home page only, once per session
     if (!shell || !canvas || (!FORCED && sessionStorage.getItem(SESSION_KEY))) { done(); return; }
     sessionStorage.setItem(SESSION_KEY, '1');
+    // tells the failsafe in Base.astro that the sequence is under way, so it
+    // does not tear the panel away mid-run
+    (window as any).__kuixlPreloaderRunning = true;
 
     const ctx = canvas.getContext('2d')!;
     const dpr = Math.min(2, devicePixelRatio || 1);
@@ -403,13 +406,22 @@ export function initPreloader(): Promise<void> {
 
     // ---------- run ----------
     let finished = false;
+    /**
+     * Dawn, not a cut. The preloader is near-black and the site is paper, and
+     * fading a black panel out over a light page steps straight from #0E0E0E
+     * to #F4F2EE in one frame of perceived brightness. Instead the panel
+     * itself lights up to paper while its contents fade, so by the time it is
+     * removed it already matches the page behind it and the removal is
+     * invisible.
+     */
     function finish() {
       if (finished) return;
       finished = true;
       sound.complete();
       sound.stopLoop();
-      shell!.style.opacity = '0';
-      setTimeout(done, 420);
+      shell!.classList.add('is-dawn');
+      setTimeout(() => { shell!.style.opacity = '0'; }, 560);
+      setTimeout(done, 880);
     }
 
     if (prm) {

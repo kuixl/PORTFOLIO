@@ -7,9 +7,11 @@
  */
 import CaseSection from './CaseSection.astro';
 import WorkFrame from './WorkFrame.astro';
-import type { Case } from '../data/cases';
+import { cases, type Case } from '../data/cases';
 import { casesRu } from '../data/cases.ru';
 import { caseLabels } from '../data/caseLabels';
+import { ui } from '../data/ui';
+import { pageName } from '../data/pageNames';
 import type { Lang } from '../data/home';
 import works from '../../public/works/works.json';
 
@@ -17,27 +19,67 @@ interface Props { c: Case; lang: Lang }
 const { c: base, lang } = Astro.props;
 
 const L = caseLabels[lang];
+const T = ui[lang];
 const c: Case = lang === 'ru' ? { ...base, ...(casesRu[base.slug] ?? {}) } : base;
 const pfx = lang === "ru" ? "/ru" : "";
+const project = base.frame?.project ?? base.slug;
 
+const shotsFor = (p: string) => (works as Record<string, any[]>)[p] ?? [];
+
+/* Captions come from the page-name table rather than the case record, so the
+   tabs above the frame and the captions under the grid always agree. */
 const screens = (base.screens ?? [])
-  .map(([label, page]) => {
-    const set = (works as Record<string, any[]>)[base.frame?.project ?? base.slug] ?? [];
-    const shot = set.find((s) => s.page === page && s.size === 'desktop');
-    return shot?.thumb
-      ? { label, file: shot.thumb.file, w: shot.thumb.w, h: shot.thumb.h, full: shot.parts[0].file }
-      : null;
+  .map(([, page]) => {
+    const shot = shotsFor(project).find((s) => s.page === page && s.size === 'desktop');
+    if (!shot?.thumb) return null;
+    const d = shot.thumb.dither as { file: string; w: number; h: number }[] | undefined;
+    const base2 = d?.[1] ?? d?.[0] ?? shot.thumb;
+    return {
+      label: pageName(lang, project, page),
+      file: base2.file,
+      srcset: d?.map((v: any) => `/works/${project}/${v.file} ${v.w}w`).join(', '),
+      w: base2.w,
+      h: base2.h,
+      full: shot.parts[0].file,
+    };
   })
-  .filter(Boolean) as { label: string; file: string; w: number; h: number; full: string }[];
+  .filter(Boolean) as { label: string; srcset?: string; file: string; w: number; h: number; full: string }[];
 
-let step = 0;
-const n = () => String(++step).padStart(2, "0");
-let artStep = 0;
-const ai = () => artStep++;
+/* The lead screen runs full width and the rest sit under it. A uniform grid of
+   equal thumbnails read as a slideshow: nothing told you where to look first. */
+const [leadScreen, ...restScreens] = screens;
+
+/**
+ * The next-case card used to be a label and a name. "NEXT / BETA" tells you
+ * nothing about what BETA is, so there was no reason to click it. It now
+ * carries the same first line the case itself opens with, and a screenshot.
+ */
+const nextCase = base.next ? cases.find((x) => x.slug === base.next!.slug) : undefined;
+const nextCopy = nextCase && lang === 'ru' ? { ...nextCase, ...(casesRu[nextCase.slug] ?? {}) } : nextCase;
+const nextProject = nextCase?.frame?.project ?? nextCase?.slug;
+const nextShotRaw = nextProject
+  ? shotsFor(nextProject).find((s) => s.size === 'desktop' && s.thumb)
+  : undefined;
+const nextShot = nextShotRaw?.thumb
+  ? (nextShotRaw.thumb.dither?.[0] ?? nextShotRaw.thumb)
+  : undefined;
 ---
+{/*
+  The language switch belongs on every page, not just the home page.
+
+  Case pages had no switcher at all, so a reader who arrived on a Russian case
+  from a link had no way to reach the English one short of going back to the
+  index and starting again. It also has to keep them where they are: the pair
+  points at this same case in the other language, not at the other home page.
+*/}
 <header class="site-head">
   <a href={pfx || "/"} class="font-mono text-mono-nav">kuixl</a>
-  <a href={`${pfx}/#contact`} class="font-mono text-mono-nav">{L.contact}</a>
+  <nav class="head-nav font-mono text-mono-nav">
+    <a href={`/${base.slug}`} aria-current={lang === 'en' ? 'page' : undefined} class={lang === 'en' ? 'is-on' : ''}>EN</a>
+    <span class="sep" aria-hidden="true">/</span>
+    <a href={`/ru/${base.slug}`} aria-current={lang === 'ru' ? 'page' : undefined} class={lang === 'ru' ? 'is-on' : ''}>RU</a>
+    <a href={`${pfx}/#contact`} class="head-contact">{L.contact}</a>
+  </nav>
 </header>
   <main class="case" id="main">
     <section class="case-cover">
@@ -50,7 +92,7 @@ const ai = () => artStep++;
       <p class="cc-lead">{c.lead}</p>
     </section>
 
-    <CaseSection n={n()} title={L.result} wide>
+    <CaseSection title={L.result} wide>
       <dl class="facts">
         {c.facts.map(([k, v]) => (
           <div><dt>{k}</dt><dd>{v}</dd></div>
@@ -59,18 +101,19 @@ const ai = () => artStep++;
     </CaseSection>
 
     {c.frame && (
-      <CaseSection n={n()} title={L.work} wide>
+      <CaseSection title={L.work} wide>
         <WorkFrame
           project={base.frame.project}
           title={c.title}
           url={base.frame.url}
-          note={base.frame.note}
+          note={base.frame.note?.[lang]}
           tabs={base.frame.tabs}
+          lang={lang}
         />
       </CaseSection>
     )}
 
-    <CaseSection n={n()} title={L.brief} art={base.slug} artIndex={ai()}>
+    <CaseSection title={L.brief}>
       {c.brief.map((p) => <p>{p}</p>)}
       <dl class="meta">
         {c.meta.map(([k, v]) => (
@@ -80,111 +123,164 @@ const ai = () => artStep++;
     </CaseSection>
 
     {c.broken && (
-      <CaseSection n={n()} title={L.broken} art={base.slug} artIndex={ai()}>
+      <CaseSection title={L.broken} aside={c.asides?.broken}>
         {c.broken.map((p) => <p>{p}</p>)}
       </CaseSection>
     )}
 
     {c.myRole && (
-      <CaseSection n={n()} title={L.role} art={base.slug} artIndex={ai()}>
+      <CaseSection title={L.role} aside={c.asides?.role}>
         {c.myRole.map((p) => <p>{p}</p>)}
       </CaseSection>
     )}
 
     {c.personas && (
-      <CaseSection n={n()} title={L.research} art={base.slug} artIndex={ai()}>
+      <CaseSection title={L.research}>
         <div class="personas">
           {c.personas.map(([name, who, quote]) => (
             <figure class="persona">
+              <blockquote>{quote}</blockquote>
               <figcaption><strong>{name}</strong><span>{who}</span></figcaption>
-              <blockquote>&laquo;{quote}&raquo;</blockquote>
             </figure>
           ))}
         </div>
       </CaseSection>
     )}
 
-    <CaseSection n={n()} title={L.decisions} art={base.slug} artIndex={ai()}>
+    <CaseSection title={L.decisions} aside={c.asides?.decisions}>
       <div class="decisions">
         {c.decisions.map((d) => (
           <article class="decision">
-            <span class="d-n" aria-hidden="true">{d.n}</span>
-            <div class="d-body">
-              <h3>{d.title}</h3>
-              {d.body.map((p) => <p>{p}</p>)}
-            </div>
+            <h3>{d.title}</h3>
+            {d.body.map((p) => <p>{p}</p>)}
           </article>
         ))}
       </div>
     </CaseSection>
 
-    {screens.length > 1 && (
-      <CaseSection n={n()} title={L.screens} wide>
-        <div class="screens">
-          {screens.map((s) => (
-            <figure class="screen">
-              <button type="button" class="screen-open"
-                data-fullview={`/works/${base.frame?.project ?? base.slug}/${s.full}`}
-                data-fullview-label={`${c.title} - ${s.label}`}>
-                <img src={`/works/${base.frame?.project ?? base.slug}/${s.file}`} width={s.w} height={s.h}
-                  alt={`${c.title} - ${s.label}`} loading="lazy" decoding="async" />
-                <span class="screen-cue">OPEN</span>
-              </button>
-              <figcaption>{s.label}</figcaption>
-            </figure>
-          ))}
-        </div>
+    {leadScreen && (
+      <CaseSection title={L.screens} wide ground>
+        {/* No second label here. "Site pages" sat directly under the section
+            label in the same mono, same size, same muted tone, so the band
+            opened with two headings stacked on top of each other and it was
+            not clear which named what. The captions under each screenshot
+            already say these are pages of the site. */}
+        <figure class="screen screen-lead">
+          <button type="button" class="screen-open"
+            data-fullview={`/works/${project}/${leadScreen.full}`}
+            data-fullview-label={`${c.title}, ${leadScreen.label}`}>
+            {/* alt is empty on purpose: the caption right below already names
+                the page, and both being read out produced "HOMEOPEN" */}
+            <img src={`/works/${project}/${leadScreen.file}`} srcset={leadScreen.srcset}
+              sizes="(min-width: 901px) 1140px, 100vw"
+              width={leadScreen.w} height={leadScreen.h}
+              alt="" loading="lazy" decoding="async" />
+            <span class="screen-cue">{T.open}</span>
+          </button>
+          <figcaption>{leadScreen.label}</figcaption>
+        </figure>
+        {restScreens.length > 0 && (
+          <div class="screens">
+            {restScreens.map((s) => (
+              <figure class="screen">
+                <button type="button" class="screen-open"
+                  data-fullview={`/works/${project}/${s.full}`}
+                  data-fullview-label={`${c.title}, ${s.label}`}>
+                  <img src={`/works/${project}/${s.file}`} srcset={s.srcset}
+                    sizes="(min-width: 901px) 360px, 50vw"
+                    width={s.w} height={s.h}
+                    alt="" loading="lazy" decoding="async" />
+                  <span class="screen-cue">{T.open}</span>
+                </button>
+                <figcaption>{s.label}</figcaption>
+              </figure>
+            ))}
+          </div>
+        )}
       </CaseSection>
     )}
 
     {c.system && (
-      <CaseSection n={n()} title={L.system} art={base.slug} artIndex={ai()}>
+      <CaseSection title={L.system}>
         {c.system.map((p) => <p>{p}</p>)}
       </CaseSection>
     )}
 
     {c.judges && (
-      <CaseSection n={n()} title={L.judges} wide>
+      <CaseSection title={L.judges} wide ground>
         <div class="judges">
-          {c.judges.quotes.map((q) => <blockquote>&laquo;{q}&raquo;</blockquote>)}
+          {/* No wrapping guillemets. A quote that already contains a
+              guillemet phrase would have nested them, and the pair the
+              nesting calls for is in neither font file. The blockquote and
+              the attribution below carry the job instead. */}
+          {c.judges.quotes.map((q) => <blockquote>{q}</blockquote>)}
         </div>
         <span class="judges-src font-mono">{c.judges.source}</span>
       </CaseSection>
     )}
 
-    <CaseSection n={n()} title={L.retro} art={base.slug} artIndex={ai()}>
+    <CaseSection title={L.retro} aside={c.asides?.retro}>
       {c.retro.map((p) => <p>{p}</p>)}
     </CaseSection>
 
-    <a class="case-next" href={`${pfx}/${base.next.slug}`}>
-      <span class="font-mono text-mono-label">{L.next}</span>
-      <span class="cn-title">{base.next.title}</span>
-    </a>
+    {nextCase ? (
+      <a class="case-next" href={`${pfx}/${nextCase.slug}`}>
+        {nextShot && (
+          <span class="cn-shot">
+            <img src={`/works/${nextProject}/${nextShot.file}`}
+              width={nextShot.w} height={nextShot.h}
+              alt="" loading="lazy" decoding="async" />
+          </span>
+        )}
+        <span class="cn-text">
+          <span class="cn-kicker font-mono">{L.next}</span>
+          <span class="cn-title">{nextCase.title}</span>
+          <span class="cn-lead">{nextCopy?.teaser}</span>
+        </span>
+      </a>
+    ) : (
+      <div class="case-end">
+        <p class="ce-title">{L.endTitle}</p>
+        <p class="ce-note">{L.endNote}</p>
+        <div class="ce-links font-mono">
+          <a href={pfx || '/'}>{L.allWorks}</a>
+          <a href={`${pfx}/#contact`}>{L.write}</a>
+        </div>
+      </div>
+    )}
   </main>
 
 <style>
+  /* Same container as the home page: the header used to run the full viewport
+     while the case column was centred in 1240px, so the wordmark and the case
+     title did not share a left edge on anything wider than a laptop. */
+  .site-head, .case {
+    max-width: 1240px;
+    margin-inline: auto;
+    padding-inline: 20px;
+  }
   .site-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
     height: 64px;
-    padding-inline: 20px;
-    border-bottom: 1px solid var(--color-hairline);
   }
-  .case {
-    max-width: 1240px;
-    margin-inline: auto;
-    padding-inline: 20px;
-    padding-bottom: var(--gap-section);
-  }
+  .head-nav { display: flex; align-items: center; gap: var(--gap-tight); }
+  .head-nav a { color: var(--color-muted); transition: color 0.15s; }
+  .head-nav a:hover { color: var(--color-primary); }
+  .head-contact:hover { text-decoration: underline; text-underline-offset: 5px; }
+  .head-nav a.is-on { color: var(--color-primary); }
+  .head-nav .sep { color: var(--color-muted); }
+  .head-contact { margin-left: var(--gap-block); color: var(--color-primary) !important; }
+  .case { padding-bottom: var(--gap-section); }
 
-  .case-cover { padding-block: var(--gap-section); }
+  .case-cover { padding-block: var(--gap-block) var(--gap-section); }
   .cc-meta {
     display: flex;
     flex-wrap: wrap;
     gap: var(--gap-block);
     font-family: var(--font-mono);
-    font-size: var(--text-mono-label);
+    font-size: var(--text-mono-caption);
     letter-spacing: 0.1em;
     color: var(--color-muted);
   }
@@ -194,7 +290,8 @@ const ai = () => artStep++;
     font-family: var(--font-sans);
     font-weight: 900;
     font-size: clamp(56px, 15vw, 180px);
-    line-height: 0.9;
+    /* see the note on Cyrillic diacritics in global.css */
+    line-height: 1;
     letter-spacing: -0.03em;
   }
   .cc-lead {
@@ -206,19 +303,18 @@ const ai = () => artStep++;
 
   .facts { display: grid; gap: var(--gap-block); grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
 
-  /* auto-fit left a single orphan on a second row whenever the count was not a
-     multiple of the column count; ruled rows carry any number cleanly and match
-     the fact tables elsewhere on the site */
-  .meta { margin-top: var(--gap-block); border-top: 1px solid var(--color-hairline); }
+  /* One rule per row is the whole reason the page felt like graph paper. The
+     label column already separates key from value, so the rows only need
+     space. */
+  .meta { margin-top: var(--gap-block); }
   .meta > div {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 5px;
-    padding-block: var(--gap-item);
-    border-bottom: 1px solid var(--color-hairline);
+    gap: 4px;
+    padding-block: var(--gap-tight);
   }
   @media (min-width: 901px) {
-    .meta > div { grid-template-columns: 170px minmax(0, 1fr); gap: var(--gap-block); align-items: baseline; }
+    .meta > div { grid-template-columns: 150px minmax(0, 1fr); gap: var(--gap-block); align-items: baseline; }
   }
   .facts dt, .meta dt {
     font-family: var(--font-mono);
@@ -227,61 +323,64 @@ const ai = () => artStep++;
     color: var(--color-muted);
   }
   .facts dd { margin-top: 6px; font-weight: 700; font-size: 22px; line-height: 1.2; }
-  .meta dd { margin-top: 6px; font-size: var(--text-body); }
+  .meta dd { font-size: var(--text-body); }
 
   .personas { display: grid; gap: var(--gap-block); grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-  .persona figcaption { display: flex; flex-direction: column; gap: 2px; }
-  .persona strong { font-size: 24px; font-weight: 700; }
+  /* The quote leads and the name signs it, the way a pull quote works on
+     paper. Italic is gone: it appeared on personas and jury and nowhere else
+     on the site, so it read as a stray default rather than a decision. */
+  .persona blockquote {
+    font-size: 19px;
+    line-height: 1.45;
+    text-wrap: pretty;
+  }
+  .persona figcaption { margin-top: var(--gap-tight); display: flex; flex-wrap: wrap; gap: var(--gap-tight); align-items: baseline; }
+  .persona strong { font-size: 15px; font-weight: 700; }
   .persona span {
     font-family: var(--font-mono);
     font-size: var(--text-mono-caption);
     letter-spacing: 0.06em;
     color: var(--color-muted);
   }
-  .persona blockquote { margin-top: var(--gap-tight); font-style: italic; color: var(--color-muted); }
 
-  /* Three identical stacks of label, bold line, two grey paragraphs read as one
-     undifferentiated column. A large numeral in its own gutter gives the eye a
-     place to land and turns the section into a list you can scan. */
-  .decisions { display: grid; gap: var(--gap-block); }
-  .decision {
-    display: grid;
-    grid-template-columns: 56px minmax(0, 1fr);
-    gap: var(--gap-item);
-    align-items: start;
-    padding-block: var(--gap-block);
-    border-top: 1px solid var(--color-hairline);
-  }
-  .decision:first-child { border-top: 0; padding-top: 0; }
-  .d-n {
-    font-family: var(--font-sans);
-    font-weight: 900;
-    font-size: 44px;
-    line-height: 0.85;
-    letter-spacing: -0.03em;
-    color: var(--color-hairline);
-  }
-  .d-body { max-width: var(--measure); }
+  /* Three identical stacks of a bold line and two grey paragraphs read as one
+     undifferentiated column. The big numeral that used to sit in a gutter was
+     the same trick as the section numbers and had the same problem: it implied
+     an order the reasoning does not have. Space and heading weight do the
+     separating now. */
+  .decisions { display: grid; gap: var(--gap-section); }
+  /* No max-width here. CaseSection already caps every paragraph at the one
+     measure; capping the article as well stacked two limits and made the
+     decisions column 530px against 627px everywhere else on the same page. */
+  .decision { }
   .decision h3 {
+    max-width: var(--measure);
     font-size: clamp(22px, 2.4vw, 30px);
     font-weight: 700;
     line-height: 1.15;
     letter-spacing: -0.015em;
+    text-wrap: balance;
   }
   .decision p { margin-top: var(--gap-item); }
   /* the opening sentence carries the claim; let it lead */
   .decision p:first-of-type { font-size: 19px; line-height: 1.55; color: var(--color-primary); }
 
-  /* On a phone one card per row turned Screens into 1800px of scrolling - a
-     third of the page for a contact sheet. Two up: still legible as a
-     thumbnail, half the height. */
+  .screen-lead { margin-bottom: var(--gap-block); }
   .screens {
     display: grid;
     gap: var(--gap-item);
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   @media (min-width: 901px) {
-    .screens { gap: var(--gap-block); grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+    /* A fixed card, not auto-fit. auto-fit divides the row between however
+       many cards there are, so nichive's five came out at 349px and
+       Yakitoria's two at 548px: the same screenshots at two different sizes
+       depending on how many the case happened to have. */
+    .screens {
+      gap: var(--gap-block);
+      grid-template-columns: repeat(auto-fill, 340px);
+      justify-content: start;
+    }
   }
   .screen-open {
     position: relative;
@@ -292,7 +391,7 @@ const ai = () => artStep++;
     background: none;
     cursor: pointer;
   }
-  .screen img { width: 100%; height: auto; display: block; border: 1px solid var(--color-hairline); }
+  .screen img { width: 100%; height: auto; display: block; }
   .screen-cue {
     position: absolute;
     inset: auto 8px 8px auto;
@@ -312,41 +411,82 @@ const ai = () => artStep++;
     font-family: var(--font-mono);
     font-size: var(--text-mono-caption);
     letter-spacing: 0.08em;
-    color: var(--color-muted);
+    color: var(--color-caption);
   }
 
   .judges { display: grid; gap: var(--gap-block); grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
   .judges blockquote {
     font-size: 20px;
     line-height: 1.45;
-    font-style: italic;
-    padding-left: var(--gap-item);
-    border-left: 1px solid var(--color-hairline);
+    text-wrap: pretty;
   }
+  /* the attribution belongs to the quotes above it, not to the space below */
   .judges-src {
     display: block;
     margin-top: var(--gap-item);
     font-size: var(--text-mono-caption);
     letter-spacing: 0.1em;
-    color: var(--color-muted);
+    color: var(--color-caption);
   }
 
   .case-next {
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap-tight);
-    padding-top: var(--gap-section);
+    display: grid;
+    gap: var(--gap-item);
+    /* no top margin: the retro section above already pads its own bottom, and
+       stacking the two put 144px of blank paper before the closing block */
+    padding-top: var(--gap-block);
     border-top: 1px solid var(--color-hairline);
+  }
+  .cn-shot { display: block; overflow: hidden; }
+  .cn-shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .case-next:hover .cn-shot img { transform: scale(1.02); }
+  .cn-text { display: flex; flex-direction: column; gap: var(--gap-tight); }
+  .cn-kicker {
+    font-size: var(--text-mono-caption);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-muted);
   }
   .cn-title {
     font-family: var(--font-sans);
     font-weight: 900;
-    font-size: clamp(48px, 10vw, 96px);
+    font-size: clamp(40px, 8vw, 80px);
     line-height: 1;
     letter-spacing: -0.02em;
   }
+  .cn-lead { max-width: 46ch; color: var(--color-muted); }
+
+  .case-end {
+    /* no top margin: the retro section above already pads its own bottom, and
+       stacking the two put 144px of blank paper before the closing block */
+    padding-top: var(--gap-block);
+    border-top: 1px solid var(--color-hairline);
+  }
+  .ce-title {
+    font-family: var(--font-sans);
+    font-weight: 900;
+    font-size: clamp(32px, 6vw, 56px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .ce-note { margin-top: var(--gap-tight); color: var(--color-muted); }
+  .ce-links { display: flex; flex-wrap: wrap; gap: var(--gap-block); margin-top: var(--gap-block); }
+  .ce-links a {
+    font-size: var(--text-mono-caption);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding-bottom: 3px;
+    border-bottom: 1px solid var(--color-primary);
+  }
 
   @media (min-width: 901px) {
-    .case, .site-head { padding-inline: var(--spacing-080); }
+    .case, .site-head { padding-inline: var(--spacing-048); }
+    .case-next { grid-template-columns: 300px minmax(0, 1fr); align-items: center; gap: var(--gap-block); }
   }
 </style>

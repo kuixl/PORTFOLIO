@@ -1,0 +1,15 @@
+02:19:41 [types] Generated 1ms
+02:19:41 [content] Syncing content
+02:19:41 [content] Astro config changed
+02:19:41 [content] Clearing content store
+02:19:41 [content] Synced content
+02:19:41 [vite] Re-optimizing dependencies because vite config has changed
+
+ astro  v5.18.2 ready in 565 ms
+
+┃ Local    http://localhost:4322/
+┃ Network  http://172.19.0.1:4322/
+           http://192.168.1.26:4322/
+
+02:19:41 watching for file changes...
+02:19:49 [200] /ru 83ms

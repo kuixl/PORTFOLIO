@@ -6,7 +6,9 @@
  * a soft noise puff per sketch, one low tone on completion.
  * State lives in module scope - session memory, not localStorage.
  */
-const prm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+import { reducedMotion } from './motionPref';
+
+const prm = reducedMotion();
 
 let enabled = false;
 let ctx: AudioContext | null = null;

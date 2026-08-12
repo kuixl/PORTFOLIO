@@ -13,6 +13,9 @@
  * than flattening everyone down to the thinnest.
  */
 import works from '../../public/works/works.json';
+import { ui, pageCount } from '../data/ui';
+import { pageName } from '../data/pageNames';
+import type { Lang } from '../data/home';
 
 interface Props {
   project: keyof typeof works;
@@ -21,8 +24,10 @@ interface Props {
   note?: string;
   /** limit which pages get a tab; the rest stay available for screen grids */
   tabs?: string[];
+  lang: Lang;
 }
-const { project, title, url, note, tabs } = Astro.props;
+const { project, title, url, note, tabs, lang } = Astro.props;
+const T = ui[lang];
 
 const all = works[project] as {
   page: string; size: string; w: number; h: number;
@@ -44,20 +49,20 @@ const first = pages[0];
 
 <section class="work-frame" data-project={project}>
   <header class="wf-head">
-    <span class="wf-label">FULL VIEW</span>
+    <span class="wf-label">{T.fullView}</span>
 
     {pages.length > 1 && (
-      <div class="wf-tabs" role="tablist" aria-label={`${title} pages`}>
+      <div class="wf-tabs" role="tablist" aria-label={title}>
         {pages.map((p) => (
           <button type="button" role="tab" data-page={p}
             aria-selected={p === first ? 'true' : 'false'}
-            class={p === first ? 'is-active' : ''}>{p}</button>
+            class={p === first ? 'is-active' : ''}>{pageName(lang, project, p)}</button>
         ))}
       </div>
     )}
 
     {hasMobile && (
-      <div class="wf-sizes" role="group" aria-label="viewport">
+      <div class="wf-sizes" role="group" aria-label={T.viewport}>
         <button type="button" data-size="desktop" class="is-active">1440</button>
         <button type="button" data-size="mobile">375</button>
       </div>
@@ -68,7 +73,7 @@ const first = pages[0];
     <div class="wf-chrome">
       <span class="wf-dots"><i></i><i></i><i></i></span>
       <span class="wf-url">{url ?? title.toLowerCase()}</span>
-      <span class="wf-hint">click to open</span>
+      <span class="wf-hint">{T.clickToOpen}</span>
     </div>
     <div class="wf-viewport" data-viewport>
       {[...shots].sort((a, b) => pages.indexOf(a.page) - pages.indexOf(b.page)).map((s) => (
@@ -76,7 +81,7 @@ const first = pages[0];
           src={`/works/${project}/${s.parts[0].file}`}
           width={s.parts[0].w}
           height={s.parts[0].h}
-          alt={`${title} - ${s.page}, ${s.size}`}
+          alt={`${title}, ${pageName(lang, project, s.page)}`}
           data-page={s.page}
           data-size={s.size}
           class={s.page === first && s.size === 'desktop' ? 'is-active' : ''}
@@ -88,9 +93,9 @@ const first = pages[0];
   </div>
 
   <div class="wf-foot">
-    <span class="wf-count">{pages.length} {pages.length === 1 ? 'page' : 'pages'}</span>
+    <span class="wf-count">{pageCount(pages.length, lang)}</span>
     {note && <span class="wf-note">{note}</span>}
-    {url && <a class="wf-live" href={url} target="_blank" rel="noopener">open the live site &rarr;</a>}
+    {url && <a class="wf-live" href={url} target="_blank" rel="noopener">{T.openLive} &rarr;</a>}
   </div>
 </section>
 
@@ -114,7 +119,9 @@ const first = pages[0];
     margin-right: auto;
   }
 
-  .wf-tabs, .wf-sizes { display: flex; gap: 2px; }
+  /* The tab strip is as wide as the page names inside it. On a 320px screen
+     three of them push the whole window past the edge, so it wraps. */
+  .wf-tabs, .wf-sizes { display: flex; flex-wrap: wrap; gap: 2px; }
   .wf-tabs button, .wf-sizes button {
     font-family: var(--font-mono);
     font-size: var(--text-mono-caption);
@@ -156,8 +163,16 @@ const first = pages[0];
     width: 8px; height: 8px; border-radius: 50%;
     border: 1px solid var(--color-hairline);
   }
-  .wf-url { letter-spacing: 0.04em; }
-  .wf-hint { margin-left: auto; opacity: 0; transition: opacity 0.2s; }
+  /* The address is one unbreakable string and was setting the minimum width of
+     the whole frame. It truncates instead. */
+  .wf-url {
+    letter-spacing: 0.04em;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .wf-hint { margin-left: auto; opacity: 0; transition: opacity 0.2s; white-space: nowrap; }
   .wf-frame:hover .wf-hint { opacity: 1; }
 
   .wf-viewport {
@@ -181,10 +196,18 @@ const first = pages[0];
   .wf-viewport.is-mobile {
     background: color-mix(in srgb, var(--color-ink) 6%, var(--color-paper));
   }
+  /* A hard 375px is wider than the window it sits in on a 320px screen and
+     dragged the whole frame past the edge. Phone width, or the room there is. */
+  /* A hard 375px is wider than the window it sits in on a 320px screen and
+     dragged the whole frame past the edge. Phone width, or the room there is.
+     Centred with auto margins rather than a transform: the pinned
+     scroll-through writes translateY to this element and would wipe out a
+     translateX put here. */
   .wf-viewport.is-mobile img.is-active {
-    width: 375px;
-    left: 50%;
-    margin-left: -187px;
+    width: min(375px, 100%);
+    left: 0;
+    right: 0;
+    margin-inline: auto;
     box-shadow: 0 0 0 1px var(--color-hairline);
   }
 
@@ -202,6 +225,9 @@ const first = pages[0];
   @media (max-width: 900px) {
     .wf-viewport { height: 46vh; min-height: 280px; }
     .wf-hint { opacity: 1; }
+    /* on a phone the address and the hint cannot both fit; the hint is the
+       one that tells you what to do, so the address goes */
+    .wf-url { display: none; }
     /* the footer runs out of room for three items side by side */
     .wf-foot { flex-wrap: wrap; gap: var(--gap-tight) var(--gap-item); }
     .wf-live { margin-left: 0; }

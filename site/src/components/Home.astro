@@ -25,71 +25,131 @@ const monolithPages = ['index', 'archive', 'materials']
  * hiding it.
  */
 const index = [
-  { n: '01', title: 'nichive', kind: 'nichive', year: '2026', team: 'solo', href: `${p}/nichive` },
-  { n: '02', title: 'Yakitoria', kind: 'yakitoria', year: '2025', team: 'solo', href: `${p}/yakitoria` },
-  { n: '03', title: 'BETA', kind: 'beta', year: '2026', team: 'team', href: `${p}/beta` },
-  { n: '04', title: 'Monolith', kind: 'monolith', year: '2025', team: 'solo', full: monolithPages, quiet: true },
+  { n: '01', title: 'nichive', kind: 'nichive', year: '2026', team: 'solo', href: `${p}/nichive`, project: 'nichive', lead: true },
+  { n: '02', title: 'Yakitoria', kind: 'yakitoria', year: '2025', team: 'solo', href: `${p}/yakitoria`, project: 'yakitoria' },
+  { n: '03', title: 'BETA', kind: 'beta', year: '2026', team: 'team', href: `${p}/beta`, project: 'beta' },
+  { n: '04', title: 'Monolith', kind: 'monolith', year: '2025', team: 'solo', full: monolithPages, project: 'monolith', noCase: true },
 ];
 
+/**
+ * First desktop capture of a project, as a dithered preview.
+ *
+ * Each width in the set was rastered at that width: an ordered dither is a
+ * grid of dots, and letting the browser resample one size into another turns
+ * the grid into moire. srcset lets it pick the raster made for the slot.
+ */
+const thumb = (project: string) => {
+  const s = (works as Record<string, any[]>)[project]?.find((x) => x.size === 'desktop' && x.thumb);
+  if (!s?.thumb) return null;
+  const d = s.thumb.dither as { file: string; w: number; h: number }[] | undefined;
+  const base = d?.[1] ?? d?.[0];
+  return {
+    src: `/works/${project}/${(base ?? s.thumb).file}`,
+    srcset: d?.map((v) => `/works/${project}/${v.file} ${v.w}w`).join(', '),
+    w: (base ?? s.thumb).w,
+    h: (base ?? s.thumb).h,
+  };
+};
+
+/**
+ * No icons and no channel labels.
+ *
+ * The icons were the vendors' own colour logos, and three colour marks in the
+ * footer of a strictly monochrome page looked pasted in from another project.
+ * The labels sat pinned to the right edge, a thousand pixels from the address
+ * they described, so they connected to nothing. An email address and a t.me
+ * link announce what they are without help.
+ */
 const contacts = [
-  ['asrieldreemur1213@gmail.com', 'mailto:asrieldreemur1213@gmail.com', '/logo/gmail.svg', 'Email'],
-  ['t.me/kuixl', 'https://t.me/kuixl', '/logo/telegram.svg', 'Telegram'],
-  ['github.com/kuixl', 'https://github.com/kuixl', '/logo/github.svg', 'GitHub'],
+  ['asrieldreemur1213@gmail.com', 'mailto:asrieldreemur1213@gmail.com'],
+  ['t.me/kuixl', 'https://t.me/kuixl'],
+  ['github.com/kuixl', 'https://github.com/kuixl'],
 ];
 ---
 <header class="site-head">
   <span class="font-mono text-mono-nav">kuixl</span>
   <nav class="head-nav font-mono text-mono-nav">
     <a href="/" aria-current={lang === 'en' ? 'page' : undefined} class={lang === 'en' ? 'is-on' : ''}>EN</a>
-    <span class="sep">/</span>
+    <span class="sep" aria-hidden="true">/</span>
     <a href="/ru" aria-current={lang === 'ru' ? 'page' : undefined} class={lang === 'ru' ? 'is-on' : ''}>RU</a>
     <a href="#contact" class="head-contact">{lang === 'ru' ? 'КОНТАКТЫ' : 'CONTACT'}</a>
   </nav>
 </header>
 
 <main id="main">
+  {/* The study/location/format row that used to sit under the lead is gone:
+      the profile table below carried the same three facts verbatim. First
+      screen is the name, what I do, and a way down. */}
   <section class="hero">
-    <ul class="hero-tags">{t.tags.map((tag) => <li>{tag}</li>)}</ul>
+    <p class="hero-tags font-mono">{t.tags.map((tag) => <span>{tag}</span>)}</p>
     <h1 class="hero-title" set:html={t.title.replace('\n', '<br />')} />
     <p class="hero-lead">{t.lead}</p>
-    <dl class="hero-meta">
-      {t.meta.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}
-    </dl>
     <span class="hero-scroll font-mono">{t.scroll}</span>
   </section>
 
   <section class="works" id="works">
     <h2 class="sec-title" data-reveal>{t.works}</h2>
-    <ol class="index" data-reveal data-reveal-children>
+    {/* Previews, not a table. The index had become four rows of text with a
+        rule under each, which is the layout we rejected at the design stage
+        for being the obvious one. The lead entry runs larger than the rest so
+        the section has a shape rather than a repeat. */}
+    <ol class="index" data-reveal data-reveal-children style={`--rows:${index.length}`}>
+      {/* Monolith 2025 came before nichive 2026 and is the same idea earlier.
+          The thread runs up the gutter from the draft to what it became, which
+          is the one relationship in this list worth drawing. */}
+      <li class="ix-thread" role="presentation" aria-hidden="true"></li>
       {index.map((w) => {
         const Tag = w.href ? 'a' : 'button';
+        const sh = thumb(w.project);
         return (
-          <li class="index-row" data-quiet={w.quiet ? '' : undefined}>
+          <li class="index-row" data-lead={w.lead ? '' : undefined}>
             <Tag class="index-link" href={w.href} type={w.href ? undefined : 'button'}
               data-fullview={w.full}
-              data-fullview-label={w.full ? `${w.title} - full site` : undefined}>
-              <span class="ix-n">{w.n}</span>
-              <span class="ix-title">{w.title}</span>
-              <span class="ix-meta">
-                <span>{t.kinds[w.kind]}</span>
-                <span>{w.year}</span>
-                <span>{t.teams[w.team]}</span>
+              data-fullview-label={w.full ? `${w.title}, ${t.fullLink}` : undefined}>
+              {/* The clip lives on an inner element. With overflow on .ix-shot
+                  itself, the number that hangs over the left edge was cut in
+                  half by the same rule that keeps the hover zoom inside. */}
+              <span class="ix-shot">
+                <span class="ix-clip">
+                  {sh && (
+                    <img src={sh.src} srcset={sh.srcset}
+                      sizes={w.lead ? '(min-width: 901px) 560px, 100vw' : '(min-width: 901px) 300px, 100vw'}
+                      width={sh.w} height={sh.h} alt="" loading="lazy" decoding="async" />
+                  )}
+                </span>
+                <span class="ix-n" aria-hidden="true">{w.n}</span>
               </span>
-              <span class="ix-go font-mono">{w.href ? t.caseLink : t.fullLink}</span>
+              <span class="ix-text">
+                <span class="ix-title">{w.title}</span>
+                <span class="ix-meta">
+                  <span>{t.kinds[w.kind]}</span>
+                  <span>{w.year}</span>
+                  <span>{t.teams[w.team]}</span>
+                  {w.noCase && <span>{t.noCase}</span>}
+                </span>
+              </span>
             </Tag>
           </li>
         );
       })}
     </ol>
-    <p class="index-note font-mono">{t.worksNote}</p>
+    {/* The footnote under the list said the same thing as Monolith's own
+        metadata row, one screen apart. The row won: it sits with the entry it
+        describes instead of trailing the whole section. */}
   </section>
 
   <section class="profile" id="profile">
     <h2 class="sec-title" data-reveal>{t.profile}</h2>
     <div class="pf-grid" data-reveal data-reveal-children>
+      {/* The caption said PORTRAIT under a portrait and drew a rule across the
+          page to do it. Both are gone; the alt text carries the name, in the
+          alphabet of the page it is on. */}
+      {/* Same raster as the previews, so the page is made of one material */}
       <figure class="pf-portrait">
-        <img src="/portrait.webp" alt="Konstantin Darovskiy" width="1200" height="1560" loading="lazy" />
-        <figcaption class="font-mono">{t.portrait}</figcaption>
+        <img src="/portrait.dither-640.webp"
+          srcset="/portrait.dither-640.webp 640w, /portrait.dither-1120.webp 1120w"
+          sizes="(min-width: 901px) 340px, 100vw"
+          alt={t.name} width="640" height="832" loading="lazy" decoding="async" />
       </figure>
       <div class="pf-text">
         {t.profileText.map((para) => <p>{para}</p>)}
@@ -106,15 +166,22 @@ const contacts = [
       <div class="ct-status font-mono">{t.status.map((s) => <span>{s}</span>)}</div>
     </div>
     <ul class="ct-list">
-      {contacts.map(([label, href, icon, name]) => (
-        <li>
-          <a href={href}>
-            <img src={icon} alt="" width="22" height="22" loading="lazy" />
-            <span class="ct-label">{label}</span>
-            <span class="ct-kind font-mono">{name}</span>
-          </a>
-        </li>
-      ))}
+      {/* Telegram and GitHub go to other sites and should not replace the
+          portfolio in the tab the reader is in. noopener because a page you
+          open with target=_blank can otherwise reach back through
+          window.opener. mailto has no tab to open. */}
+      {contacts.map(([label, href]) => {
+        const external = href.startsWith('http');
+        return (
+          <li>
+            <a href={href}
+              target={external ? '_blank' : undefined}
+              rel={external ? 'noopener noreferrer' : undefined}>
+              <span class="ct-label">{label}</span>
+            </a>
+          </li>
+        );
+      })}
     </ul>
   </section>
 </main>
@@ -131,15 +198,29 @@ const contacts = [
     justify-content: space-between;
     height: 64px;
     padding-inline: 20px;
-    border-bottom: 1px solid var(--color-hairline);
   }
   .head-nav { display: flex; align-items: center; gap: var(--gap-tight); }
-  .head-nav a { color: var(--color-muted); }
+  .head-nav a { color: var(--color-muted); transition: color 0.15s; }
+  /* the switcher and the contact link were the only interactive things on the
+     page with no hover response at all */
+  .head-nav a:hover { color: var(--color-primary); }
+  .head-contact:hover { text-decoration: underline; text-underline-offset: 5px; }
   .head-nav a.is-on { color: var(--color-primary); }
-  .head-nav .sep { color: var(--color-hairline); }
+  /* was hairline, which is 1.38:1 on paper. It is decoration between two
+     links rather than content, so it is hidden from the reader and set at the
+     muted tone the rest of the chrome uses. */
+  .head-nav .sep { color: var(--color-muted); }
   .head-contact { margin-left: var(--gap-block); color: var(--color-primary) !important; }
 
-  main { max-width: 1240px; margin-inline: auto; padding-inline: 20px; }
+  /* The container. main was centred inside 1240px while the header and footer
+     ran the full viewport, so on a wide screen the wordmark sat 340px to the
+     left of the title underneath it and nothing on the page shared an edge.
+     All three now use the same measure. */
+  main, .site-head, .site-foot {
+    max-width: 1240px;
+    margin-inline: auto;
+    padding-inline: 20px;
+  }
 
   .sec-title {
     font-family: var(--font-sans);
@@ -158,50 +239,33 @@ const contacts = [
     flex-direction: column;
     justify-content: center;
   }
+  /* A boxed tag row is the stock lending-page component, and the boxes were
+     the only borders of their kind on the site. Set in a line with wide
+     spacing the same words read as a caption instead of a widget. */
   .hero-tags {
-    list-style: none;
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
-    font-family: var(--font-mono);
+    gap: var(--gap-item) var(--gap-block);
     font-size: var(--text-mono-caption);
-    letter-spacing: 0.1em;
+    letter-spacing: 0.14em;
     color: var(--color-muted);
   }
-  .hero-tags li {
-    display: grid;
-    place-items: center;
-    min-width: 132px;
-    padding: 6px 12px;
-    border: 1px solid var(--color-hairline);
-  }
-  .hero-meta {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-    margin-top: var(--gap-block);
-    border-top: 1px solid var(--color-hairline);
-  }
-  .hero-meta > div {
-    padding: var(--gap-item) var(--gap-block);
-    border-right: 1px solid var(--color-hairline);
-  }
-  .hero-meta > div:first-child { padding-left: 0; }
-  .hero-meta > div:last-child { border-right: 0; }
-  .hero-meta dt {
-    font-family: var(--font-mono);
-    font-size: var(--text-mono-caption);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--color-muted);
-  }
-  .hero-meta dd { margin-top: 4px; font-size: 15px; }
   .hero-title {
     margin-block: var(--gap-block);
     font-family: var(--font-sans);
     font-weight: 900;
     font-size: clamp(56px, 13vw, 180px);
-    line-height: 0.9;
+    /* 1, not 0.9: the breve on "й" lives above the cap line and a sub-1
+       leading crops it against the line above. See the note in global.css. */
+    line-height: 1;
     letter-spacing: -0.03em;
+  }
+  /* "Даровский" is nine characters of black grotesque and will not break. At
+     the 56px floor it is about 30px wider than a 320px screen, so the floor
+     comes down for the narrowest phones only; 375 and up keep the size they
+     had. */
+  @media (max-width: 360px) {
+    .hero-title { font-size: 44px; }
   }
   .hero-lead { font-size: var(--text-body-lg); color: var(--color-muted); }
   .hero-scroll {
@@ -212,41 +276,72 @@ const contacts = [
     color: var(--color-muted);
   }
 
-  .works { padding-block: var(--gap-section); border-top: 1px solid var(--color-hairline); }
-  .index { list-style: none; }
-  .index-row + .index-row { border-top: 1px solid var(--color-hairline); }
+  /* Sections pad on top only. Padding on both sides meant every boundary was
+     two stacked gaps, so 72px of rhythm arrived as 144px of empty screen. */
+  .works { padding-top: var(--gap-section); border-top: 1px solid var(--color-hairline); }
+  .index { list-style: none; display: grid; gap: var(--gap-block); }
+  /* hidden until there is a gutter to draw it in */
+  .ix-thread { display: none; }
   .index-link {
     display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-areas: 'n title' '. meta' '. go';
-    gap: var(--gap-tight) var(--gap-block);
+    gap: var(--gap-item);
     width: 100%;
-    padding-block: var(--gap-block);
     text-align: left;
     background: none;
     border: 0;
+    padding: 0;
     cursor: pointer;
     font: inherit;
     color: inherit;
-    transition: opacity 0.2s;
   }
-  .index-link:hover { opacity: 0.55; }
+
+  .ix-shot { position: relative; display: block; }
+  .ix-clip {
+    display: block;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--color-ink) 4%, var(--color-paper));
+  }
+  .ix-shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .index-link:hover .ix-shot img { transform: scale(1.03); }
+  /* The number rides the edge of its preview rather than sitting in a column
+     of its own, which is what made it look adrift from the title. It only
+     hangs outside the preview where there is a page margin to hang into: at
+     phone widths the margin is 20px and the digits fell off the screen. */
   .ix-n {
-    grid-area: n;
-    font-family: var(--font-mono);
-    font-size: clamp(24px, 5vw, 40px);
-    color: var(--color-muted);
-  }
-  .ix-title {
-    grid-area: title;
+    position: absolute;
+    left: var(--gap-tight);
+    /* sat at -0.08em with 0.78 leading, so the digits ran past the bottom of
+       the preview and looked sheared off by it */
+    bottom: 0;
     font-family: var(--font-sans);
     font-weight: 900;
-    font-size: clamp(32px, 7vw, 72px);
+    font-size: clamp(48px, 9vw, 120px);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    /* Solid ink, not difference blending. Against a dithered preview the
+       backdrop is a hard black-and-white checkerboard, so a difference blend
+       inverted the digit pixel by pixel and shredded it. Every preview is
+       light where the number sits. */
+    color: var(--color-ink);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .ix-text { display: flex; flex-direction: column; gap: var(--gap-tight); }
+  .ix-title {
+    font-family: var(--font-sans);
+    font-weight: 900;
+    font-size: clamp(32px, 5vw, 56px);
     line-height: 1;
     letter-spacing: -0.02em;
   }
+  .index-link:hover .ix-title { text-decoration: underline; text-underline-offset: 6px; }
   .ix-meta {
-    grid-area: meta;
     display: flex;
     flex-wrap: wrap;
     gap: var(--gap-item);
@@ -255,16 +350,21 @@ const contacts = [
     letter-spacing: 0.08em;
     color: var(--color-muted);
   }
-  .ix-go { grid-area: go; font-size: var(--text-mono-caption); letter-spacing: 0.1em; }
-  /* the unfinished one: smaller, paler, still openable */
-  .index-row[data-quiet] .ix-title { font-size: clamp(24px, 4vw, 40px); color: var(--color-muted); }
-  .index-row[data-quiet] .ix-n { font-size: clamp(18px, 3vw, 26px); }
-  .index-row[data-quiet] .ix-go { color: var(--color-muted); }
-  .index-row[data-quiet] .index-link { padding-block: var(--gap-item); }
 
-  .index-note { margin-top: var(--gap-item); font-size: var(--text-mono-caption); color: var(--color-muted); }
+  /* The section below pads its own top, so this only has to keep the rule off
+     the last line rather than open a second full gap under it. */
+  .index-note { margin-top: var(--gap-item); margin-bottom: var(--gap-block); font-size: var(--text-mono-caption); color: var(--color-muted); }
 
-  .profile { padding-block: var(--gap-section); border-top: 1px solid var(--color-hairline); }
+  /* No rule above this one. It used to sit directly under the Monolith row,
+     because the works section pads only its top and the note that used to
+     hold the bottom open is gone: the line read as an underline drawn on the
+     last work rather than as a boundary between two sections. The space does
+     the separating. */
+  .works { padding-bottom: var(--gap-section); }
+  /* The portrait column is taller than the text beside it, so with no bottom
+     padding here the photo ended a few pixels above the contact rule and sat
+     on it. */
+  .profile { padding-top: 0; padding-bottom: var(--gap-section); }
   .pf-grid { display: grid; gap: var(--gap-block); }
   .pf-portrait img {
     width: 100%;
@@ -273,21 +373,14 @@ const contacts = [
     display: block;
     image-rendering: -webkit-optimize-contrast;
   }
-  .pf-portrait figcaption {
-    margin-top: var(--gap-tight);
-    font-size: var(--text-mono-caption);
-    letter-spacing: 0.1em;
-    color: var(--color-muted);
-  }
   .pf-text > * + * { margin-top: var(--gap-item); }
   .pf-text p { max-width: 62ch; }
-  .pf-facts { margin-top: var(--gap-block); border-top: 1px solid var(--color-hairline); }
+  .pf-facts { margin-top: var(--gap-block); margin-bottom: var(--gap-block); }
   .pf-facts div {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 5px;
-    padding-block: var(--gap-item);
-    border-bottom: 1px solid var(--color-hairline);
+    gap: 4px;
+    padding-block: var(--gap-tight);
   }
   .pf-facts dt {
     font-family: var(--font-mono);
@@ -298,7 +391,21 @@ const contacts = [
   .pf-facts dd { font-size: 15px; line-height: 1.45; }
 
   .contact { padding-block: var(--gap-section); border-top: 1px solid var(--color-hairline); }
+  .contact .ct-head { margin-bottom: var(--gap-block); }
+  /* The status sat flush against the heading with nothing tying the two
+     together. A rule running out from the baseline gives it an anchor, the
+     same device the first screen uses. */
   .ct-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--gap-block); }
+  .ct-status { position: relative; padding-left: var(--gap-block); }
+  .ct-status::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.45em;
+    width: var(--gap-item);
+    /* same weight as the other leader lines on the site */
+    border-top: 2px solid var(--color-hairline);
+  }
   .ct-title {
     font-family: var(--font-sans);
     font-weight: 900;
@@ -313,29 +420,18 @@ const contacts = [
     letter-spacing: 0.1em;
     color: var(--color-muted);
   }
-  .ct-list { list-style: none; margin-top: var(--gap-block); display: grid; border-top: 1px solid var(--color-hairline); }
+  .ct-list { list-style: none; margin-top: var(--gap-block); display: grid; gap: var(--gap-item); }
   .ct-list a {
-    display: grid;
-    grid-template-columns: 22px minmax(0, 1fr) auto;
-    align-items: center;
-    gap: var(--gap-item);
-    padding-block: var(--gap-item);
-    border-bottom: 1px solid var(--color-hairline);
-    font-size: clamp(18px, 2.4vw, 22px);
+    display: inline-block;
+    font-size: clamp(20px, 3vw, 32px);
+    letter-spacing: -0.01em;
   }
-  .ct-list img { display: block; }
-  .ct-kind {
-    font-size: var(--text-mono-caption);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--color-muted);
-  }
-  .ct-list a:hover .ct-label { text-decoration: underline; text-underline-offset: 4px; }
+  .ct-list a:hover .ct-label { text-decoration: underline; text-underline-offset: 6px; }
 
   .site-foot {
     display: flex;
     justify-content: space-between;
-    padding: var(--gap-item) 20px;
+    padding-block: var(--gap-item);
     border-top: 1px solid var(--color-hairline);
     font-size: var(--text-mono-caption);
     letter-spacing: 0.1em;
@@ -343,14 +439,61 @@ const contacts = [
   }
 
   @media (min-width: 901px) {
-    main, .site-head, .site-foot { padding-inline: var(--spacing-080); }
+    main, .site-head, .site-foot { padding-inline: var(--spacing-048); }
+    /* A gutter column so the thread has somewhere to live, and grid-row
+       spanning so it stretches from the first entry to the last without any
+       measuring: the grid already knows where the rows are. */
+    .index {
+      gap: var(--gap-section);
+      grid-template-columns: 34px minmax(0, 1fr);
+      /* The rows have to be explicit. With only implicit rows, `grid-row: 1 /
+         -1` on the thread resolved -1 to the end of the explicit grid, which
+         was row one, so the line stopped after the first entry. */
+      grid-template-rows: repeat(var(--rows, 4), auto);
+    }
+    .index-row { grid-column: 2; }
+    /* A head at each end rather than one. The thread connects the draft and
+       what it became; with a single arrow it read as one-way, and the bare
+       end looked like the line had simply been cut off. */
+    .ix-thread {
+      display: block;
+      position: relative;
+      grid-column: 1;
+      grid-row: 1 / -1;
+      border-left: 2px solid var(--color-hairline);
+      margin-block: 6% 2%;
+    }
+    .ix-thread::before,
+    .ix-thread::after {
+      content: '';
+      position: absolute;
+      left: -4px;
+      width: 7px;
+      height: 7px;
+      border-left: 2px solid var(--color-hairline);
+      border-top: 2px solid var(--color-hairline);
+      transform: rotate(45deg);
+    }
+    .ix-thread::before { top: -1px; }
+    .ix-thread::after { bottom: -1px; transform: rotate(225deg); }
+    /* The line carries no caption. Set vertically it was the only rotated
+       text on the site and it competed with the numbers for the same gutter;
+       the sentence now sits in Monolith's metadata where it reads flat. */
+    /* Asymmetry on purpose: the lead entry gets a wider preview and the rest
+       sit narrower, so the four read as a set with an order rather than as
+       four identical cards. */
+    /* Proportional, not fixed. At 300 and 560 hard pixels the preview kept its
+       size while the row shrank, so between about 1000 and 1200 the title
+       column ran out of room and "nichive" spilled out of it. These are the
+       same proportions the fixed values had at 1440. */
     .index-link {
-      grid-template-columns: 90px minmax(0, 1fr) auto auto;
-      grid-template-areas: 'n title meta go';
-      align-items: baseline;
+      grid-template-columns: minmax(0, 26%) minmax(0, 1fr);
+      align-items: center;
       gap: var(--gap-block);
     }
-    .ix-meta { justify-content: flex-end; }
+    .ix-n { left: 0; transform: translateX(-42%); }
+    .index-row[data-lead] .index-link { grid-template-columns: minmax(0, 49%) minmax(0, 1fr); }
+    .index-row[data-lead] .ix-title { font-size: clamp(48px, 6vw, 80px); }
     .pf-grid { grid-template-columns: 340px minmax(0, 1fr); gap: var(--gap-block); }
     .pf-facts div { grid-template-columns: 170px minmax(0, 1fr); gap: var(--gap-block); align-items: baseline; }
   }

@@ -1,36 +1,20 @@
 /**
- * Behaviour for <WorkFrame>: tabs, viewport toggle, scroll-through and the
- * full-screen reader.
+ * Behaviour for <WorkFrame>: tabs, viewport toggle and the full-screen reader.
  *
- * The page inside the frame is driven by ScrollTrigger rather than by its own
- * scrollbar. An inner scroll area would trap the wheel - the visitor scrolls
- * past, the cursor lands in the frame, and the page stops moving. Pinning keeps
- * one scroll direction meaning one thing.
+ * The window shows the top of a project page and nothing scrolls inside it.
+ * Two alternatives were tried and both got in the reader's way: an inner
+ * scroll area traps the wheel when the cursor lands in it, and pinning the
+ * section stops the page dead while the image travels. Clicking opens the
+ * whole page in the reader, which is the one place scrolling a project page
+ * is what the reader asked for.
  */
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-const prm = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const DESKTOP = matchMedia('(min-width: 901px)');
 
 type FrameState = { page: string; size: string };
 
 function activeImg(root: HTMLElement): HTMLImageElement | null {
   return root.querySelector<HTMLImageElement>('img.is-active');
-}
-
-/**
- * How far the page travels inside the window, in rendered pixels. Measured off
- * the element's own rendered width rather than the viewport's, because the
- * mobile capture is displayed at phone width, not stretched to fill.
- */
-function travel(root: HTMLElement): number {
-  const img = activeImg(root);
-  const viewport = root.querySelector<HTMLElement>('[data-viewport]');
-  if (!img || !viewport) return 0;
-  const shownW = img.getBoundingClientRect().width || img.width;
-  const ratio = (img.naturalHeight || img.height) / (img.naturalWidth || img.width || 1);
-  return Math.max(0, shownW * ratio - viewport.clientHeight);
 }
 
 function show(root: HTMLElement, state: FrameState) {
@@ -151,23 +135,19 @@ export function initWorkFrames() {
       if (img) openFull(img.src, img.alt);
     });
 
-    if (prm || !DESKTOP.matches) continue;
-
-    // Pin the whole section, not just the window: pinning the window alone
-    // scrolls the tabs off the top, so the page can't be switched while the
-    // thing it switches is the only thing on screen.
-    ScrollTrigger.create({
-      trigger: root,
-      start: 'center center',
-      end: () => `+=${Math.max(300, travel(root))}`,
-      pin: true,
-      scrub: 0.6,
-      invalidateOnRefresh: true,
-      onUpdate: (self) => {
-        const img = activeImg(root);
-        if (img) img.style.transform = `translateY(${-travel(root) * self.progress}px)`;
-      },
-    });
+    /**
+     * No pinning.
+     *
+     * The window used to pin and the project page scrolled through it. On
+     * paper that shows a whole site inside a case; in the hand it means the
+     * page stops responding to the wheel for a screen or more, and every
+     * reader who met it read that as the site being broken rather than as an
+     * effect. Shortening it from 1.5 screens to 0.9 did not change the
+     * reading, because the problem is the stop itself, not its length.
+     *
+     * The whole page is still one click away in the reader, and the tabs
+     * still switch between pages. What is gone is the scroll trap.
+     */
   }
 
   addEventListener('resize', () => ScrollTrigger.refresh());

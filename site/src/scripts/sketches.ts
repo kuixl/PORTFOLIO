@@ -4,10 +4,11 @@
  * fresh randomness on every spawn - no vector polish. Preloader only.
  */
 import { sound } from './sound';
+import { reducedMotion } from './motionPref';
 
 const NS = 'http://www.w3.org/2000/svg';
 const PAPER = '#F4F2EE';
-const prm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const prm = reducedMotion();
 
 const j = (v: number, amp = 2.2) => v + (Math.random() - 0.5) * amp * 2;
 

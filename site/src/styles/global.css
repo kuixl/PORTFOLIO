@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ---------- fonts, self-hosted, latin subsets ----------
-   Switzer / Boska: Fontshare (ITF Free Font EULA), Sligoil Micro: Velvetyne.
+   Switzer: Fontshare (ITF Free Font EULA), Sligoil Micro: Velvetyne.
    Cyrillic subsets are impossible for these families - they contain no
    Cyrillic glyphs. The RU version needs its own font decision. */
 
@@ -21,20 +21,15 @@
   font-display: swap;
 }
 
-@font-face {
-  font-family: 'Boska';
-  src: url('/fonts/boska-var-latin.woff2') format('woff2-variations');
-  font-weight: 200 900;
-  font-style: normal;
-  font-display: swap;
-}
+/* Boska was declared here and used by nothing: a 33 KB accent face with no
+   accent to set. Removed rather than found a job for. */
 
 /* ---------- design tokens, 1:1 with the Figma variables ---------- */
 
 /**
  * Cyrillic.
  *
- * Switzer, Sligoil Micro and Boska carry no Cyrillic at all, so the Russian
+ * Switzer and Sligoil Micro carry no Cyrillic at all, so the Russian
  * version needs different faces. Rather than swapping families in the markup,
  * these are declared under the same family names with a Cyrillic unicode-range:
  * the browser then picks Onest and JetBrains Mono for Cyrillic characters and
@@ -49,14 +44,22 @@
   src: url('/fonts/onest-cyrillic.woff2') format('woff2');
   font-weight: 100 900;
   font-display: swap;
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+  /* U+201E/U+201C are the low and high quotes Russian nests inside guillemets.
+     They are punctuation, not Cyrillic, so they were falling outside this
+     range and into the Latin file, which does not carry them: the jury quote
+     on Yakitoria rendered its inner quotes in a system fallback. */
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116, U+201C, U+201E;
 }
 @font-face {
   font-family: 'Sligoil Micro';
   src: url('/fonts/jbmono-cyrillic.woff2') format('woff2');
   font-weight: 400;
   font-display: swap;
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+  /* U+201E/U+201C are the low and high quotes Russian nests inside guillemets.
+     They are punctuation, not Cyrillic, so they were falling outside this
+     range and into the Latin file, which does not carry them: the jury quote
+     on Yakitoria rendered its inner quotes in a system fallback. */
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116, U+201C, U+201E;
 }
 
 @theme {
@@ -65,11 +68,14 @@
   --color-primary: #0E0E0E;
   --color-muted: #535366;
   --color-hairline: #D4D0C8;
-  --color-muted-inverse: #A8A5AE;
+  /* was #A8A5AE, which is 2.57:1 on ink and fails AA at caption sizes. The
+     nichive case tells the reader accessibility was part of its brief, so the
+     portfolio failing the same check on its own dark sections would be the
+     one claim on the site that is measurably untrue. 5.44:1. */
+  --color-muted-inverse: #8A8792;
 
   --font-sans: 'Switzer', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'Sligoil Micro', ui-monospace, 'Cascadia Mono', Consolas, monospace;
-  --font-serif: 'Boska', ui-serif, Georgia, serif;
 
   /* spacing scale from the space collection */
   --spacing-004: 4px;
@@ -87,16 +93,28 @@
 
   /* Semantic rhythm. The raw 4-240 scale says how far, not what for, so every
      file was picking its own distance and the page read as either cavernous or
-     stuck together. Four steps, one meaning each, used everywhere. */
-  --gap-section: 72px;   /* between major sections */
-  --gap-block: 32px;     /* between blocks inside a section */
-  --gap-item: 16px;      /* between related items in a block */
+     stuck together. Five steps, one meaning each, used everywhere - a literal
+     pixel value anywhere in a component is a bug. */
+  --gap-ground: 160px;   /* around an inverted section */
+  --gap-section: 120px;  /* between major sections */
+  --gap-block: 48px;     /* between blocks inside a section */
+  --gap-item: 24px;      /* between related items in a block */
   --gap-tight: 8px;      /* label to value */
-  --measure: 68ch;       /* longest comfortable line */
+  /* One width, in pixels, not 68ch.
+     `ch` resolves against each element's own font-size, so the same token gave
+     627px to body copy at 16px, 744px to the lead paragraph of a decision at
+     19px and 530px to a 13px caption. Correct by character count, and three
+     visibly different columns on one page. */
+  --measure: 640px;      /* longest comfortable line */
 
-  /* type scale, desktop */
+  /* type scale, desktop.
+     Display line heights are 1.0, not the 0.9 they were set to. Latin caps fit
+     inside 0.9 because nothing rises above the cap line; Cyrillic puts a breve
+     over "й" and a diaeresis over "ё", and at 180px those sit outside the line
+     box and get shaved by the line above. The tight look came from the wrong
+     lever - tracking does that job here, leading was just clipping letters. */
   --text-display-xl: 180px;
-  --text-display-xl--line-height: 0.9;
+  --text-display-xl--line-height: 1;
   --text-display-xl--letter-spacing: -0.03em;
   --text-display-xl--font-weight: 900;
 
@@ -145,7 +163,7 @@
 
   /* mobile display counterparts */
   --text-display-xl-m: 56px;
-  --text-display-xl-m--line-height: 0.9;
+  --text-display-xl-m--line-height: 1;
   --text-display-xl-m--letter-spacing: -0.03em;
   --text-display-xl-m--font-weight: 900;
 
@@ -155,16 +173,30 @@
   --text-display-l-m--font-weight: 900;
 }
 
+/* The same five steps, scaled for a phone. 120px between sections on a 812px
+   screen is most of a viewport spent on nothing. */
 @media (max-width: 900px) {
   :root {
-    --gap-section: 48px;
-    --gap-block: 24px;
+    --gap-ground: 72px;
+    --gap-section: 64px;
+    --gap-block: 32px;
+    --gap-item: 16px;
   }
 }
 
 /* ---------- base ---------- */
 
+/**
+ * Secondary text colour, as an inherited variable rather than a fixed token.
+ *
+ * Captions inside an inverted section need the inverse tone, and doing that
+ * with a descendant selector meant fighting the more specific rule that set
+ * the paper tone in the first place. A custom property inherits down the tree
+ * no matter which component declared it, so the dark section simply reassigns
+ * it once and everything inside follows.
+ */
 html {
+  --color-caption: var(--color-muted);
   background: var(--color-paper);
   color: var(--color-primary);
   font-family: var(--font-sans);
@@ -203,13 +235,30 @@ html.is-preloading {
   overflow: hidden;
 }
 
+/* Hidden unless the lock is on, and the lock is only ever set by script.
+   Without JavaScript this panel would otherwise sit over the whole page with
+   no way to dismiss it. */
+#preloader { display: none; }
+html.is-preloading #preloader { display: block; }
+
 /* preloader shell */
 #preloader {
   position: fixed;
   inset: 0;
   z-index: 100;
   background: var(--color-ink);
-  transition: opacity 0.45s ease;
+  transition: opacity 0.32s ease, background-color 0.6s ease;
+}
+/* The handoff to the light page. See finish() in preloader.ts: the panel
+   lights up to paper and its contents go out, so the fade that follows has
+   nothing left to reveal. */
+#preloader.is-dawn { background: var(--color-paper); }
+#preloader.is-dawn canvas,
+#preloader.is-dawn .sketches,
+#preloader.is-dawn #preload-wordmark,
+#preloader.is-dawn #sound-toggle {
+  opacity: 0;
+  transition: opacity 0.4s ease;
 }
 #preloader.is-done {
   opacity: 0;

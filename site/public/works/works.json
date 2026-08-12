@@ -17,7 +17,30 @@
         "file": "landing-desktop.thumb.webp",
         "w": 720,
         "h": 518,
-        "kb": 25
+        "kb": 25,
+        "dither": [
+          {
+            "file": "landing-desktop.dither-640.webp",
+            "w": 640,
+            "h": 460,
+            "rasterW": 640,
+            "kb": 9
+          },
+          {
+            "file": "landing-desktop.dither-1120.webp",
+            "w": 1120,
+            "h": 806,
+            "rasterW": 1120,
+            "kb": 19
+          },
+          {
+            "file": "landing-desktop.dither-1600.webp",
+            "w": 1600,
+            "h": 1151,
+            "rasterW": 1600,
+            "kb": 32
+          }
+        ]
       }
     }
   ],
@@ -39,7 +62,30 @@
         "file": "archive-desktop.thumb.webp",
         "w": 720,
         "h": 518,
-        "kb": 16
+        "kb": 16,
+        "dither": [
+          {
+            "file": "archive-desktop.dither-640.webp",
+            "w": 640,
+            "h": 460,
+            "rasterW": 640,
+            "kb": 7
+          },
+          {
+            "file": "archive-desktop.dither-1120.webp",
+            "w": 1120,
+            "h": 806,
+            "rasterW": 1120,
+            "kb": 17
+          },
+          {
+            "file": "archive-desktop.dither-1600.webp",
+            "w": 1600,
+            "h": 1151,
+            "rasterW": 1600,
+            "kb": 26
+          }
+        ]
       }
     },
     {
@@ -59,7 +105,30 @@
         "file": "index-desktop.thumb.webp",
         "w": 720,
         "h": 518,
-        "kb": 25
+        "kb": 25,
+        "dither": [
+          {
+            "file": "index-desktop.dither-640.webp",
+            "w": 640,
+            "h": 460,
+            "rasterW": 640,
+            "kb": 13
+          },
+          {
+            "file": "index-desktop.dither-1120.webp",
+            "w": 1120,
+            "h": 806,
+            "rasterW": 1120,
+            "kb": 31
+          },
+          {
+            "file": "index-desktop.dither-1600.webp",
+            "w": 1600,
+            "h": 1151,
+            "rasterW": 1600,
+            "kb": 52
+          }
+        ]
       }
     },
     {
@@ -79,7 +148,30 @@
         "file": "materials-desktop.thumb.webp",
         "w": 720,
         "h": 518,
-        "kb": 24
+        "kb": 24,
+        "dither": [
+          {
+            "file": "materials-desktop.dither-640.webp",
+            "w": 640,
+            "h": 460,
+            "rasterW": 640,
+            "kb": 7
+          },
+          {
+            "file": "materials-desktop.dither-1120.webp",
+            "w": 1120,
+            "h": 806,
+            "rasterW": 1120,
+            "kb": 18
+          },
+          {
+            "file": "materials-desktop.dither-1600.webp",
+            "w": 1600,
+            "h": 1151,
+            "rasterW": 1600,
+            "kb": 31
+          }
+        ]
       }
     }
   ],
@@ -101,7 +193,30 @@
         "file": "exhibitions-desktop.thumb.webp",
         "w": 720,
         "h": 518,
-        "kb": 15
+        "kb": 15,
+        "dither": [
+          {
+            "file": "exhibitions-desktop.dither-640.webp",
+            "w": 640,
+            "h": 460,
+            "rasterW": 640,
+            "kb": 6
+          },
+          {
+            "file": "exhibitions-desktop.dither-1120.webp",
+            "w": 1120,
+            "h": 806,
+            "rasterW": 1120,
+            "kb": 13
+          },
+          {
+            "file": "exhibitions-desktop.dither-1600.webp",
+            "w": 1600,
+            "h": 1151,
+            "rasterW": 1600,
+            "kb": 21
+          }
+        ]
       }
     },
     {
@@ -121,7 +236,30 @@
         "file": "exhibitions-mobile.thumb.webp",
         "w": 720,
         "h": 518,
-        "kb": 11
+        "kb": 11,
+        "dither": [
+          {
+            "file": "exhibitions-mobile.dither-640.webp",
+            "w": 640,
+            "h": 460,
+            "rasterW": 640,
+            "kb": 5
+          },
+          {
+            "file": "exhibitions-mobile.dither-1120.webp",
+            "w": 1120,
+            "h": 806,
+            "rasterW": 1120,
+            "kb": 10
+          },
+          {
+            "file": "exhibitions-mobile.dither-1600.webp",
+            "w": 1600,
+            "h": 1151,
+            "rasterW": 1600,
+            "kb": 16
+          }
+        ]
       }
     },
     {
@@ -141,7 +279,30 @@
         "file": "index-desktop.thumb.webp",
         "w": 720,
         "h": 518,
-        "kb": 16
+        "kb": 16,
+        "dither": [
+          {
+            "file": "index-desktop.dither-640.webp",
+            "w": 640,
+            "h": 460,
+            "rasterW": 640,
+            "kb": 6
+          },
+          {
+            "file": "index-desktop.dither-1120.webp",
+            "w": 1120,
+            "h": 806,
+            "rasterW": 1120,
+            "kb": 12
+          },
+          {
+            "file": "index-desktop.dither-1600.webp",
+            "w": 1600,
+            "h": 1151,
+            "rasterW": 1600,
+            "kb": 21
+          }
+        ]
       }
     },
     {
@@ -161,7 +322,30 @@
         "file": "index-mobile.thumb.webp",
         "w": 720,
         "h": 518,
-        "kb": 10
+        "kb": 10,
+        "dither": [
+          {
+            "file": "index-mobile.dither-640.webp",
+            "w": 640,
+            "h": 460,
+            "rasterW": 640,
+            "kb": 5
+          },
+          {
+            "file": "index-mobile.dither-1120.webp",
+            "w": 1120,
+            "h": 806,
+            "rasterW": 1120,
+            "kb": 10
+          },
+          {
+            "file": "index-mobile.dither-1600.webp",
+            "w": 1600,
+            "h": 1151,
+            "rasterW": 1600,
+            "kb": 17
+          }
+        ]
       }
     },
     {
@@ -181,7 +365,30 @@
         "file": "manifesto-desktop.thumb.webp",
         "w": 720,
         "h": 518,
-        "kb": 23
+        "kb": 23,
+        "dither": [
+          {
+            "file": "manifesto-desktop.dither-640.webp",
+            "w": 640,
+            "h": 460,
+            "rasterW": 640,
+            "kb": 7
+          },
+          {
+            "file": "manifesto-desktop.dither-1120.webp",
+            "w": 1120,
+            "h": 806,
+            "rasterW": 1120,
+            "kb": 16
+          },
+          {
+            "file": "manifesto-desktop.dither-1600.webp",
+            "w": 1600,
+            "h": 1151,
+            "rasterW": 1600,
+            "kb": 27
+          }
+        ]
       }
     },
     {
@@ -201,7 +408,30 @@
         "file": "materials-desktop.thumb.webp",
         "w": 720,
         "h": 518,
-        "kb": 23
+        "kb": 23,
+        "dither": [
+          {
+            "file": "materials-desktop.dither-640.webp",
+            "w": 640,
+            "h": 460,
+            "rasterW": 640,
+            "kb": 10
+          },
+          {
+            "file": "materials-desktop.dither-1120.webp",
+            "w": 1120,
+            "h": 806,
+            "rasterW": 1120,
+            "kb": 22
+          },
+          {
+            "file": "materials-desktop.dither-1600.webp",
+            "w": 1600,
+            "h": 1151,
+            "rasterW": 1600,
+            "kb": 38
+          }
+        ]
       }
     },
     {
@@ -221,7 +451,30 @@
         "file": "materials-mobile.thumb.webp",
         "w": 720,
         "h": 518,
-        "kb": 12
+        "kb": 12,
+        "dither": [
+          {
+            "file": "materials-mobile.dither-640.webp",
+            "w": 640,
+            "h": 460,
+            "rasterW": 640,
+            "kb": 5
+          },
+          {
+            "file": "materials-mobile.dither-1120.webp",
+            "w": 1120,
+            "h": 806,
+            "rasterW": 1120,
+            "kb": 11
+          },
+          {
+            "file": "materials-mobile.dither-1600.webp",
+            "w": 1600,
+            "h": 1151,
+            "rasterW": 1600,
+            "kb": 18
+          }
+        ]
       }
     },
     {
@@ -241,7 +494,30 @@
         "file": "stories-desktop.thumb.webp",
         "w": 720,
         "h": 518,
-        "kb": 22
+        "kb": 22,
+        "dither": [
+          {
+            "file": "stories-desktop.dither-640.webp",
+            "w": 640,
+            "h": 460,
+            "rasterW": 640,
+            "kb": 10
+          },
+          {
+            "file": "stories-desktop.dither-1120.webp",
+            "w": 1120,
+            "h": 806,
+            "rasterW": 1120,
+            "kb": 22
+          },
+          {
+            "file": "stories-desktop.dither-1600.webp",
+            "w": 1600,
+            "h": 1151,
+            "rasterW": 1600,
+            "kb": 37
+          }
+        ]
       }
     },
     {
@@ -261,7 +537,30 @@
         "file": "subscribe-desktop.thumb.webp",
         "w": 720,
         "h": 518,
-        "kb": 13
+        "kb": 13,
+        "dither": [
+          {
+            "file": "subscribe-desktop.dither-640.webp",
+            "w": 640,
+            "h": 460,
+            "rasterW": 640,
+            "kb": 4
+          },
+          {
+            "file": "subscribe-desktop.dither-1120.webp",
+            "w": 1120,
+            "h": 806,
+            "rasterW": 1120,
+            "kb": 10
+          },
+          {
+            "file": "subscribe-desktop.dither-1600.webp",
+            "w": 1600,
+            "h": 1151,
+            "rasterW": 1600,
+            "kb": 17
+          }
+        ]
       }
     }
   ],
@@ -283,7 +582,30 @@
         "file": "menu-desktop.thumb.webp",
         "w": 720,
         "h": 518,
-        "kb": 25
+        "kb": 25,
+        "dither": [
+          {
+            "file": "menu-desktop.dither-640.webp",
+            "w": 640,
+            "h": 460,
+            "rasterW": 640,
+            "kb": 11
+          },
+          {
+            "file": "menu-desktop.dither-1120.webp",
+            "w": 1120,
+            "h": 806,
+            "rasterW": 1120,
+            "kb": 27
+          },
+          {
+            "file": "menu-desktop.dither-1600.webp",
+            "w": 1600,
+            "h": 1151,
+            "rasterW": 1600,
+            "kb": 47
+          }
+        ]
       }
     },
     {
@@ -303,7 +625,30 @@
         "file": "menu-mobile.thumb.webp",
         "w": 720,
         "h": 518,
-        "kb": 10
+        "kb": 10,
+        "dither": [
+          {
+            "file": "menu-mobile.dither-640.webp",
+            "w": 640,
+            "h": 460,
+            "rasterW": 640,
+            "kb": 5
+          },
+          {
+            "file": "menu-mobile.dither-1120.webp",
+            "w": 1120,
+            "h": 806,
+            "rasterW": 1120,
+            "kb": 11
+          },
+          {
+            "file": "menu-mobile.dither-1600.webp",
+            "w": 1600,
+            "h": 1151,
+            "rasterW": 1600,
+            "kb": 18
+          }
+        ]
       }
     },
     {
@@ -323,7 +668,30 @@
         "file": "product-desktop.thumb.webp",
         "w": 720,
         "h": 518,
-        "kb": 30
+        "kb": 30,
+        "dither": [
+          {
+            "file": "product-desktop.dither-640.webp",
+            "w": 640,
+            "h": 460,
+            "rasterW": 640,
+            "kb": 14
+          },
+          {
+            "file": "product-desktop.dither-1120.webp",
+            "w": 1120,
+            "h": 806,
+            "rasterW": 1120,
+            "kb": 35
+          },
+          {
+            "file": "product-desktop.dither-1600.webp",
+            "w": 1600,
+            "h": 1151,
+            "rasterW": 1600,
+            "kb": 60
+          }
+        ]
       }
     },
     {
@@ -343,7 +711,30 @@
         "file": "reviews-desktop.thumb.webp",
         "w": 720,
         "h": 518,
-        "kb": 36
+        "kb": 36,
+        "dither": [
+          {
+            "file": "reviews-desktop.dither-640.webp",
+            "w": 640,
+            "h": 460,
+            "rasterW": 640,
+            "kb": 8
+          },
+          {
+            "file": "reviews-desktop.dither-1120.webp",
+            "w": 1120,
+            "h": 806,
+            "rasterW": 1120,
+            "kb": 17
+          },
+          {
+            "file": "reviews-desktop.dither-1600.webp",
+            "w": 1600,
+            "h": 1151,
+            "rasterW": 1600,
+            "kb": 29
+          }
+        ]
       }
     },
     {
@@ -363,7 +754,30 @@
         "file": "reviews-mobile.thumb.webp",
         "w": 720,
         "h": 518,
-        "kb": 11
+        "kb": 11,
+        "dither": [
+          {
+            "file": "reviews-mobile.dither-640.webp",
+            "w": 640,
+            "h": 460,
+            "rasterW": 640,
+            "kb": 5
+          },
+          {
+            "file": "reviews-mobile.dither-1120.webp",
+            "w": 1120,
+            "h": 806,
+            "rasterW": 1120,
+            "kb": 10
+          },
+          {
+            "file": "reviews-mobile.dither-1600.webp",
+            "w": 1600,
+            "h": 1151,
+            "rasterW": 1600,
+            "kb": 17
+          }
+        ]
       }
     }
   ]

@@ -12,10 +12,25 @@ export type Case = {
   slug: string;
   title: string;
   lead: string;
+  /**
+   * One line for the next-case card, and deliberately not the lead.
+   *
+   * The card used to print the target case's own opening sentence, so you read
+   * the identical sentence twice: once as a promise at the bottom of one page
+   * and again as the introduction at the top of the next. This says what is
+   * interesting in there instead of describing what it is.
+   */
+  teaser: string;
   coverMeta: [string, string][];
   facts: [string, string][];
   meta: [string, string][];
-  frame?: { project: 'nichive' | 'beta' | 'yakitoria' | 'monolith'; url?: string; note?: string; tabs?: string[] };
+  frame?: {
+    project: 'nichive' | 'beta' | 'yakitoria' | 'monolith';
+    url?: string;
+    /** per language: this line sits in the interface, so it has to translate */
+    note?: { en: string; ru: string };
+    tabs?: string[];
+  };
   brief: string[];
   myRole?: string[];
   broken?: string[];
@@ -27,7 +42,26 @@ export type Case = {
   system?: string[];
   judges?: { quotes: string[]; source: string };
   retro: string[];
-  next: { slug: string; title: string };
+  /**
+   * A fact for the empty right field of a text section, keyed by section.
+   *
+   * Two jobs at once. Prose sections were capped at a reading measure with a
+   * third of the row left blank beside them, and three or four of them ran
+   * back to back with nothing to tell one from the next. A short figure in
+   * that field fills it with something worth reading and breaks the run.
+   *
+   * Rules it has to keep: it states a number, never the name of the section
+   * it sits beside; it goes in every other section, or the asides become the
+   * run; and it never repeats what the section's own paragraphs already say.
+   */
+  asides?: Record<string, string>;
+  /**
+   * Optional on purpose. The last case in the chain has no next one, and
+   * pointing it back at the first turned three cases into a carousel with no
+   * exit: you could keep clicking NEXT forever and never learn you had seen
+   * everything. The last case closes instead.
+   */
+  next?: { slug: string; title: string };
 };
 
 export const cases: Case[] = [
@@ -35,6 +69,7 @@ export const cases: Case[] = [
     slug: 'nichive',
     title: 'nichive',
     lead: 'A digital museum of one archival fashion object per month.',
+    teaser: 'A fashion archive that gives an object a month and no price.',
     coverMeta: [
       ['ROLE', 'Solo · design + frontend'],
       ['YEAR', '2026'],
@@ -42,8 +77,8 @@ export const cases: Case[] = [
     ],
     facts: [
       ['PAGES', '6, desktop and mobile'],
-      ['3D MODEL', '3.3 MB in the browser, down from 80'],
-      ['STATUS', 'Live, code public'],
+      ['3D MODEL', '3.3 MB, down from 80'],
+      ['CODE', 'Public'],
       ['ACCESSIBILITY', 'AA contrast, keyboard, reduced-motion'],
     ],
     meta: [
@@ -55,7 +90,7 @@ export const cases: Case[] = [
     frame: {
       project: 'nichive',
       url: 'https://kuixl.github.io/final-kt/',
-      note: 'the site ships in Russian',
+      note: { en: 'the site ships in Russian', ru: 'сайт на русском' },
       tabs: ['index', 'exhibitions', 'materials'],
     },
     brief: [
@@ -72,54 +107,54 @@ export const cases: Case[] = [
         n: '1',
         title: 'No cart, no prices',
         body: [
-          'The obvious move for a fashion site is commerce. I built the first structure with a product page, sizes and a buy button, then cut all of it. The moment a price appears, everything on the page becomes an argument for spending money. The photography starts selling, the copy starts persuading.',
-          'Removing commerce freed the layout. Without a buy button there is no hierarchy to fight over, so the object could take the whole screen and the text could take its time.',
+          'I built the first structure as a shop: product page, sizes, a buy button. Then cut all of it. Next to a price the page starts persuading, and the photography works for the sale. With the button gone the object could take the whole screen.',
         ],
       },
       {
         n: '2',
-        title: 'One object per month, not a catalogue',
+        title: 'One object per month',
         body: [
-          'A catalogue was the safer option: more content and better search coverage. I chose the constraint instead. A single object per month forces every page to justify itself - there is no grid to hide a weak page in.',
-          'The cost is real. Fewer pages means less traffic and a site that looks empty on launch. I accepted it because the concept collapses without the constraint.',
+          'A catalogue was the safer option: more pages, better search coverage. I chose the constraint. One object per month means a weak page has no grid to hide in. The cost is honest: on launch the site looks empty.',
         ],
       },
       {
         n: '3',
-        title: '3D in the browser, not more photos',
+        title: '3D instead of another shoot',
         body: [
-          'Photography would have been faster and lighter. But the object is a shoe with a split toe, and its shape is the whole point - flat images kept losing it.',
-          'The model came out of Blender at 80 MB, which is unusable on the web. Optimisation through gltf-transform with meshopt and WebP brought it to 3.3 MB. That number decided whether the feature shipped at all.',
+          'The object is a shoe with a split toe, and its shape is the whole point. Flat images kept losing it.',
+          'The model came out of Blender too heavy for the web by any measure. gltf-transform with meshopt and WebP cut it by a factor of 24, and only then could it go to a browser.',
         ],
       },
     ],
+    /* Unnumbered on purpose. These are six places in a site, not six steps in
+       an order, and the numbers were being read as one. */
     screens: [
-      ['01 HOME', 'index'],
-      ['02 EXHIBITIONS', 'exhibitions'],
-      ['03 STORIES', 'stories'],
-      ['04 MANIFESTO', 'manifesto'],
-      ['05 MATERIALS', 'materials'],
-      ['06 SUBSCRIBE', 'subscribe'],
+      ['HOME', 'index'],
+      ['EXHIBITIONS', 'exhibitions'],
+      ['STORIES', 'stories'],
+      ['MANIFESTO', 'manifesto'],
+      ['MATERIALS', 'materials'],
+      ['SUBSCRIBE', 'subscribe'],
     ],
     system: [
-      'Variables for colour, spacing and type scale. Components named for what they do, not where they sit. Auto layout throughout, so the intent survives handoff.',
-      'The system was built to be read by a developer and by an agent. Tokens map to CSS variables one to one, which meant the build stayed close to the design without a translation step.',
+      'Variables for colour, spacing and type scale. Components named so you can find them without the file open. Auto layout throughout.',
+      'Tokens map to CSS variables one to one, so the build ran straight off the design.',
     ],
     retro: [
       'The typography is set in Inter and JetBrains Mono, which was the safe choice and reads as one. A project about archival fashion deserved a face with more character.',
-      'I also underestimated how much writing a single-object site needs. With no catalogue to browse, the text carries the whole experience, and I was still editing it after the build was done.',
+      'I underestimated how much writing a single-object site needs. With no catalogue to browse, the text carries the whole experience, and I was still editing it after the build was done.',
     ],
-    next: { slug: 'beta', title: 'BETA' },
+    asides: { decisions: '6 pages', retro: '3 months' },
+    next: { slug: 'yakitoria', title: 'Yakitoria' },
   },
 
   {
     slug: 'beta',
     title: 'BETA',
-    lead:
-      'A landing page for a student design sprint. One page has to do the whole job, ' +
-      'because there is no second screen to move an objection to.',
+    lead: 'A landing page for a student design sprint. Two weeks, a team of five, a real client.',
+    teaser: 'Selling an educational format to people who know it is educational.',
     coverMeta: [
-      ['ROLE', 'Team of 5 · UX + structure'],
+      ['ROLE', 'UX + structure'],
       ['YEAR', '2026'],
       ['STATUS', 'Shipped'],
     ],
@@ -127,7 +162,7 @@ export const cases: Case[] = [
       ['FORMAT', 'One page, eight sections'],
       ['DURATION', '2 weeks, fixed'],
       ['TEAM', '5 people, 1 client'],
-      ['OUTCOME', 'Shipped, structure held without a rewrite'],
+      ['OUTCOME', 'Structure held without a rewrite'],
     ],
     meta: [
       ['ROLE', 'UX structure, prototype, part of visual design'],
@@ -137,13 +172,12 @@ export const cases: Case[] = [
     ],
     frame: { project: 'beta' },
     brief: [
-      'IT-Hub runs a two-week design sprint where students work with a real client instead of a made-up assignment. The landing page had to recruit the next intake.',
-      'The audience knows the format is educational, and that is the problem. Student projects read as practice, and practice is easy to skip. The page needed to say the opposite: a deadline, a client, a public defence, a case you can actually show.',
+      'IT-Hub runs a two-week design sprint where students work with a real client. The landing page had to recruit the next intake.',
+      'The format itself is the problem. Student projects read as practice, and practice is easy to skip. The page needed to say the opposite: a deadline, a client, a public defence.',
     ],
     myRole: [
-      'I worked on the information architecture and the prototype. Before anything was designed, we needed to know what a visitor asks in what order - what this is, how it runs, what they walk away with, who is behind it. That sequence became the page structure and it did not change after the first review.',
-      'From there I built wireframes and a clickable prototype, which let the team test the flow and show the client something concrete before the visual design existed. I also worked on parts of the interface once the direction was set.',
-      'Five people, and everyone carried their section. My job was mostly the skeleton: making sure the order made sense and the team had something to build against.',
+      'I worked on the information architecture and the prototype. First we worked out what a visitor asks and in what order: what this is, how it runs, what they walk away with, who is behind it. That sequence became the page structure.',
+      'From there, wireframes and a clickable prototype, then parts of the interface. Five people, everyone carried a section, mine was mostly the skeleton.',
     ],
     decisions: [
       {
@@ -155,9 +189,10 @@ export const cases: Case[] = [
       },
       {
         n: '2',
-        title: 'Answering the objection, not hiding it',
+        title: 'Name the doubt directly',
         body: [
-          '"Student project" is the first thing a visitor thinks and the hardest thing to argue with. We put it in the copy directly (not a course, a release) rather than dressing it up as something more corporate. Naming the doubt is faster than working around it.',
+          'It all fits on one page, so there is no second screen to move an objection to. And there is one objection: "student project" is the first thing a visitor thinks.',
+          'We put it in the copy directly and set the deadline, the client and the date of the public defence beside it.',
         ],
       },
       {
@@ -169,24 +204,25 @@ export const cases: Case[] = [
       },
     ],
     retro: [
-      'The page shipped and the sprint ran. The structure I set survived the whole two weeks without a rewrite, which for a project this short was the thing that mattered.',
-      'What I would do differently: we tested the flow inside the team, not on people from the actual audience. Two or three conversations with students who had never heard of the programme would have caught things we could not see from inside. I also left the copy for late in the sprint, and it needed more time than we gave it.',
-      'Working with four other people taught me more than the design did. Agreeing on a structure is slower than deciding alone, and the result holds up better.',
+      'We tested the flow inside the team. Two or three conversations with students who had never heard of the programme would have caught things we could not see from inside.',
+      'I left the copy until late in the sprint and it ran out of time. That was my planning, not the deadline.',
     ],
-    next: { slug: 'yakitoria', title: 'Yakitoria' },
+    asides: { role: '2 weeks', retro: '8 sections' },
+    // last in the chain: no next, the case closes
   },
 
   {
     slug: 'yakitoria',
     title: 'Yakitoria',
-    lead: 'A menu and cart redesign for a sushi delivery chain. Competition entry, third place out of 47 teams.',
+    lead: 'A menu and cart redesign for a sushi delivery chain.',
+    teaser: 'Raise the average order without touching the brand or the range.',
     coverMeta: [
       ['ROLE', 'Solo · UX + UI'],
       ['YEAR', '2025'],
       ['AWARD', '3rd of 47'],
     ],
     facts: [
-      ['RESULT', '3rd place, 47 teams'],
+      ['COMPETITION', 'FoodTech Lab, 47 teams'],
       ['BUDGET', '60 developer hours'],
       ['JUDGED BY', 'Yandex, Lunka, Yakitoria, HSE Design School'],
       ['SCOPE', 'Menu and cart, existing range kept'],
@@ -200,51 +236,46 @@ export const cases: Case[] = [
     frame: { project: 'yakitoria', tabs: ['menu', 'product', 'reviews'] },
     brief: [
       'Redesign the menu and cart so the average order goes up and fewer people drop out before checkout. Audience: 18 to 35, ordering delivery three or four times a week.',
-      'Three constraints. Keep the brand recognisable. Fit inside 60 developer hours. Work with the existing product range - the catalogue stays, the interface around it changes. The last one mattered most: this was not an invitation to redraw the site, it was a question about which mechanics move an order forward.',
+      'Three constraints: keep the brand recognisable, fit inside 60 developer hours, leave the product range alone. The last one shaped the work. The catalogue stays, the interface around it changes.',
     ],
     broken: [
       'The original menu listed dishes with a photo and a price, and stopped there.',
-      'Reviews sat behind a separate tab, so nobody reached them. Filters sorted by calories and cooking time - neither is how anyone picks sushi. The product page had no upsell at all: you added a roll to the cart and the site let you go.',
-      'Every one of these is a place where the order stops growing or the visitor leaves.',
+      'Reviews sat behind a separate tab, so nobody reached them. Filters sorted by calories and cooking time. The product page had no upsell at all: you added a roll to the cart and the site let you go.',
     ],
     decisions: [
       {
         n: '1',
         title: 'Nutrition data next to the price',
         body: [
-          'The audience counts calories whether the site shows them or not. Hiding the numbers does not remove the question, it just moves it somewhere the site cannot answer.',
-          'The hypothesis: showing protein, fat and carbs will not scare people off. It removes a doubt at the moment of choosing, and people order what fits them instead of closing the tab to check elsewhere.',
+          'The audience counts calories whether the site shows them or not. Without the numbers on the card people leave to look them up elsewhere. The hypothesis was simple: protein, fat and carbs settle the doubt at the moment of choosing.',
         ],
       },
       {
         n: '2',
         title: 'Frequently ordered together',
         body: [
-          'Sales data showed rolls going out with soups and gunkan more than anything else. The original site knew this and did nothing with it.',
-          'I put the pairing on the product page as a visible block, not a footnote. This is the one change aimed directly at the brief: average order value.',
+          'Sales data showed rolls going out with soups and gunkan more than anything else. The original site knew this and did nothing with it. I put the pairing on the product page as a visible block. Of every change I made, this is the one aimed straight at the brief.',
         ],
       },
       {
         n: '3',
         title: 'Filters people actually use',
         body: [
-          'Calories and cooking time went out. Popularity and dish type went in.',
-          'A filter is only useful if it matches how someone decides. Nobody browses sushi by cooking time. They browse by what kind of thing they want and what other people order.',
+          'Calories and cooking time went out, popularity and dish type went in. Nobody browses sushi by cooking time. They browse by what they feel like and what other people order.',
         ],
       },
       {
         n: '4',
-        title: 'Reviews on the page, not behind a tab',
+        title: 'Reviews on the product page',
         body: [
-          'A tab is a decision the visitor has to make before they get the information. Most do not make it.',
-          'Moving reviews onto the product page puts social proof where the doubt is, at the point of adding to cart.',
+          'A tab asks for a decision before the visitor has the information, and most never make it. On the card itself, other people\'s experience lands where the doubt is: at the point of adding to cart.',
         ],
       },
     ],
     screens: [
-      ['01 MENU', 'menu'],
-      ['02 PRODUCT PAGE', 'product'],
-      ['03 REVIEWS', 'reviews'],
+      ['MENU', 'menu'],
+      ['PRODUCT PAGE', 'product'],
+      ['REVIEWS', 'reviews'],
     ],
     judges: {
       quotes: [
@@ -255,11 +286,11 @@ export const cases: Case[] = [
       source: 'Jury, final broadcast',
     },
     retro: [
-      'Third place out of 47 teams. The jury singled out the upsell block as the strongest conversion mechanic in the competition.',
-      'What I would do differently: the judges flagged headings breaking on 375 width. It was a technical slip, an hour of work, and it was in the version I submitted. Small things like that are what separates a prototype from something a client can ship - and the brief was explicitly about shipping inside 60 hours.',
-      'I also had sales data and used it for one decision. With more time I would have taken the same approach to the rest of the menu structure, not just the pairing block.',
+      'The judges flagged headings breaking at 375 width. An hour of work, and it went out in the version I submitted.',
+      'I had sales data and used it for exactly one decision. With more time I would have taken the same approach to the rest of the menu structure.',
     ],
-    next: { slug: 'nichive', title: 'nichive' },
+    asides: { broken: '47 teams', retro: '3rd place' },
+    next: { slug: 'beta', title: 'BETA' },
   },
 ];
 

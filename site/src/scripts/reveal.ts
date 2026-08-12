@@ -9,22 +9,25 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-/**
- * `?motion` forces animation on even when the system asks for reduced motion.
- * Windows ships with animation effects switched off on plenty of machines, and
- * the author's is one of them - without an override he cannot see his own site.
- * Typing the parameter is a deliberate choice, unlike the ambient setting, and
- * the choice sticks for the session so it survives navigation.
- */
-const FORCED = (() => {
-  if (new URLSearchParams(location.search).has('motion')) {
-    sessionStorage.setItem('kuixl:motion', '1');
-    return true;
-  }
-  return sessionStorage.getItem('kuixl:motion') === '1';
-})();
+import { reducedMotion as prm } from './motionPref';
 
-const prm = () => !FORCED && matchMedia('(prefers-reduced-motion: reduce)').matches;
+/**
+ * Anything already on screen when the page loads is shown at once.
+ *
+ * A reveal starts at `top 88%`, which is the right place for a block you
+ * scroll down to. For a block that is already on screen at load it is the
+ * wrong place twice: an element sitting between 88% and 100% of the viewport
+ * is visible to the reader and hidden by the animation, and it stays hidden
+ * until they scroll. On the home page that was the "Works" heading, and a
+ * visitor arriving from a direct link - which is how everyone arrives - saw a
+ * blank space where a heading should be.
+ *
+ * The rule is simply: on screen at load means visible at load.
+ */
+const onScreenNow = (el: HTMLElement) => {
+  const r = el.getBoundingClientRect();
+  return r.top < innerHeight && r.bottom > 0;
+};
 
 /** blocks rise into place once, as they enter */
 export function initReveals() {
@@ -36,14 +39,15 @@ export function initReveals() {
     const kids = el.hasAttribute('data-reveal-children')
       ? Array.from(el.children)
       : [el];
+    const show = () =>
+      gsap.to(kids, { opacity: 1, y: 0, duration: 0.7, stagger: 0.06, ease: 'power2.out' });
+
+    if (onScreenNow(el)) {
+      // no hidden state at all: it was never off screen to arrive from
+      return;
+    }
     gsap.set(kids, { opacity: 0, y: 18 });
-    ScrollTrigger.create({
-      trigger: el,
-      start: 'top 88%',
-      once: true,
-      onEnter: () =>
-        gsap.to(kids, { opacity: 1, y: 0, duration: 0.7, stagger: 0.06, ease: 'power2.out' }),
-    });
+    ScrollTrigger.create({ trigger: el, start: 'top 88%', once: true, onEnter: show });
   });
 
   // Lazy images land after the triggers are measured and shift everything below
@@ -117,13 +121,15 @@ export function initAssembleHeading(selector = '[data-assemble]') {
       const tick = () => {
         const t = performance.now() - start;
         el.textContent = chars
-          .map((c, i) =>
-            locked[i] || t >= settleAt[i] + HOLD
-              ? c
-              : t >= settleAt[i]
-                ? GLYPHS[Math.floor(Math.random() * GLYPHS.length)]
-                : ' '
-          )
+          .map((c, i) => {
+            if (locked[i] || t >= settleAt[i] + HOLD) return c;
+            // Characters whose turn has not come used to render as a space,
+            // so for the first second the word was a single stray glyph
+            // followed by nothing: "Пишите." read as "П=#" and looked broken
+            // rather than unresolved. Every position now holds a glyph, so
+            // the word keeps its shape and only its letters are in doubt.
+            return GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+          })
           .join('');
         if (t <= RUN) requestAnimationFrame(tick);
         else el.textContent = final;

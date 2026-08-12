@@ -1,78 +1,73 @@
 ---
 /**
- * One numbered section of a case page. The number and title sit in a narrow
- * left rail so the body copy keeps a readable measure instead of stretching
- * across the full grid.
+ * One section of a case page.
+ *
+ * There is no number and no rule above it. Numbering implies a sequence the
+ * reader has to follow in order, and these sections are not one: Result, Live
+ * site, Screens and the retro are places to look, not steps to take. The rules
+ * were worse - nine hairlines a page, none of them separating anything the
+ * spacing did not already separate, and together they read as a template.
+ *
+ * The left rail used to carry an ASCII ornament per section. They were
+ * scrollwork and rocaille: Victorian decoration in the margin of a Swiss
+ * layout, related to nothing in the project, the brand or the rest of the
+ * site. Decoration with no function is the clearest tell of a generated page,
+ * so the rail now holds the label and nothing else. ASCII art still has one
+ * job on this site, in the preloader, where turning an image into characters
+ * is the subject rather than the garnish.
  */
-import { readFileSync, readdirSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-
 interface Props {
-  n: string;
   title: string;
   wide?: boolean;
+  /**
+   * Puts the section on a dark full-bleed ground.
+   *
+   * The case pages were one uninterrupted sheet of paper: reading and looking
+   * got identical treatment, so scrolling through felt like one long slide
+   * deck. Screens and jury quotes are the sections you look at rather than
+   * read, and giving them their own ground makes that switch something you
+   * feel rather than something you have to notice.
+   */
+  ground?: boolean;
+  /** short figure for the right field; see `asides` on the Case type */
+  aside?: string;
   id?: string;
-  /** rail drawing: a per-case offset so two cases do not open on the same one */
-  art?: string;
-  /** position within the case, so no drawing repeats on a page */
-  artIndex?: number;
 }
-const { n, title, wide = false, id, art, artIndex = 0 } = Astro.props;
-
-/**
- * The rail sits empty for the height of a long section. It gets the artwork
- * itself, cut out and recoloured, rather than a re-conversion of it: a grid
- * narrow enough to fit 240px has too few columns to keep a subject and comes
- * out as scattered dots.
- */
-const ART_DIR = fileURLToPath(new URL('../../public/art/', import.meta.url));
-let artSrc = '';
-if (art) {
-  const files = readdirSync(ART_DIR).filter((f) => f.endsWith('.cut.webp')).sort();
-  if (files.length) {
-    // Hashing the section name alone repeated drawings within a page - with
-    // eleven files and five sections a collision is likely, and two identical
-    // drawings a screen apart read as a bug. The case name sets a starting
-    // point and sections walk forward from it, so a page never repeats.
-    let h = 0;
-    for (const ch of art) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-    artSrc = `/art/${files[(h + artIndex) % files.length]}`;
-  }
-}
+const { title, wide = false, ground = false, aside, id } = Astro.props;
 ---
-<section class="case-section" id={id} data-wide={wide ? '' : undefined}>
+<section class="case-section" id={id} data-wide={wide ? '' : undefined} data-ground={ground ? '' : undefined}>
   <div class="cs-rail">
-    <span class="cs-n">{n}</span>
     <h2 class="cs-title">{title}</h2>
-    {artSrc && (
-      <div class="cs-art-box" aria-hidden="true">
-        <img class="cs-art" src={artSrc} alt="" loading="lazy" decoding="async" />
-      </div>
-    )}
   </div>
   <div class="cs-body" data-reveal data-reveal-children>
     <slot />
   </div>
+  {aside && !wide && <p class="cs-aside font-mono">{aside}</p>}
 </section>
 
 <style>
+  /* minmax(0, 1fr), not 1fr. A grid column defaults to a minimum of its
+     content's min-content width, so one unbreakable string anywhere inside
+     pushes the column, the section and the page wider than the screen. That
+     is what put every case page into horizontal scroll at 320px. */
   .case-section {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--gap-block);
-    /* was 120 top and bottom - a rhythm that reads as unfinished rather than
-       generous once the sections carry real content */
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--gap-item);
     padding-block: var(--gap-section);
-    border-top: 1px solid var(--color-hairline);
   }
+  .cs-body { min-width: 0; }
+  /* Sections pad on one side of the boundary, not both. Two 120px blocks
+     meeting made 240px of empty screen. */
+  .case-section + .case-section { padding-top: 0; }
+  /* Except a dark one. Its padding is the only thing holding its label off
+     the top edge of its own band, and the rule above was zeroing it because
+     the band happens to follow another section: the word ЭКРАНЫ sat flush
+     against the edge of the ink. */
+  .case-section + .case-section[data-ground] { padding-top: var(--gap-section); }
+
   .cs-rail { display: flex; align-items: baseline; gap: var(--gap-item); }
-  .cs-n {
-    font-family: var(--font-mono);
-    font-size: var(--text-mono-label);
-    color: var(--color-muted);
-    padding-right: var(--gap-tight);
-    border-right: 1px solid var(--color-hairline);
-  }
+
   /* Case pages are commentary about a product, not the product. Setting their
      headings in the same heavy grotesque as the sites they describe made the
      two read as one continuous thing. Mono, small, ruled - the voice of an
@@ -80,59 +75,110 @@ if (art) {
   .cs-title {
     font-family: var(--font-mono);
     font-weight: 400;
-    font-size: clamp(15px, 1.6vw, 18px);
+    font-size: 13px;
     line-height: 1.2;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
+    color: var(--color-muted);
     hyphens: none;
     overflow-wrap: normal;
   }
   .cs-body > :global(* + *) { margin-top: var(--gap-item); }
+  /* One measure for every text block. Paragraphs in "My role" ran to the full
+     column while the ones in "Decisions" stopped at their own max-width, so
+     two blocks on the same page had different line lengths. */
+  .cs-body :global(p) { max-width: var(--measure); }
 
-  /* Hidden on narrow screens: the rail collapses to a single line there and a
-     drawing would push the section it labels off the screen. */
-  .cs-art-box { display: none; }
-  @media (min-width: 901px) {
-    /* The clip has to live on a wrapper. `overflow: hidden` on the scaled
-       element itself clips its children, not its own transformed box, so the
-       drawing kept running out over the body copy. */
-    .cs-art-box {
-      display: block;
-      width: 100%;
-      margin-top: var(--gap-block);
-      pointer-events: none;
-      user-select: none;
-    }
-    /* Sized to fit the rail outright rather than scaled and clipped: clipping
-       showed one corner of a drawing, which reads as a stray mark, not art.
-       At 76 columns a 5.2px monospace advance lands just inside 240px. */
-    .cs-art {
-      display: block;
-      width: 100%;
-      max-width: 220px;
-      height: auto;
-      opacity: 0.62;
-    }
+  /* Full bleed without overflow. A 100vw width would include the scrollbar and
+     push the page sideways; the shadow paints past the element in both
+     directions and the clip trims it vertically to the section, so the band
+     reaches the window edge and nothing scrolls horizontally. */
+  .case-section[data-ground] {
+    background: var(--color-ink);
+    box-shadow: 0 0 0 100vmax var(--color-ink);
+    clip-path: inset(0 -100vmax);
+    /* All the room is padding, and there is no margin at all.
+       Three spacings used to stack at this boundary: the previous section's
+       120px bottom padding, then 160px of margin, then 120px of padding
+       inside the band. Four hundred pixels between the last sentence and the
+       word ЭКРАНЫ, most of it empty paper. The colour change is the
+       separator; it does not need a moat as well. */
+    padding-block: var(--gap-section);
+    margin-block: 0;
+    color: var(--color-paper);
+    /* everything inside picks this up, whichever component drew it */
+    --color-caption: var(--color-muted-inverse);
+  }
+  /* Two dark sections in a row are one spread, not two. The margin between
+     them is outside both backgrounds, so on Yakitoria the screens band and the
+     jury band were separated by 160px of paper and the whole thing read as a
+     rendering fault. They now run together. */
+  .case-section[data-ground]:has(+ .case-section[data-ground]) {
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  /* One spread, but not two blocks glued together. The second section used to
+     take padding-top: 0, so on Yakitoria the word ЖЮРИ sat 30px under the
+     screenshots while ЭКРАНЫ had 120px above it: the same label treatment
+     with two different amounts of air, which reads as a seam. */
+  .case-section[data-ground] + .case-section[data-ground] {
+    margin-top: 0;
+    padding-top: var(--gap-section);
+  }
+  /* Coming back out onto paper the next section needs its own top padding
+     again: the band's padding stops at the edge of the ink. */
+  .case-section[data-ground] + .case-section { padding-top: var(--gap-section); }
+  /* And the section before a band keeps its bottom padding, which is now the
+     only paper between the text and the ink. */
+  .case-section[data-ground] .cs-title { color: var(--color-muted-inverse); }
+  /* the hover cue is ink on paper by default, which vanishes here */
+  .case-section[data-ground] :global(.screen-cue) {
+    color: var(--color-ink);
+    background: var(--color-paper);
+  }
+
+  /* On a phone there is no right field to sit in, so it follows the text as a
+     line of its own rather than being dropped. */
+  .cs-aside {
+    position: relative;
+    margin-top: var(--gap-item);
+    padding-left: var(--gap-block);
+    font-size: var(--text-mono-caption);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-caption);
+  }
+  /* 2px, like the thread in the works index. At one pixel a leader line is
+     invisible next to the type it is attached to. */
+  .cs-aside::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.6em;
+    width: var(--gap-item);
+    border-top: 2px solid var(--color-hairline);
   }
 
   @media (min-width: 901px) {
+    /* Three columns: the label rail, the reading column, and the field the
+       aside lives in. The third column exists on every text section whether
+       or not it is filled, so the reading measure never shifts between one
+       section and the next. */
     .case-section {
-      grid-template-columns: 240px minmax(0, 1fr);
+      grid-template-columns: 190px minmax(0, 1fr) 180px;
       gap: var(--gap-block);
     }
-    .cs-rail {
-      flex-direction: row;
-      align-items: baseline;
-      /* the drawing is a third child of a row - without this it lines up beside
-         the heading and runs into the body column */
-      flex-wrap: wrap;
-      gap: var(--gap-tight);
-      position: sticky;
-      top: var(--gap-item);
-      align-self: start;
-    }
-    .cs-art-box { flex-basis: 100%; }
-    .case-section[data-wide] { grid-template-columns: 1fr; }
-    .case-section[data-wide] .cs-rail { flex-direction: row; align-items: baseline; }
+    .cs-aside { margin-top: 0; align-self: start; }
+    /* Not sticky. A label that follows the scroll ends up beside whatever
+       happens to be on screen: on BETA the word ЗАДАЧА drifted down until it
+       sat against the metadata table, which read as if the table were the
+       brief. It now stays on the first line of the block it names. */
+    .cs-rail { align-self: start; }
+    /* A wide section stacks its label above its content, so the gap between
+       them is the only thing separating a 13px label from a 20px quote. At
+       24px they read as one block; the label needs to sit apart from what it
+       names. */
+    .case-section[data-wide] { grid-template-columns: 1fr; gap: var(--gap-block); }
+    .case-section[data-wide] .cs-body { grid-column: 1; }
   }
 </style>

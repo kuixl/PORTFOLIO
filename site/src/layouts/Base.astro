@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { ui } from '../data/ui';
 interface Props {
   title: string;
   description?: string;
@@ -12,27 +13,94 @@ interface Props {
   /** social card image, relative to the site root */
   image?: string;
   lang?: 'en' | 'ru';
+  /**
+   * A page that does not exist should not claim to be the canonical version
+   * of itself, and should not advertise a translation at an address that is
+   * equally absent. The 404 sets this and gets neither, plus noindex.
+   */
+  noindex?: boolean;
 }
 const {
   title,
   description = 'Konstantin Darovskiy, web designer in Moscow. UX/UI, web and 3D. I design the work, then I build it.',
   preload = false,
-  image = '/og.png',
+  image,
   lang = 'en',
+  noindex = false,
 } = Astro.props;
 
-const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://kuixl.github.io');
-const ogImage = new URL(image, Astro.site ?? 'https://kuixl.github.io');
+const SITE = Astro.site ?? 'https://kuixl.github.io';
+/* Trailing slashes were inconsistent: the home page advertised its Russian
+   twin as /ru/ while that page's own canonical said /ru. One shape for both. */
+const strip = (p: string) => (p !== '/' ? p.replace(/\/$/, '') : p);
+const here = strip(Astro.url.pathname);
+const canonical = new URL(here, SITE);
+const enHref = new URL(strip(here.replace(/^\/ru/, '')) || '/', SITE);
+const ruHref = new URL(strip('/ru' + here.replace(/^\/ru/, '')), SITE);
+/**
+ * A card per page, derived from the route.
+ *
+ * Every page used to share /og.png, so a link to any case previewed as the
+ * home page. scripts/og.mjs writes one card per route under /og/ using this
+ * same naming, and anything without one falls back to the generic card.
+ */
+const slug = here.replace(/^\/ru/, '').replace(/^\//, '') || 'home';
+const ogImage = new URL(image ?? (noindex ? '/og.png' : `/og/${slug}-${lang}.png`), SITE);
 ---
 <!doctype html>
-<html lang={lang} class={preload ? 'is-preloading' : undefined}>
+<html lang={lang}>
   <head>
+    {preload && (
+      /**
+       * The lock is put on by script and taken off by script.
+       *
+       * It used to be written into this tag, so the page shipped locked and
+       * only JavaScript could free it: with scripting off, or with the module
+       * blocked or broken, the home page was a black panel over content that
+       * could not be scrolled to. Now the markup is a readable page and the
+       * preloader is something laid on top of it.
+       *
+       * Inline and synchronous on purpose: a deferred module would run after
+       * first paint and the visitor would see the site flash before the panel
+       * covered it.
+       */
+      <script is:inline>
+        (function () {
+          var d = document.documentElement;
+          // ?replay runs the sequence again even though the session flag is
+          // set, so the lock has to survive that case too
+          var replay = location.search.indexOf('replay') > -1;
+          // second visit in this session: no preloader, so never lock
+          try { if (!replay && sessionStorage.getItem('kuixl:preloaded')) return; } catch (e) { return; }
+          d.classList.add('is-preloading');
+
+          function release() {
+            d.classList.remove('is-preloading');
+            var s = document.getElementById('preloader');
+            if (s && s.parentNode) s.parentNode.removeChild(s);
+          }
+          // the module never got as far as running: blocked, failed to load,
+          // threw while parsing. Nothing else would ever unlock the page.
+          setTimeout(function () {
+            if (!window.__kuixlPreloaderRunning) release();
+          }, 5000);
+          // it started but never finished
+          setTimeout(release, 15000);
+        })();
+      </script>
+    )}
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical.href} />
-    <link rel="alternate" hreflang="en" href={new URL(Astro.url.pathname.replace(/^\/ru/, '') || '/', Astro.site ?? 'https://kuixl.github.io').href} />
-    <link rel="alternate" hreflang="ru" href={new URL('/ru' + Astro.url.pathname.replace(/^\/ru/, ''), Astro.site ?? 'https://kuixl.github.io').href} />
+    {noindex ? (
+      <meta name="robots" content="noindex" />
+    ) : (
+      <>
+        <link rel="canonical" href={canonical.href} />
+        <link rel="alternate" hreflang="en" href={enHref.href} />
+        <link rel="alternate" hreflang="ru" href={ruHref.href} />
+      </>
+    )}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
     <meta property="og:type" content="website" />
@@ -40,15 +108,40 @@ const ogImage = new URL(image, Astro.site ?? 'https://kuixl.github.io');
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical.href} />
     <meta property="og:image" content={ogImage.href} />
+    {/* Twitter falls back to Open Graph, but only for the tags it recognises
+        and only until it decides not to. Stated outright instead. */}
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage.href} />
+    <meta name="twitter:image:alt" content={title} />
 
-    <link rel="preload" href="/fonts/switzer-var-latin.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/sligoil-micro-latin.woff2" as="font" type="font/woff2" crossorigin />
+    {/*
+      Preload what the first screen of THIS page is actually set in.
+
+      Both versions used to preload the Latin pair. On a Russian page that is
+      the wrong pair twice over: the title, the lead and every label above the
+      fold are Cyrillic, so they come from Onest and JetBrains Mono, and the
+      two files being fetched at high priority are the two the first screen
+      never touches. The Latin faces still load on the Russian pages, just on
+      demand, because the wordmark and the project names are Latin.
+    */}
+    {lang === 'ru' ? (
+      <>
+        <link rel="preload" href="/fonts/onest-cyrillic.woff2" as="font" type="font/woff2" crossorigin />
+        <link rel="preload" href="/fonts/jbmono-cyrillic.woff2" as="font" type="font/woff2" crossorigin />
+      </>
+    ) : (
+      <>
+        <link rel="preload" href="/fonts/switzer-var-latin.woff2" as="font" type="font/woff2" crossorigin />
+        <link rel="preload" href="/fonts/sligoil-micro-latin.woff2" as="font" type="font/woff2" crossorigin />
+      </>
+    )}
     <title>{title}</title>
   </head>
   <body class="bg-paper text-primary">
     <!-- keyboard users should not have to tab through the header on every page -->
-    <a class="skip-link" href="#main">Skip to content</a>
+    <a class="skip-link" href="#main">{ui[lang].skip}</a>
     <slot />
   </body>
 </html>
