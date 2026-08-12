@@ -12,13 +12,16 @@ import { cases } from '../data/cases';
 const SITE = 'https://kuixl.github.io';
 
 export const GET: APIRoute = () => {
-  const paths = ['/', ...cases.map((c) => `/${c.slug}`)];
+  /* Trailing slashes throughout: that is what the host serves and what the
+     canonical link on each page says. A sitemap listing the other form would
+     be advertising a redirect. */
+  const paths = ['/', ...cases.map((c) => `/${c.slug}/`)];
 
   const urls = paths
-    .flatMap((p) => [p, p === '/' ? '/ru' : `/ru${p}`])
+    .flatMap((p) => [p, p === '/' ? '/ru/' : `/ru${p}`])
     .map((loc) => {
       const bare = loc.replace(/^\/ru/, '') || '/';
-      const ru = bare === '/' ? '/ru' : `/ru${bare}`;
+      const ru = bare === '/' ? '/ru/' : `/ru${bare}`;
       return `  <url>
     <loc>${SITE}${loc}</loc>
     <xhtml:link rel="alternate" hreflang="en" href="${SITE}${bare}"/>

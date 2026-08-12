@@ -30,13 +30,15 @@ const {
 } = Astro.props;
 
 const SITE = Astro.site ?? 'https://kuixl.github.io';
-/* Trailing slashes were inconsistent: the home page advertised its Russian
-   twin as /ru/ while that page's own canonical said /ru. One shape for both. */
-const strip = (p: string) => (p !== '/' ? p.replace(/\/$/, '') : p);
-const here = strip(Astro.url.pathname);
+/* One shape for every address we advertise, and it is the shape the host
+   actually serves. A static host answers /ru with a redirect to /ru/, so a
+   canonical without the slash points at a redirect rather than at the page. */
+const slash = (p: string) => (p.endsWith('/') ? p : p + '/');
+const here = slash(Astro.url.pathname);
+const bare = here.replace(/^\/ru/, '') || '/';
 const canonical = new URL(here, SITE);
-const enHref = new URL(strip(here.replace(/^\/ru/, '')) || '/', SITE);
-const ruHref = new URL(strip('/ru' + here.replace(/^\/ru/, '')), SITE);
+const enHref = new URL(slash(bare), SITE);
+const ruHref = new URL(slash('/ru' + bare), SITE);
 /**
  * A card per page, derived from the route.
  *
@@ -44,7 +46,9 @@ const ruHref = new URL(strip('/ru' + here.replace(/^\/ru/, '')), SITE);
  * home page. scripts/og.mjs writes one card per route under /og/ using this
  * same naming, and anything without one falls back to the generic card.
  */
-const slug = here.replace(/^\/ru/, '').replace(/^\//, '') || 'home';
+/* Strip both ends: `here` now carries a trailing slash, and leaving it in
+   produced /og/nichive/-ru.png */
+const slug = bare.replace(/^\/|\/$/g, '') || 'home';
 const ogImage = new URL(image ?? (noindex ? '/og.png' : `/og/${slug}-${lang}.png`), SITE);
 ---
 <!doctype html>
