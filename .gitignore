@@ -10,8 +10,11 @@ site/.astro/
 refs/
 
 # desktop font sources (EULA forbids redistribution; web subsets in
-# site/public/fonts are the embedded webfonts and stay tracked)
-fonts/
+# site/public/fonts are the embedded webfonts and stay tracked).
+# The leading slash matters: written as `fonts/` this pattern matched a
+# directory of that name at any depth, so it was quietly swallowing
+# site/public/fonts too and the site shipped with no webfonts at all.
+/fonts/
 
 # ascii art sources (large originals; committed output lives in site/public/art)
 art/source/
