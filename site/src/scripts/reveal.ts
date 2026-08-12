@@ -211,61 +211,11 @@ export function initFrameEntrance() {
 }
 
 /**
- * ASCII wipe on internal navigation. Runs on click, before the browser leaves,
- * and again on arrival - a real page load, so the two halves are separate.
+ * The ASCII page wipe is gone.
+ *
+ * It covered the screen in random characters on arrival and again on the way
+ * out, which meant every ordinary page refresh opened on a field of noise
+ * before showing the page. It also intercepted every internal link to run its
+ * exit half, so a click waited on an animation before the browser was allowed
+ * to navigate. Two costs, both paid on the most common actions there are.
  */
-export function initPageWipe() {
-  if (prm()) return;
-
-  const make = () => {
-    const el = document.createElement('div');
-    el.className = 'page-wipe';
-    el.setAttribute('aria-hidden', 'true');
-    document.body.appendChild(el);
-    return el;
-  };
-
-  const fill = (el: HTMLElement, density: number) => {
-    const cols = Math.ceil(innerWidth / 10);
-    const rows = Math.ceil(innerHeight / 19);
-    let s = '';
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++)
-        s += Math.random() < density ? GLYPHS[Math.floor(Math.random() * GLYPHS.length)] : ' ';
-      s += '\n';
-    }
-    el.textContent = s;
-  };
-
-  // arrival: a dense screen that thins out
-  const inWipe = make();
-  inWipe.classList.add('is-in');
-  let d = 0.5;
-  const thin = () => {
-    d -= 0.06;
-    if (d <= 0) { inWipe.remove(); return; }
-    fill(inWipe, d);
-    setTimeout(thin, 45);
-  };
-  fill(inWipe, d);
-  requestAnimationFrame(() => setTimeout(thin, 60));
-
-  // departure: thicken, then let the navigation happen
-  document.querySelectorAll<HTMLAnchorElement>('a[href^="/"]').forEach((a) => {
-    a.addEventListener('click', (e) => {
-      if (e.metaKey || e.ctrlKey || e.shiftKey || a.target === '_blank') return;
-      const url = a.getAttribute('href')!;
-      if (url.startsWith('/#')) return;
-      e.preventDefault();
-      const out = make();
-      let dd = 0;
-      const thicken = () => {
-        dd += 0.09;
-        fill(out, dd);
-        if (dd < 0.55) setTimeout(thicken, 40);
-        else location.href = url;
-      };
-      thicken();
-    });
-  });
-}
