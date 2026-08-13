@@ -12,7 +12,7 @@
  * has six captures, BETA has one page. The component shows what each has rather
  * than flattening everyone down to the thinnest.
  */
-import works from '../../public/works/works.json';
+import works from '../data/works.json';
 import { ui, pageCount } from '../data/ui';
 import { pageName } from '../data/pageNames';
 import type { Lang } from '../data/home';
@@ -131,7 +131,7 @@ const first = pages[0];
     border: 1px solid var(--color-hairline);
     background: transparent;
     cursor: pointer;
-    transition: color 0.2s, border-color 0.2s, background 0.2s;
+    transition: color var(--duration-base) ease, border-color var(--duration-base) ease, background var(--duration-base) ease;
   }
   .wf-tabs button:hover, .wf-sizes button:hover { color: var(--color-primary); }
   .wf-tabs button.is-active, .wf-sizes button.is-active {
@@ -172,7 +172,7 @@ const first = pages[0];
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .wf-hint { margin-left: auto; opacity: 0; transition: opacity 0.2s; white-space: nowrap; }
+  .wf-hint { margin-left: auto; opacity: 0; transition: opacity var(--duration-base) ease; white-space: nowrap; }
   .wf-frame:hover .wf-hint { opacity: 1; }
 
   .wf-viewport {

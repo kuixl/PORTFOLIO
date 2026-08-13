@@ -89,6 +89,14 @@
   /* Height of the sticky bar, so anchors can clear it. */
   --head-h: 60px;
 
+  /* How far a colour preview is pulled toward the paper. Both are dialled
+     here rather than baked into the image files, so the strength can change
+     without regenerating anything. */
+  --preview-grain: 0.07;
+  --preview-tint: 0.06;
+  /* One tile of monochrome noise, inline so it costs no request */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+
   --font-sans: 'Switzer', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'Sligoil Micro', ui-monospace, 'Cascadia Mono', Consolas, monospace;
 

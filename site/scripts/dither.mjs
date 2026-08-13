@@ -27,7 +27,7 @@ import { fileURLToPath } from 'node:url';
 
 const SRC = fileURLToPath(new URL('../../captures/', import.meta.url));
 const OUT = fileURLToPath(new URL('../public/works/', import.meta.url));
-const MANIFEST = join(OUT, 'works.json');
+const MANIFEST = fileURLToPath(new URL('../src/data/works.json', import.meta.url));
 
 /** Widths the browser selects between, in device pixels. */
 const TARGETS = [640, 1120, 1600];
@@ -149,11 +149,30 @@ const run = async () => {
       const top = Math.max(0, Math.min(height - cropH, Math.round((shot.h - cropH) * 0)));
 
       const variants = [];
+      const colour = [];
       for (const w of TARGETS) {
         const rw = w * SUPERSAMPLE;
         const rh = Math.round(rw * ratio);
+        const crop = { left: 0, top, width, height: cropH };
+
+        /* The colour preview, which is what the page shows.
+           Outside reviewers read the greyscale treatment as an unfinished
+           screenshot rather than as a decision, so the projects keep their own
+           colours and the paper palette is reconciled in CSS instead. */
+        const plain = await sharp(capture)
+          .extract(crop)
+          .resize(w, Math.round(w * ratio), { fit: 'cover', position: 'top' })
+          .webp({ quality: 82 })
+          .toFile(join(OUT, project, `${shot.page}-${shot.size}.c-${w}.webp`));
+        colour.push({
+          file: `${shot.page}-${shot.size}.c-${w}.webp`,
+          w,
+          h: Math.round(w * ratio),
+          kb: Math.round(plain.size / 1024),
+        });
+
         const { data, info } = await sharp(capture)
-          .extract({ left: 0, top, width, height: cropH })
+          .extract(crop)
           .resize(rw, rh, { fit: 'cover', position: 'top' })
           .greyscale()
           .linear(CONTRAST, OFFSET)
@@ -180,15 +199,17 @@ const run = async () => {
       }
 
       shot.thumb.dither = variants;
+      shot.thumb.colour = colour;
       console.log(
         `${project}/${shot.page}-${shot.size}  ` +
-          variants.map((v) => `${v.w}px ${v.kb}KB`).join('  ')
+          `colour ${colour.map((v) => v.kb).join('/')}KB  ` +
+          `raster ${variants.map((v) => v.kb).join('/')}KB`
       );
     }
   }
 
   await writeFile(MANIFEST, JSON.stringify(manifest, null, 2), 'utf8');
-  console.log('\nupdated public/works/works.json');
+  console.log('\nupdated src/data/works.json');
   await portrait();
 };
 

@@ -19,6 +19,7 @@ import { fileURLToPath } from 'node:url';
 
 const SRC = fileURLToPath(new URL('../../captures/', import.meta.url));
 const OUT = fileURLToPath(new URL('../public/works/', import.meta.url));
+const MANIFEST_OUT = fileURLToPath(new URL('../src/data/works.json', import.meta.url));
 const MAX_H = 16000;      // stay clear of the 16383px encoder ceiling
 const QUALITY = 80;
 
@@ -94,8 +95,8 @@ const run = async () => {
   }
 
   await mkdir(OUT, { recursive: true });
-  await writeFile(join(OUT, 'works.json'), JSON.stringify(manifest, null, 2), 'utf8');
-  console.log('\nwrote public/works/works.json');
+  await writeFile(MANIFEST_OUT, JSON.stringify(manifest, null, 2), 'utf8');
+  console.log('\nwrote src/data/works.json');
 };
 
 run().catch((e) => {

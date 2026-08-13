@@ -13,7 +13,7 @@ import { caseLabels } from '../data/caseLabels';
 import { ui } from '../data/ui';
 import { pageName } from '../data/pageNames';
 import type { Lang } from '../data/home';
-import works from '../../public/works/works.json';
+import works from '../data/works.json';
 
 interface Props { c: Case; lang: Lang }
 const { c: base, lang } = Astro.props;
@@ -32,12 +32,13 @@ const screens = (base.screens ?? [])
   .map(([, page]) => {
     const shot = shotsFor(project).find((s) => s.page === page && s.size === 'desktop');
     if (!shot?.thumb) return null;
-    const d = shot.thumb.dither as { file: string; w: number; h: number }[] | undefined;
-    const base2 = d?.[1] ?? d?.[0] ?? shot.thumb;
+    /* Colour, like the index. The reviewer is here to look at the work. */
+    const c = shot.thumb.colour as { file: string; w: number; h: number }[] | undefined;
+    const base2 = c?.[1] ?? c?.[0] ?? shot.thumb;
     return {
       label: pageName(lang, project, page),
       file: base2.file,
-      srcset: d?.map((v: any) => `/works/${project}/${v.file} ${v.w}w`).join(', '),
+      srcset: c?.map((v: any) => `/works/${project}/${v.file} ${v.w}w`).join(', '),
       w: base2.w,
       h: base2.h,
       full: shot.parts[0].file,
@@ -73,7 +74,7 @@ const neighbour = (step: number) => {
     title: c.title,
     teaser: (lang === 'ru' ? casesRu[c.slug]?.teaser : undefined) ?? c.teaser,
     project,
-    shot: shot?.thumb ? (shot.thumb.dither?.[0] ?? shot.thumb) : undefined,
+    shot: shot?.thumb ? (shot.thumb.colour?.[1] ?? shot.thumb.colour?.[0] ?? shot.thumb) : undefined,
   };
 };
 const prevCase = neighbour(-1);
@@ -413,7 +414,19 @@ const nextWraps = at === ring.length - 1;
     background: none;
     cursor: pointer;
   }
+  /* Same treatment as the index previews: the projects keep their colours and
+     the grain puts them back on the site's stock. */
+  .screen-open, .cn-shot { position: relative; }
   .screen img { width: 100%; height: auto; display: block; }
+  .screen-open::after, .cn-shot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: var(--preview-grain);
+    background-image: var(--grain);
+    background-size: 180px 180px;
+  }
   .screen-cue {
     position: absolute;
     inset: auto 8px 8px auto;
@@ -424,7 +437,7 @@ const nextWraps = at === ring.length - 1;
     color: var(--color-paper);
     background: var(--color-ink);
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: opacity var(--duration-base) ease;
   }
   .screen-open:hover .screen-cue,
   .screen-open:focus-visible .screen-cue { opacity: 1; }

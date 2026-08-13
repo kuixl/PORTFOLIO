@@ -4,7 +4,7 @@
  * English and Russian versions cannot drift apart in layout.
  */
 import { home, type Lang } from '../data/home';
-import works from '../../public/works/works.json';
+import works from '../data/works.json';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -41,13 +41,19 @@ const index = [
 const thumb = (project: string) => {
   const s = (works as Record<string, any[]>)[project]?.find((x) => x.size === 'desktop' && x.thumb);
   if (!s?.thumb) return null;
+  const set = (list?: { file: string; w: number }[]) =>
+    list?.map((v) => `/works/${project}/${v.file} ${v.w}w`).join(', ');
+  const c = s.thumb.colour as { file: string; w: number; h: number }[] | undefined;
   const d = s.thumb.dither as { file: string; w: number; h: number }[] | undefined;
-  const base = d?.[1] ?? d?.[0];
+  const lead = c?.[1] ?? c?.[0] ?? s.thumb;
   return {
-    src: `/works/${project}/${(base ?? s.thumb).file}`,
-    srcset: d?.map((v) => `/works/${project}/${v.file} ${v.w}w`).join(', '),
-    w: (base ?? s.thumb).w,
-    h: (base ?? s.thumb).h,
+    src: `/works/${project}/${lead.file}`,
+    srcset: set(c),
+    /* the halftone version of the same crop, faded in on hover */
+    rasterSrc: d?.[1] ? `/works/${project}/${d[1].file}` : undefined,
+    rasterSrcset: set(d),
+    w: lead.w,
+    h: lead.h,
   };
 };
 
@@ -116,10 +122,20 @@ const contacts = [
               <span class="ix-shot">
                 <span class="ix-clip">
                   {sh && (
-                    <img src={sh.src} srcset={sh.srcset}
+                    <img class="ix-colour" src={sh.src} srcset={sh.srcset}
                       sizes={w.lead ? '(min-width: 901px) 560px, 100vw' : '(min-width: 901px) 300px, 100vw'}
                       width={sh.w} height={sh.h} alt="" loading="lazy" decoding="async" />
                   )}
+                  {/* The halftone stays, one layer down: colour is what a
+                      reviewer needs to judge the work, the raster is what the
+                      rest of the site is made of. Hovering trades one for the
+                      other. */}
+                  {sh?.rasterSrc && (
+                    <img class="ix-raster" src={sh.rasterSrc} srcset={sh.rasterSrcset}
+                      sizes={w.lead ? '(min-width: 901px) 560px, 100vw' : '(min-width: 901px) 300px, 100vw'}
+                      width={sh.w} height={sh.h} alt="" loading="lazy" decoding="async" aria-hidden="true" />
+                  )}
+                  <span class="ix-veil" aria-hidden="true"></span>
                 </span>
                 <span class="ix-n" aria-hidden="true">{w.n}</span>
               </span>
@@ -284,6 +300,7 @@ const contacts = [
 
   .ix-shot { position: relative; display: block; }
   .ix-clip {
+    position: relative;
     display: block;
     overflow: hidden;
     background: color-mix(in srgb, var(--color-ink) 4%, var(--color-paper));
@@ -292,9 +309,46 @@ const contacts = [
     display: block;
     width: 100%;
     height: auto;
-    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform var(--duration-slow) var(--ease-out),
+                opacity var(--duration-base) ease;
   }
   .index-link:hover .ix-shot img { transform: scale(1.03); }
+
+  /* The raster sits exactly over the colour and is revealed by fading the
+     colour out from under it, so the two never slide against each other. */
+  .ix-raster {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+  }
+  .index-link:hover .ix-raster,
+  .index-link:focus-visible .ix-raster { opacity: 1; }
+  .index-link:hover .ix-colour,
+  .index-link:focus-visible .ix-colour { opacity: 0; }
+
+  /* Colour screenshots on a paper page look like something pasted in from
+     another site. A grain and a warm tint at a few percent put them back on
+     the same stock without touching the projects' own colours. */
+  .ix-veil {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-color: color-mix(in srgb, var(--color-paper) 100%, transparent);
+    opacity: var(--preview-tint);
+    mix-blend-mode: multiply;
+  }
+  .ix-clip::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: var(--preview-grain);
+    background-image: var(--grain);
+    background-size: 180px 180px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ix-shot img { transition: none; }
+  }
   /* The number rides the edge of its preview rather than sitting in a column
      of its own, which is what made it look adrift from the title. It only
      hangs outside the preview where there is a page margin to hang into: at

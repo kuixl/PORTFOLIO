@@ -11,6 +11,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import { reducedMotion as prm } from './motionPref';
 
+/* once per module: every exported init used to call this again */
+gsap.registerPlugin(ScrollTrigger);
+
 /**
  * Anything already on screen when the page loads is shown at once.
  *
@@ -32,7 +35,6 @@ const onScreenNow = (el: HTMLElement) => {
 /** blocks rise into place once, as they enter */
 export function initReveals() {
   if (prm()) return;
-  gsap.registerPlugin(ScrollTrigger);
 
   const targets = document.querySelectorAll<HTMLElement>('[data-reveal]');
   targets.forEach((el) => {
@@ -96,7 +98,6 @@ export function initIndexHover() {
 export function initAssembleHeading(selector = '[data-assemble]') {
   const el = document.querySelector<HTMLElement>(selector);
   if (!el || prm()) return;
-  gsap.registerPlugin(ScrollTrigger);
 
   const final = el.textContent ?? '';
   const chars = [...final];
@@ -154,7 +155,6 @@ export function initRailArt() {
     arts.forEach((a) => (a.style.clipPath = 'none'));
     return;
   }
-  gsap.registerPlugin(ScrollTrigger);
 
   arts.forEach((art) => {
     gsap.set(art, { clipPath: 'inset(0 0 100% 0)' });
@@ -179,7 +179,6 @@ export function initRailArt() {
  */
 export function initFrameEntrance() {
   if (prm()) return;
-  gsap.registerPlugin(ScrollTrigger);
 
   document.querySelectorAll<HTMLElement>('.work-frame').forEach((frame) => {
     const viewport = frame.querySelector<HTMLElement>('[data-viewport]');
