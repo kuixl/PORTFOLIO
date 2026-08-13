@@ -295,3 +295,17 @@ export const cases: Case[] = [
 ];
 
 export const caseBySlug = (slug: string) => cases.find((c) => c.slug === slug);
+
+/**
+ * Reading order, and the order the previous/next links walk.
+ *
+ * The array above is grouped by when each case was written, which put BETA
+ * second; the numbered index on the home page runs nichive, Yakitoria, BETA.
+ * Walking the cases in a different order from the list that sent you into
+ * them is disorienting, so the order is stated once, here, and both use it.
+ */
+export const caseOrder = ['nichive', 'yakitoria', 'beta'] as const;
+
+export const orderedCases = caseOrder
+  .map((slug) => cases.find((c) => c.slug === slug))
+  .filter(Boolean) as Case[];

@@ -18,9 +18,12 @@ export const caseLabels: Record<Lang, Record<string, string>> = {
     /* "Retro" is studio shorthand, and set in caps beside a design portfolio it
        reads as retro styling rather than retrospective. */
     retro: "What I'd change",
+    prev: 'Previous case',
     next: 'Next case',
-    endTitle: 'That was the last case',
-    endNote: 'Three projects written up. The fourth you can look through in full.',
+    /* forward from the last case lands on the first: say so rather than let it
+       look like the reader is going round in circles by accident */
+    nextWrap: 'Back to the first',
+    caseNav: 'Other cases',
     allWorks: 'All work',
     contact: 'CONTACT',
     write: 'Write to me',
@@ -37,9 +40,10 @@ export const caseLabels: Record<Lang, Record<string, string>> = {
     system: 'Система',
     judges: 'Жюри',
     retro: 'Что бы сделал иначе',
+    prev: 'Предыдущий кейс',
     next: 'Следующий кейс',
-    endTitle: 'Кейсы закончились',
-    endNote: 'Разобрано три проекта. Четвёртый можно посмотреть целиком.',
+    nextWrap: 'Сначала',
+    caseNav: 'Другие кейсы',
     allWorks: 'Все работы',
     contact: 'КОНТАКТЫ',
     write: 'Написать',

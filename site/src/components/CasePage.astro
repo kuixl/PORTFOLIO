@@ -7,7 +7,7 @@
  */
 import CaseSection from './CaseSection.astro';
 import WorkFrame from './WorkFrame.astro';
-import { cases, type Case } from '../data/cases';
+import { orderedCases, type Case } from '../data/cases';
 import { casesRu } from '../data/cases.ru';
 import { caseLabels } from '../data/caseLabels';
 import { ui } from '../data/ui';
@@ -50,19 +50,36 @@ const screens = (base.screens ?? [])
 const [leadScreen, ...restScreens] = screens;
 
 /**
- * The next-case card used to be a label and a name. "NEXT / BETA" tells you
- * nothing about what BETA is, so there was no reason to click it. It now
- * carries the same first line the case itself opens with, and a screenshot.
+ * Both neighbours, read off the order of the case list.
+ *
+ * There used to be a single forward link built from a `next` field written by
+ * hand on each case, which meant the chain could only be walked one way: to
+ * see the previous work you had to go back to the index and start again. The
+ * order now comes from the array itself, so adding a case cannot break the
+ * ring and nobody has to remember to update two records.
+ *
+ * The ring closes rather than repeating. From the last case forward you land
+ * on the first, and the card says so.
  */
-const nextCase = base.next ? cases.find((x) => x.slug === base.next!.slug) : undefined;
-const nextCopy = nextCase && lang === 'ru' ? { ...nextCase, ...(casesRu[nextCase.slug] ?? {}) } : nextCase;
-const nextProject = nextCase?.frame?.project ?? nextCase?.slug;
-const nextShotRaw = nextProject
-  ? shotsFor(nextProject).find((s) => s.size === 'desktop' && s.thumb)
-  : undefined;
-const nextShot = nextShotRaw?.thumb
-  ? (nextShotRaw.thumb.dither?.[0] ?? nextShotRaw.thumb)
-  : undefined;
+const ring = orderedCases;
+const at = ring.findIndex((c) => c.slug === base.slug);
+const neighbour = (step: number) => {
+  const c = ring[(at + step + ring.length) % ring.length];
+  if (!c || c.slug === base.slug) return undefined;
+  const project = c.frame?.project ?? c.slug;
+  const shot = shotsFor(project).find((s) => s.size === 'desktop' && s.thumb);
+  return {
+    slug: c.slug,
+    title: c.title,
+    teaser: (lang === 'ru' ? casesRu[c.slug]?.teaser : undefined) ?? c.teaser,
+    project,
+    shot: shot?.thumb ? (shot.thumb.dither?.[0] ?? shot.thumb) : undefined,
+  };
+};
+const prevCase = neighbour(-1);
+const nextCase = neighbour(1);
+/* wrapping forward past the end is the one move worth labelling */
+const nextWraps = at === ring.length - 1;
 ---
 {/*
   The language switch belongs on every page, not just the home page.
@@ -73,13 +90,15 @@ const nextShot = nextShotRaw?.thumb
   points at this same case in the other language, not at the other home page.
 */}
 <header class="site-head">
-  <a href={pfx || "/"} class="font-mono text-mono-nav">kuixl</a>
-  <nav class="head-nav font-mono text-mono-nav">
-    <a href={`/${base.slug}`} aria-current={lang === 'en' ? 'page' : undefined} class={lang === 'en' ? 'is-on' : ''}>EN</a>
-    <span class="sep" aria-hidden="true">/</span>
-    <a href={`/ru/${base.slug}`} aria-current={lang === 'ru' ? 'page' : undefined} class={lang === 'ru' ? 'is-on' : ''}>RU</a>
-    <a href={`${pfx}/#contact`} class="head-contact">{L.contact}</a>
-  </nav>
+  <div class="head-inner">
+    <a href={pfx || "/"} class="font-mono text-mono-nav">kuixl</a>
+    <nav class="head-nav font-mono text-mono-nav">
+      <a href={`/${base.slug}/`} aria-current={lang === 'en' ? 'page' : undefined} class={lang === 'en' ? 'is-on' : ''}>EN</a>
+      <span class="sep" aria-hidden="true">/</span>
+      <a href={`/ru/${base.slug}/`} aria-current={lang === 'ru' ? 'page' : undefined} class={lang === 'ru' ? 'is-on' : ''}>RU</a>
+      <a href={`${pfx}/#contact`} class="head-contact">{L.contact}</a>
+    </nav>
+  </div>
 </header>
   <main class="case" id="main">
     <section class="case-cover">
@@ -223,56 +242,59 @@ const nextShot = nextShotRaw?.thumb
       {c.retro.map((p) => <p>{p}</p>)}
     </CaseSection>
 
-    {nextCase ? (
-      <a class="case-next" href={`${pfx}/${nextCase.slug}`}>
-        {nextShot && (
-          <span class="cn-shot">
-            <img src={`/works/${nextProject}/${nextShot.file}`}
-              width={nextShot.w} height={nextShot.h}
-              alt="" loading="lazy" decoding="async" />
+    {/* Both directions, so a reader can walk the portfolio without going back
+        to the index between every case. */}
+    <nav class="case-nav" aria-label={L.caseNav}>
+      {prevCase && (
+        <a class="cn-card cn-prev" href={`${pfx}/${prevCase.slug}/`}>
+          {prevCase.shot && (
+            <span class="cn-shot">
+              <img src={`/works/${prevCase.project}/${prevCase.shot.file}`}
+                width={prevCase.shot.w} height={prevCase.shot.h}
+                alt="" loading="lazy" decoding="async" />
+            </span>
+          )}
+          <span class="cn-text">
+            <span class="cn-kicker font-mono">{L.prev}</span>
+            <span class="cn-title">{prevCase.title}</span>
+            <span class="cn-lead">{prevCase.teaser}</span>
           </span>
-        )}
-        <span class="cn-text">
-          <span class="cn-kicker font-mono">{L.next}</span>
-          <span class="cn-title">{nextCase.title}</span>
-          <span class="cn-lead">{nextCopy?.teaser}</span>
-        </span>
-      </a>
-    ) : (
-      <div class="case-end">
-        <p class="ce-title">{L.endTitle}</p>
-        <p class="ce-note">{L.endNote}</p>
-        <div class="ce-links font-mono">
-          <a href={pfx || '/'}>{L.allWorks}</a>
-          <a href={`${pfx}/#contact`}>{L.write}</a>
-        </div>
-      </div>
-    )}
+        </a>
+      )}
+
+      {nextCase && (
+        <a class="cn-card cn-next" href={`${pfx}/${nextCase.slug}/`}>
+          {nextCase.shot && (
+            <span class="cn-shot">
+              <img src={`/works/${nextCase.project}/${nextCase.shot.file}`}
+                width={nextCase.shot.w} height={nextCase.shot.h}
+                alt="" loading="lazy" decoding="async" />
+            </span>
+          )}
+          <span class="cn-text">
+            <span class="cn-kicker font-mono">{nextWraps ? L.nextWrap : L.next}</span>
+            <span class="cn-title">{nextCase.title}</span>
+            <span class="cn-lead">{nextCase.teaser}</span>
+          </span>
+        </a>
+      )}
+    </nav>
+
+    <p class="case-all font-mono">
+      <a href={pfx || '/'}>{L.allWorks}</a>
+      <a href={`${pfx}/#contact`}>{L.write}</a>
+    </p>
   </main>
 
 <style>
-  /* Same container as the home page: the header used to run the full viewport
-     while the case column was centred in 1240px, so the wordmark and the case
-     title did not share a left edge on anything wider than a laptop. */
-  .site-head, .case {
+  /* Same container as the home page, so the wordmark in the bar and the case
+     title below it share a left edge. The bar itself is styled in global.css. */
+  .case {
     max-width: 1240px;
     margin-inline: auto;
     padding-inline: 20px;
+    padding-bottom: var(--gap-section);
   }
-  .site-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 64px;
-  }
-  .head-nav { display: flex; align-items: center; gap: var(--gap-tight); }
-  .head-nav a { color: var(--color-muted); transition: color 0.15s; }
-  .head-nav a:hover { color: var(--color-primary); }
-  .head-contact:hover { text-decoration: underline; text-underline-offset: 5px; }
-  .head-nav a.is-on { color: var(--color-primary); }
-  .head-nav .sep { color: var(--color-muted); }
-  .head-contact { margin-left: var(--gap-block); color: var(--color-primary) !important; }
-  .case { padding-bottom: var(--gap-section); }
 
   .case-cover { padding-block: var(--gap-block) var(--gap-section); }
   .cc-meta {
@@ -429,22 +451,25 @@ const nextShot = nextShotRaw?.thumb
     color: var(--color-caption);
   }
 
-  .case-next {
+  /* Two cards side by side. Stacked on a phone, where a half-width preview
+     would be too small to tell one project from another.
+     No top margin: the retro section above already pads its own bottom. */
+  .case-nav {
     display: grid;
-    gap: var(--gap-item);
-    /* no top margin: the retro section above already pads its own bottom, and
-       stacking the two put 144px of blank paper before the closing block */
+    gap: var(--gap-block);
     padding-top: var(--gap-block);
     border-top: 1px solid var(--color-hairline);
   }
+  .cn-card { display: grid; gap: var(--gap-item); align-content: start; }
   .cn-shot { display: block; overflow: hidden; }
   .cn-shot img {
     display: block;
     width: 100%;
     height: auto;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform var(--duration-slow) var(--ease-out);
   }
-  .case-next:hover .cn-shot img { transform: scale(1.02); }
+  .cn-card:hover .cn-shot img { transform: scale(1.02); }
+  .cn-card:hover .cn-title { text-decoration: underline; text-underline-offset: 6px; }
   .cn-text { display: flex; flex-direction: column; gap: var(--gap-tight); }
   .cn-kicker {
     font-size: var(--text-mono-caption);
@@ -452,32 +477,26 @@ const nextShot = nextShotRaw?.thumb
     text-transform: uppercase;
     color: var(--color-muted);
   }
+  /* Smaller than the old single card. Two of these at 80px would have shouted
+     louder than the case title at the top of the page. */
   .cn-title {
     font-family: var(--font-sans);
     font-weight: 900;
-    font-size: clamp(40px, 8vw, 80px);
+    font-size: clamp(28px, 4.4vw, 44px);
     line-height: 1;
     letter-spacing: -0.02em;
   }
-  .cn-lead { max-width: 46ch; color: var(--color-muted); }
+  .cn-lead { max-width: 42ch; color: var(--color-muted); }
 
-  .case-end {
-    /* no top margin: the retro section above already pads its own bottom, and
-       stacking the two put 144px of blank paper before the closing block */
+  .case-all {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-block);
+    margin-top: var(--gap-section);
     padding-top: var(--gap-block);
     border-top: 1px solid var(--color-hairline);
   }
-  .ce-title {
-    font-family: var(--font-sans);
-    font-weight: 900;
-    font-size: clamp(32px, 6vw, 56px);
-    line-height: 1.05;
-    letter-spacing: -0.02em;
-    text-wrap: balance;
-  }
-  .ce-note { margin-top: var(--gap-tight); color: var(--color-muted); }
-  .ce-links { display: flex; flex-wrap: wrap; gap: var(--gap-block); margin-top: var(--gap-block); }
-  .ce-links a {
+  .case-all a {
     font-size: var(--text-mono-caption);
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -486,7 +505,7 @@ const nextShot = nextShotRaw?.thumb
   }
 
   @media (min-width: 901px) {
-    .case, .site-head { padding-inline: var(--spacing-048); }
-    .case-next { grid-template-columns: 300px minmax(0, 1fr); align-items: center; gap: var(--gap-block); }
+    .case { padding-inline: var(--spacing-048); }
+    .case-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
 </style>
