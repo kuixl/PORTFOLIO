@@ -34,7 +34,7 @@ import { cases } from '../data/cases';
     </p>
     <ul class="nf-list">
       {cases.map((c) => (
-        <li><a href={`/${c.slug}`} data-slug={c.slug}>{c.title}</a></li>
+        <li><a href={`/${c.slug}/`} data-slug={c.slug}>{c.title}</a></li>
       ))}
       <li><a href="/" data-home data-en="Everything else" data-ru="Всё остальное">Everything else</a></li>
     </ul>
@@ -55,11 +55,11 @@ import { cases } from '../data/cases';
       const skip = document.querySelector('.skip-link');
       if (skip) skip.textContent = 'Перейти к содержимому';
       // keep the reader inside the language they were browsing
-      for (const a of document.querySelectorAll('[data-slug]')) a.href = '/ru/' + a.dataset.slug;
+      for (const a of document.querySelectorAll('[data-slug]')) a.href = '/ru/' + a.dataset.slug + '/';
       const home = document.querySelector('[data-home]');
-      if (home) home.href = '/ru';
+      if (home) home.href = '/ru/';
       const wordmark = document.querySelector('[data-home-link]');
-      if (wordmark) wordmark.href = '/ru';
+      if (wordmark) wordmark.href = '/ru/';
       const contact = document.querySelector('[data-contact-link]');
       if (contact) contact.href = '/ru/#contact';
       document.querySelector('[data-lang-en]')?.classList.remove('is-on');

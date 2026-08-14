@@ -22,6 +22,9 @@ const L = caseLabels[lang];
 const T = ui[lang];
 const c: Case = lang === 'ru' ? { ...base, ...(casesRu[base.slug] ?? {}) } : base;
 const pfx = lang === "ru" ? "/ru" : "";
+/* Trailing slash, because the build writes /ru/ and a link to /ru costs the
+   reader a 301 on the way to the same page. */
+const homeHref = pfx ? `${pfx}/` : "/";
 const project = base.frame?.project ?? base.slug;
 
 const shotsFor = (p: string) => (works as Record<string, any[]>)[p] ?? [];
@@ -92,7 +95,7 @@ const nextWraps = at === ring.length - 1;
 */}
 <header class="site-head">
   <div class="head-inner">
-    <a href={pfx || "/"} class="font-mono text-mono-nav">kuixl</a>
+    <a href={homeHref} class="font-mono text-mono-nav">kuixl</a>
     <nav class="head-nav font-mono text-mono-nav">
       <a href={`/${base.slug}/`} aria-current={lang === 'en' ? 'page' : undefined} class={lang === 'en' ? 'is-on' : ''}>EN</a>
       <span class="sep" aria-hidden="true">/</span>
@@ -282,7 +285,7 @@ const nextWraps = at === ring.length - 1;
     </nav>
 
     <p class="case-all font-mono">
-      <a href={pfx || '/'}>{L.allWorks}</a>
+      <a href={homeHref}>{L.allWorks}</a>
       <a href={`${pfx}/#contact`}>{L.write}</a>
     </p>
   </main>

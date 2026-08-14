@@ -25,9 +25,9 @@ const monolithPages = ['index', 'archive', 'materials']
  * hiding it.
  */
 const index = [
-  { n: '01', title: 'nichive', kind: 'nichive', year: '2026', team: 'solo', href: `${p}/nichive`, project: 'nichive', lead: true },
-  { n: '02', title: 'Yakitoria', kind: 'yakitoria', year: '2025', team: 'solo', href: `${p}/yakitoria`, project: 'yakitoria' },
-  { n: '03', title: 'BETA', kind: 'beta', year: '2026', team: 'team', href: `${p}/beta`, project: 'beta' },
+  { n: '01', title: 'nichive', kind: 'nichive', year: '2026', team: 'solo', href: `${p}/nichive/`, project: 'nichive', lead: true },
+  { n: '02', title: 'Yakitoria', kind: 'yakitoria', year: '2025', team: 'solo', href: `${p}/yakitoria/`, project: 'yakitoria' },
+  { n: '03', title: 'BETA', kind: 'beta', year: '2026', team: 'team', href: `${p}/beta/`, project: 'beta' },
   { n: '04', title: 'Monolith', kind: 'monolith', year: '2025', team: 'solo', full: monolithPages, project: 'monolith', noCase: true },
 ];
 
@@ -80,7 +80,7 @@ const contacts = [
     <nav class="head-nav font-mono text-mono-nav">
       <a href="/" aria-current={lang === 'en' ? 'page' : undefined} class={lang === 'en' ? 'is-on' : ''}>EN</a>
       <span class="sep" aria-hidden="true">/</span>
-      <a href="/ru" aria-current={lang === 'ru' ? 'page' : undefined} class={lang === 'ru' ? 'is-on' : ''}>RU</a>
+      <a href="/ru/" aria-current={lang === 'ru' ? 'page' : undefined} class={lang === 'ru' ? 'is-on' : ''}>RU</a>
       <a href="#contact" class="head-contact">{lang === 'ru' ? 'КОНТАКТЫ' : 'CONTACT'}</a>
     </nav>
   </div>
