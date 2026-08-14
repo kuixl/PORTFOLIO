@@ -75,7 +75,7 @@ import { cases } from '../data/cases';
   .nf, .site-foot {
     max-width: 1240px;
     margin-inline: auto;
-    padding-inline: 20px;
+    padding-inline: var(--pad-x);
   }
   .nf {
     padding-block: var(--gap-section);
@@ -115,8 +115,5 @@ import { cases } from '../data/cases';
     font-size: var(--text-mono-caption);
     letter-spacing: 0.1em;
     color: var(--color-muted);
-  }
-  @media (min-width: 901px) {
-    .nf, .site-foot { padding-inline: var(--spacing-048); }
   }
 </style>

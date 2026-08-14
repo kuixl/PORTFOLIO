@@ -147,5 +147,35 @@ const ogImage = new URL(image ?? (noindex ? '/og.png' : `/og/${slug}-${lang}.png
     <!-- keyboard users should not have to tab through the header on every page -->
     <a class="skip-link" href="#main">{ui[lang].skip}</a>
     <slot />
+
+    {/*
+      The bar's two states, and how far down the page the reader is.
+
+      Inline and in the layout rather than in a page script: every page draws
+      the same header, and wiring this into four separate entry points is how
+      one of them ends up forgotten. It is also independent of the motion
+      preference, because a header that changes colour when it stops being
+      over the hero is not an animation, it is legibility.
+    */}
+    <script is:inline>
+      (function () {
+        var d = document.documentElement;
+        var pending = false;
+        function read() {
+          pending = false;
+          var y = window.scrollY || d.scrollTop || 0;
+          // half a bar's height: enough that the change is deliberate rather
+          // than a flicker at the first pixel of scroll
+          d.classList.toggle('is-stuck', y > 30);
+          var max = d.scrollHeight - window.innerHeight;
+          d.style.setProperty('--sp', max > 0 ? Math.min(1, y / max).toFixed(4) : '0');
+        }
+        addEventListener('scroll', function () {
+          if (!pending) { pending = true; requestAnimationFrame(read); }
+        }, { passive: true });
+        addEventListener('resize', read, { passive: true });
+        read();
+      })();
+    </script>
   </body>
 </html>

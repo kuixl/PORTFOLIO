@@ -140,37 +140,6 @@ export function initAssembleHeading(selector = '[data-assemble]') {
   });
 }
 
-/**
- * Rail drawings draw themselves in when their section arrives, top to bottom,
- * so they read as something being made rather than a grey stain in the margin.
- * A clip wipe rather than per-character reveal: these grids run to a couple of
- * thousand characters and wrapping each one in a span to animate it would cost
- * far more than the effect is worth.
- */
-export function initRailArt() {
-  const arts = [...document.querySelectorAll<HTMLElement>('.cs-art')];
-  if (!arts.length) return;
-
-  if (prm()) {
-    arts.forEach((a) => (a.style.clipPath = 'none'));
-    return;
-  }
-
-  arts.forEach((art) => {
-    gsap.set(art, { clipPath: 'inset(0 0 100% 0)' });
-    ScrollTrigger.create({
-      trigger: art.closest('.case-section') ?? art,
-      start: 'top 78%',
-      once: true,
-      onEnter: () =>
-        gsap.to(art, {
-          clipPath: 'inset(0 0 0% 0)',
-          duration: 1.4,
-          ease: 'power2.inOut',
-        }),
-    });
-  });
-}
 
 /**
  * The work frame opens like a window: the chrome bar arrives, then the viewport

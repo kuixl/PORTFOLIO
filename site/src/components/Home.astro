@@ -222,7 +222,7 @@ const contacts = [
   main, .site-foot {
     max-width: 1240px;
     margin-inline: auto;
-    padding-inline: 20px;
+    padding-inline: var(--pad-x);
   }
 
   .sec-title {
@@ -480,7 +480,6 @@ const contacts = [
   }
 
   @media (min-width: 901px) {
-    main, .site-foot { padding-inline: var(--spacing-048); }
     /* A gutter column so the thread has somewhere to live, and grid-row
        spanning so it stretches from the first entry to the last without any
        measuring: the grid already knows where the rows are. */
