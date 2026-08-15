@@ -74,14 +74,13 @@
      one claim on the site that is measurably untrue. 5.44:1. */
   --color-muted-inverse: #8A8792;
   /* The bar, once it has something to sit over.
-     Ink at 85% rather than 90 so the page genuinely shows through, with a
-     lighter muted than the one used on solid ink: over paper the glass sits
-     around #373737, where #8A8792 drops to 3.3:1 and fails. #B5B2BC holds
-     5.5:1 there and 9:1 over a dark section. */
-  --color-head: rgb(14 14 14 / 0.85);
-  --color-head-rule: rgb(244 242 238 / 0.12);
-  --color-head-lip: rgb(244 242 238 / 0.09);
-  --color-head-muted: #B5B2BC;
+     Deeper than the page ink and nearly opaque. At 85% the glass composited to
+     around #373737 over paper, which read as a grey band rather than a black
+     one; this lands near #191919 and still lets a shape pass underneath. */
+  --color-head: rgb(6 6 6 / 0.93);
+  --color-head-rule: rgb(244 242 238 / 0.16);
+  --color-head-lip: rgb(244 242 238 / 0.11);
+  --color-head-muted: #9C99A6;
 
   /* Motion. These were eight loose values picked by eye across three files;
      `--ease-*` and `--duration-*` are real Tailwind namespaces, so they also
@@ -92,7 +91,7 @@
   --duration-slow: 0.6s;
 
   /* Height of the sticky bar, so anchors can clear it. */
-  --head-h: 60px;
+  --head-h: 68px;
 
   /* One gutter for the whole site. 20px on a phone was tight enough that the
      wordmark sat almost on the screen edge. */
@@ -179,9 +178,9 @@
   --text-mono-label--line-height: 1.4;
   --text-mono-label--letter-spacing: 0.12em;
 
-  --text-mono-nav: 15px;
+  --text-mono-nav: 16px;
   --text-mono-nav--line-height: 1.4;
-  --text-mono-nav--letter-spacing: 0.06em;
+  --text-mono-nav--letter-spacing: 0.08em;
 
   --text-mono-caption: 13px;
   --text-mono-caption--line-height: 1.4;
@@ -287,6 +286,8 @@ html {
   z-index: 50;
   --head-fg: var(--color-primary);
   --head-fg-muted: var(--color-muted);
+  /* what the contact box has to put its text on once it fills with --head-fg */
+  --head-bg-contrast: var(--color-paper);
   background: transparent;
   border-bottom: 1px solid transparent;
   transition:
@@ -297,6 +298,7 @@ html {
 html.is-stuck .site-head {
   --head-fg: var(--color-paper);
   --head-fg-muted: var(--color-head-muted);
+  --head-bg-contrast: var(--color-ink);
   background: var(--color-head);
   border-bottom-color: var(--color-head-rule);
   /* the lip along the top edge is what reads as glass rather than as a panel
@@ -321,11 +323,24 @@ html.is-stuck .site-head {
 }
 .head-inner a { color: var(--head-fg); }
 
-/* The links are 21px of mono type, which is a 21px tap target inside a 60px
-   bar. Padding rather than a taller bar: the row is a fixed height and centres
-   its children, so this buys a 45px target and changes nothing visually. */
-.head-inner > a,
-.head-nav a { padding-block: 12px; }
+/* The mark is the one piece of the bar that should carry weight, and the mono
+   family ships a single 400 file: asking it for 700 gets a synthesised bold,
+   which smears a face this small and lands differently on the Latin and the
+   Cyrillic file, so EN and RU would not match. Switzer is variable 100-900, so
+   the weight here is real. */
+.head-mark {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: -0.015em;
+  line-height: 1;
+}
+
+/* The links are 21px of mono type, which is a 21px tap target inside the bar.
+   Padding rather than a taller bar: the row is a fixed height and centres its
+   children, so this buys a 45px target and changes nothing visually. */
+.head-mark,
+.head-nav a:not(.head-contact) { padding-block: 12px; }
 
 .head-nav { display: flex; align-items: center; gap: var(--gap-tight); }
 .head-nav a {
@@ -335,11 +350,37 @@ html.is-stuck .site-head {
 .head-nav a:hover,
 .head-nav a.is-on { color: var(--head-fg); }
 .head-nav .sep { color: var(--head-fg-muted); }
+
+/* Three labels in a row read as three labels. The one that is an invitation
+   gets a box, borrowed from the tab strip above the work frames so the bar
+   speaks the same language as the rest of the site: hairline, fills on hover. */
 .head-contact {
   margin-left: var(--gap-block);
+  padding: 8px 16px;
+  border: 1px solid var(--head-fg-muted);
   color: var(--head-fg) !important;
+  transition:
+    background var(--duration-fast) ease,
+    border-color var(--duration-fast) ease,
+    color var(--duration-fast) ease;
 }
-.head-contact:hover { text-decoration: underline; text-underline-offset: 5px; }
+.head-contact:hover,
+.head-contact:focus-visible {
+  background: var(--head-fg);
+  border-color: var(--head-fg);
+  color: var(--head-bg-contrast) !important;
+}
+
+/* Three items and room for two. At 320 the row ran out of space, the gap
+   between the mark and the nav closed to nothing and the contact box was
+   pushed a pixel from the screen edge, outside the gutter every other element
+   respects. Everything in the bar steps down instead; nothing is dropped,
+   since all three are the whole navigation. */
+@media (max-width: 420px) {
+  .head-mark { font-size: 19px; }
+  .head-nav { font-size: 14px; }
+  .head-contact { margin-left: var(--gap-item); padding-inline: 10px; }
+}
 
 /* How far down the page you are, drawn as the bar's own bottom rule. The site
    already speaks in hairlines and measurements; this is the one place a
