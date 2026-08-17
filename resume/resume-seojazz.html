@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Константин Даровский - Вайбкодер</title>
+<style>
+  /* Source for the printed PDF. Deliberately outside site/public so it is not
+     part of the deployed portfolio: this is a document, not a page.
+     Typography carries it. One weight jump between the name and everything
+     else, a mono label rail down the left, no decoration. */
+  @page { size: A4; margin: 14mm 15mm; }
+
+  :root {
+    --ink: #111111;
+    --muted: #5A5A66;
+    --rule: #D8D5CE;
+    --mono: "Cascadia Mono", Consolas, "DejaVu Sans Mono", monospace;
+    --sans: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--sans);
+    font-size: 9.2pt;
+    line-height: 1.5;
+    color: var(--ink);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  .name {
+    font-size: 27pt;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.02;
+  }
+  .role {
+    margin-top: 3pt;
+    font-size: 11pt;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .contacts {
+    margin-top: 7pt;
+    font-family: var(--mono);
+    font-size: 7.6pt;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+  }
+  .contacts span::after { content: "  ·  "; }
+  .contacts span:last-child::after { content: ""; }
+
+  .summary {
+    margin-top: 10pt;
+    padding-top: 9pt;
+    border-top: 1.2px solid var(--rule);
+    max-width: 165mm;
+  }
+  .summary p + p { margin-top: 4pt; }
+
+  section { margin-top: 13pt; }
+  .row {
+    display: grid;
+    grid-template-columns: 27mm 1fr;
+    gap: 6mm;
+    break-inside: avoid;
+  }
+  .label {
+    font-family: var(--mono);
+    font-size: 7.2pt;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-top: 1.5pt;
+  }
+
+  .item { break-inside: avoid; }
+  .item + .item { margin-top: 9pt; }
+  /* The date is nowrap and the titles are long; without wrapping allowed the
+     pair overflows the column and the dates run off the printable page. */
+  .item-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1pt 6mm;
+  }
+  .item-title { font-weight: 700; font-size: 9.6pt; }
+  .item-when {
+    font-family: var(--mono);
+    font-size: 7.4pt;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .item p { margin-top: 2.5pt; max-width: 148mm; }
+
+  ul { list-style: none; margin-top: 3pt; }
+  li { position: relative; padding-left: 3.6mm; max-width: 148mm; }
+  li + li { margin-top: 1.5pt; }
+  li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.42em;
+    width: 1.9mm;
+    height: 1.2px;
+    background: var(--muted);
+  }
+
+  .skill + .skill { margin-top: 4pt; }
+  .skill b { font-weight: 700; }
+  .skill span { color: var(--muted); }
+
+  .muted { color: var(--muted); }
+  .rule { height: 1.2px; background: var(--rule); margin-top: 13pt; }
+</style>
+</head>
+<body>
+
+  <header>
+    <h1 class="name">Константин Даровский</h1>
+    <p class="role">Вайбкодер · AI-разработка сайтов</p>
+    <p class="contacts">
+      <span>Москва, удалённо</span>
+      <span>asrieldreemur1213@gmail.com</span>
+      <span>t.me/kuixl</span>
+      <span>kuixl.github.io</span>
+      <span>github.com/kuixl</span>
+    </p>
+    <div class="summary">
+      <p>
+        Четыре года в дизайне, последний год почти всё собираю в связке с ИИ: Claude Code,
+        Cursor, Figma MCP. Ставлю задачу агенту, проверяю результат, дорабатываю руками
+        там, где он промахивается с версткой, текстом или логикой. В этом режиме
+        сделан весь мой рабочий сайт-портфолио - от вёрстки до деплоя на GitHub Pages,
+        и последний коммерческий лендинг.
+      </p>
+      <p>
+        Базовые требования SEO закладываю на уровне вёрстки: семантическая разметка,
+        alt-тексты, sitemap с hreflang, canonical на каждой странице, скорость загрузки.
+        Задачи веду сам, от уточняющих вопросов до сдачи, и держу срок при свободном
+        графике.
+      </p>
+    </div>
+  </header>
+
+  <section class="row">
+    <div class="label">Опыт</div>
+    <div>
+      <div class="item">
+        <div class="item-head">
+          <span class="item-title">Лендинг для Boiler Lab - обмен криптовалюты на подарочные карты</span>
+          <span class="item-when">2026</span>
+        </div>
+        <ul>
+          <li>Оффер, блок доверия (аптайм, число принимаемых монет, покупка без регистрации аккаунта) и разбор «как это работает» на четыре шага.</li>
+          <li>Текст и структура пришли готовыми, на мне вёрстка и доводка до готового результата AI-ассистированной разработкой: промпт, черновик, правки руками там, где агент промахивался.</li>
+        </ul>
+      </div>
+
+      <div class="item">
+        <div class="item-head">
+          <span class="item-title">Коммерческие проекты и фриланс</span>
+          <span class="item-when">2022 - сейчас</span>
+        </div>
+        <ul>
+          <li>MVP и сайты для небольших команд: структура, вайрфреймы, макеты, кликабельный прототип, часто и вёрстка.</li>
+          <li>Prince Clothing: дизайн магазина, 3D-модели товаров, подготовка витрины к дропу коллекции. Работал с ними дважды, сайт живой - princeclothing.ru</li>
+          <li>Задача почти всегда приходит неполной. Уточняю у заказчика, предлагаю вариант и довожу до сдачи без напоминаний.</li>
+          <li>Большая часть работ под NDA.</li>
+        </ul>
+      </div>
+
+      <div class="item">
+        <div class="item-head">
+          <span class="item-title">Т-Банк</span>
+          <span class="item-when">2 месяца</span>
+        </div>
+        <ul>
+          <li>Задачи в продуктовой команде. Содержание под NDA.</li>
+        </ul>
+      </div>
+
+      <div class="item">
+        <div class="item-head">
+          <span class="item-title">Дизайн-спринт BETA, IT-Hub College</span>
+          <span class="item-when">2 недели · 5 человек</span>
+        </div>
+        <ul>
+          <li>Лендинг на одну страницу и восемь секций. На мне информационная архитектура, вайрфреймы, кликабельный прототип, потом часть интерфейса.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <section class="row">
+    <div class="label">Проекты</div>
+    <div>
+      <div class="item">
+        <div class="item-head">
+          <span class="item-title">nichive - цифровой архив моды</span>
+          <span class="item-when">соло · 2026</span>
+        </div>
+        <p>
+          Собран через Claude Code от структуры до деплоя: Astro, Tailwind, sitemap.xml
+          с hreflang, canonical на каждой странице, OG-изображение под каждую страницу
+          отдельно. Модель предмета крутится в браузере на three.js: из Blender она была
+          неподъёмной для веба, сжал её в 24 раза.
+          <span class="muted">kuixl.github.io/final-kt</span>
+        </p>
+      </div>
+
+      <div class="item">
+        <div class="item-head">
+          <span class="item-title">Якитория - меню и корзина для сети доставки</span>
+          <span class="item-when">соло · 2025</span>
+        </div>
+        <p>
+          Конкурс FoodTech Lab, третье место из 47 команд. Ограничения жёсткие: бренд не трогать,
+          ассортимент не менять, уложиться в 60 часов разработки. По данным продаж вынес связку
+          «с этим часто берут» на карточку товара, БЖУ поставил рядом с ценой.
+        </p>
+      </div>
+
+      <div class="item">
+        <div class="item-head">
+          <span class="item-title">Monolith - архив предметов</span>
+          <span class="item-when">соло · 2025</span>
+        </div>
+        <p>Нарисован целиком, до запуска не дошёл. Первый заход на идею, из которой потом вырос nichive.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <section class="row">
+    <div class="label">Навыки</div>
+    <div>
+      <p class="skill"><b>ИИ и промпт-инжиниринг</b> &nbsp;<span>Claude Code, Cursor, MCP и Figma MCP - ежедневный рабочий инструмент; ставлю задачу, проверяю результат, дорабатываю код руками</span></p>
+      <p class="skill"><b>Разработка</b> &nbsp;<span>HTML, CSS, JS, Astro, Tailwind. Читаю и правлю фронтенд, проверяю реализуемость до сдачи</span></p>
+      <p class="skill"><b>SEO-основы</b> &nbsp;<span>семантическая разметка, sitemap с hreflang, canonical, alt-тексты, OG-изображения, скорость загрузки</span></p>
+      <p class="skill"><b>UX/UI</b> &nbsp;<span>user flows, вайрфреймы, прототипы, визуальный дизайн, дизайн-ревью</span></p>
+      <p class="skill"><b>Figma</b> &nbsp;<span>компоненты, варианты, переменные, авто-лейаут, дизайн-системы</span></p>
+      <p class="skill"><b>Ещё</b> &nbsp;<span>Blender, Three.js, GSAP, Git и GitHub</span></p>
+      <p class="skill"><b>Английский</b> &nbsp;<span>B2+</span></p>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <section class="row">
+    <div class="label">Образование</div>
+    <div>
+      <div class="item">
+        <div class="item-head">
+          <span class="item-title">IT-Hub College, веб-дизайн</span>
+          <span class="item-when">4 курс, дипломный</span>
+        </div>
+        <p>UX/UI, веб, 3D, моушен. Финальный курс с сентября 2026.</p>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>
